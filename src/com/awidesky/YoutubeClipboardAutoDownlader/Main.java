@@ -34,7 +34,7 @@ public class Main {
 						try {
 						
 							Thread.sleep(50);
-						
+							//TODO : https://stackoverflow.com/questions/14242719/copying-to-global-clipboard-does-not-work-with-java-in-ubuntu
 							String data = (String)Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
 					
 							if (data.startsWith("https://www.youtu")) {
