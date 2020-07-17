@@ -14,7 +14,8 @@ import javax.swing.JFrame;
 /** Main class */
 public class Main {
 
-	private static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+	private static ExecutorService executorService = Executors.newFixedThreadPool(1);
+	private static boolean isOkToStart = false; /** I don't know why but when you copied something, <code>flavorsChanged</code> invoked twice and we should ignore the first one. */
 	
 	public static void main(String[] args) throws Exception {
 
@@ -29,12 +30,16 @@ public class Main {
 				@Override 
 			    public void flavorsChanged(FlavorEvent e) {
 
+					if (!isOkToStart) { isOkToStart = true; return; } 
+
+					System.err.println("CHANGED");
+					
 					executorService.submit(() -> {
 						
 						try {
 						
-							Thread.sleep(50);
-							//TODO : https://stackoverflow.com/questions/14242719/copying-to-global-clipboard-does-not-work-with-java-in-ubuntu
+							Thread.sleep(100);
+							
 							String data = (String)Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
 					
 							if (data.startsWith("https://www.youtu")) {
@@ -51,6 +56,9 @@ public class Main {
 						}
 			   
 					});
+					
+					isOkToStart = !isOkToStart;
+					
 				}
 		
 		});

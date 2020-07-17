@@ -3,6 +3,7 @@ package com.awidesky.YoutubeClipboardAutoDownlader;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -29,17 +30,53 @@ public class YoutubeAudioDownloader {
 			ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl", "-x", "--audio-format", "mp3", "--audio-quality", "0",  url);
 			pb.directory(new File(youtubedlpath));
 			Process p = pb.start();
-	    
-			BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String line = null;
 			
-			while((line = br.readLine ()) != null) {
-				
-				Main.log(line);
-				
-			}
-			
+			  Thread stdout = new Thread(() -> {
+			  
+			  BufferedReader br = new BufferedReader(new
+			  InputStreamReader(p.getInputStream())); String line = null;
+			  
+			  try {
+			  
+			  while((line = br.readLine ()) != null) {
+			  
+			  Main.log(line);
+			  
+			  }
+			  
+			  } catch (IOException e) {
+			  
+			  // TODO Auto-generated catch block Main.log(e.toString());
+			  
+			  }
+			  
+			  });
+			  
+			  Thread stderr = new Thread(() -> {
+			  
+			  BufferedReader br = new BufferedReader(new
+			  InputStreamReader(p.getErrorStream())); String line = null;
+			  
+			  try {
+			  
+			  while((line = br.readLine ()) != null) {
+			  
+			  Main.log(line);
+			  
+			  }
+			  
+			  } catch (IOException e) {
+			  
+			  // TODO Auto-generated catch block Main.log(e.toString());
+			  
+			  }
+			  
+			  });
+			  
+			  stdout.start(); stderr.start();
+			 
 			p.waitFor();
+			
 			
 			//Thread.currentThread().sleep(100);
 			
