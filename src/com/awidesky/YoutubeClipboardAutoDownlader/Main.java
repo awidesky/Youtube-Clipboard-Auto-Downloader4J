@@ -32,7 +32,7 @@ public class Main {
 
 					if (!isOkToStart) { isOkToStart = true; return; } 
 
-					System.err.println("CHANGED");
+					System.err.println("CLIPBOARD CHANGED");
 					
 					executorService.submit(() -> {
 						
