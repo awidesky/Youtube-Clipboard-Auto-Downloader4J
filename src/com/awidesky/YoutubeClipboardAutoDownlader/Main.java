@@ -43,9 +43,9 @@ public class Main {
 						
 						try {
 						
-							Thread.sleep(100);
+							Thread.sleep(10);
 							
-							String data = (String)Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+							String data = new String((String)Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor));
 					
 							if (data.startsWith("https://www.youtu")) {
 			    	  

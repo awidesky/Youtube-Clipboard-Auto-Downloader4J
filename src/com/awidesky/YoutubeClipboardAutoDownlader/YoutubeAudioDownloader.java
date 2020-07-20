@@ -13,7 +13,7 @@ public class YoutubeAudioDownloader {
 	private static File downloadPath;
 	
 	static void checkFiles() {
-
+		//System.out.println(youtubedlpath);
 		if (!new File(youtubedlpath + "\\youtube-dl.exe").exists()) { throw new Error("youtube-dl.exe does not exist!");
 			/*
 			try {
