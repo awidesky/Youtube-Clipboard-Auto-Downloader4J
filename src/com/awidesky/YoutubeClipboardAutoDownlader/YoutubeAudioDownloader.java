@@ -71,7 +71,7 @@ public class YoutubeAudioDownloader {
 			
 			//Main.log(downloadPath.getAbsolutePath());
 
-			ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", "-x", "--audio-format", "mp3", "--audio-quality", "0",  url);
+			ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", "-x", "--no-playlist", "--audio-format", "mp3", "--audio-quality", "0",  url);
 			Process p = pb.directory(new File(youtubedlpath)).inheritIO().start();
 
 			/*
