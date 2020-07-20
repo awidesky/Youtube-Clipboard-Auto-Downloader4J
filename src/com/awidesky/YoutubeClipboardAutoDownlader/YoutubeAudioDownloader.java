@@ -2,20 +2,65 @@ package com.awidesky.YoutubeClipboardAutoDownlader;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 public class YoutubeAudioDownloader {
 
-	private static final String youtubedlpath = new File("").getAbsolutePath() + "\\resources\\ffmpeg\\bin"; //Thread.currentThread().getContextClassLoader().getResource("ffmpeg/bin").getPath();
+	private static final String projectpath = new File(YoutubeAudioDownloader.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
+	private static final String youtubedlpath = projectpath + "\\YoutubeAudioDownloader-resources\\ffmpeg\\bin";
 	private static File downloadPath;
 	
-	static {
-		
-		if (!new File(youtubedlpath + "\\youtube-dl.exe").exists()) { throw new Error("youtube-dl.exe does not exist!"); }
+	static void checkFiles() {
 
+		if (!new File(youtubedlpath + "\\youtube-dl.exe").exists()) { throw new Error("youtube-dl.exe does not exist!");
+			/*
+			try {
+			
+				File file = File.createTempFile("tempfile", ".zip");
+			
+				InputStream input = YoutubeAudioDownloader.class.getResourceAsStream("/com/awidesky/YoutubeClipboardAutoDownlader/resources.zip");
+				OutputStream out = new FileOutputStream(file);
+	        	int read;
+	        	byte[] bytes = new byte[1024];
+
+	        	while ((read = input.read(bytes)) != -1) {
+	        		out.write(bytes, 0, read);
+	        	}
+	        	out.close();
+	        	file.deleteOnExit();
+	        
+	    
+	        	// unzip it
+	        	ZipInputStream zis = new ZipInputStream(new FileInputStream(file));
+	        	ZipEntry ze = zis.getNextEntry();
+	        	while(ze!=null){
+	        		String entryName = ze.getName();
+	        		System.out.print("Extracting " + entryName + " -> " + projectpath + File.separator +  entryName + "...");
+            		File f = new File(projectpath + File.separator +  entryName);
+            		//create all folder needed to store in correct relative path.
+            		f.getParentFile().mkdirs();
+            		FileOutputStream fos = new FileOutputStream(f);
+            		int len;
+            		byte buffer[] = new byte[1024];
+            		while ((len = zis.read(buffer)) > 0) {
+            			fos.write(buffer, 0, len);
+            		}
+            		fos.close();  
+            		System.out.println("OK!");
+            		ze = zis.getNextEntry();
+	        	}
+        	
+	        	zis.closeEntry();
+	        	zis.close();
+
+			} catch (IOException ex) {
+	    	
+				Main.log(ex);
+	        
+			}*/
+		}
 	}
 	
 	static void download(String url, String path) throws Exception {
@@ -25,11 +70,9 @@ public class YoutubeAudioDownloader {
 		try {
 			
 			//Main.log(downloadPath.getAbsolutePath());
-			ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl", "-x", "--no-playlist", "--audio-format", "mp3", "--audio-quality", "0",  url);
-			pb.directory(new File(youtubedlpath));
-			Process p = pb.start();
-			pb.redirectError(Redirect.INHERIT);
-			pb.redirectOutput(Redirect.INHERIT);
+
+			ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", "-x", "--audio-format", "mp3", "--audio-quality", "0",  url);
+			Process p = pb.directory(new File(youtubedlpath)).inheritIO().start();
 
 			/*
 			 * Thread stdout = new Thread(() -> {
