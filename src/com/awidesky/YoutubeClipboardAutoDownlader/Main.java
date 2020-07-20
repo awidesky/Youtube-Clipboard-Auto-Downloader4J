@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /** Main class */
 public class Main {
@@ -18,11 +19,15 @@ public class Main {
 	private static boolean isOkToStart = false; /** I don't know why but when you copied something, <code>flavorsChanged</code> invoked twice and we should ignore the first one. */
 	
 	public static void main(String[] args) throws Exception {
-
+		
+		YoutubeAudioDownloader.checkFiles();
+		
 		JFileChooser jfc = new JFileChooser();
         jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         jfc.setDialogTitle("Choose directory for saving music!");
-        jfc.showDialog(new JFrame(), null);
+        
+        if (jfc.showDialog(new JFrame(), null) != JFileChooser.APPROVE_OPTION) { JOptionPane.showMessageDialog(null, "Please choose a directory!","ERROR!",JOptionPane.WARNING_MESSAGE); return; }
+        
         File dir = jfc.getSelectedFile();
 		
 		Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener(new FlavorListener() { 
@@ -51,7 +56,7 @@ public class Main {
 						
 						} catch(Exception err) {
 						
-							log(err.toString());
+							log(err);
 						
 						}
 			   
@@ -71,6 +76,12 @@ public class Main {
 	public static void log(String data) {
 		
 		System.out.println(data);
+		
+	}
+	
+	public static void log(Exception e) {
+		
+		System.out.println(e);
 		
 	}
 
