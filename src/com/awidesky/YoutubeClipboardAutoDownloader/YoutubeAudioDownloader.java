@@ -14,7 +14,7 @@ public class YoutubeAudioDownloader {
 	
 	static void checkFiles() {
 		//System.out.println(youtubedlpath);
-		if (!new File(youtubedlpath + "\\youtube-dl.exe").exists()) { throw new Error("youtube-dl.exe does not exist!");
+		if (!new File(youtubedlpath + "\\youtube-dl.exe").exists()) { throw new Error("youtube-dl.exe does not exist in " + youtubedlpath);
 			/*
 			try {
 			
@@ -125,7 +125,7 @@ public class YoutubeAudioDownloader {
 			
 			//Thread.currentThread().sleep(100);
 			
-			Main.log("founding downloaded file...");
+			Main.log("finding downloaded file...");
 			
 			File[] fileList = new File(youtubedlpath).listFiles(new FilenameFilter() {
 				
@@ -137,7 +137,7 @@ public class YoutubeAudioDownloader {
 				
 			});
 			
-			if(fileList.length ==0 ) { throw new RuntimeException("Didn't dowload any files!"); }
+			if(fileList.length ==0 ) { throw new RuntimeException("Youtube-dl didn't dowload any files!"); }
 			
 			for(File f : fileList) {
 				

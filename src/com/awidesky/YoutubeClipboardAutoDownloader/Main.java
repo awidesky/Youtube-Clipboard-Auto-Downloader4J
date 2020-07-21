@@ -27,9 +27,9 @@ public class Main {
 		
 		JFileChooser jfc = new JFileChooser();
         jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        jfc.setDialogTitle("Choose directory for saving music!");
+        jfc.setDialogTitle("Choose directory to save music!");
         
-        if (jfc.showDialog(new JFrame(), null) != JFileChooser.APPROVE_OPTION) { JOptionPane.showMessageDialog(null, "Please choose a directory!","ERROR!",JOptionPane.WARNING_MESSAGE); return; }
+        if (jfc.showDialog(new JFrame(), null) != JFileChooser.APPROVE_OPTION) { JOptionPane.showMessageDialog(null, "Please choose a directory!","ERROR!",JOptionPane.WARNING_MESSAGE); System.exit(1);; }
         
         File dir = jfc.getSelectedFile();
 		
@@ -53,7 +53,7 @@ public class Main {
 						
 							if (data.startsWith("https://www.youtu")) {
 			    	  
-								log("Receved a link from your clipboard : " + data);
+								log("Received a link from your clipboard : " + data);
 								
 								try {
 									
@@ -83,7 +83,7 @@ public class Main {
 		
 		});
 		
-		log("Listning clipboard...");
+		log("Listening clipboard...");
 		
 	}
 	
