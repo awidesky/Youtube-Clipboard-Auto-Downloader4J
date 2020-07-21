@@ -1,4 +1,4 @@
-package com.awidesky.YoutubeClipboardAutoDownlader;
+package com.awidesky.YoutubeClipboardAutoDownloader;
 
 import java.io.File;
 import java.io.FilenameFilter;

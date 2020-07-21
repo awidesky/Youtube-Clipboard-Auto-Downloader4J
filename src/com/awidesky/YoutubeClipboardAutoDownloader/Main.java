@@ -1,4 +1,4 @@
-package com.awidesky.YoutubeClipboardAutoDownlader;
+package com.awidesky.YoutubeClipboardAutoDownloader;
 
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
