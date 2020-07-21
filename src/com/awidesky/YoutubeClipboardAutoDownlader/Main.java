@@ -1,10 +1,13 @@
 package com.awidesky.YoutubeClipboardAutoDownlader;
 
+import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.FlavorEvent;
 import java.awt.datatransfer.FlavorListener;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -18,7 +21,7 @@ public class Main {
 	private static ExecutorService executorService = Executors.newFixedThreadPool(1);
 	private static boolean isOkToStart = false; /** I don't know why but when you copied something, <code>flavorsChanged</code> invoked twice and we should ignore the first one. */
 	
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		
 		YoutubeAudioDownloader.checkFiles();
 		
@@ -39,28 +42,40 @@ public class Main {
 
 					//System.err.println("CLIPBOARD CHANGED");
 					
-					executorService.submit(() -> {
+					try {
 						
-						try {
+						Thread.sleep(50);
+						final String data = (String)Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
 						
-							Thread.sleep(10);
-							
-							String data = new String((String)Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor));
 					
+						executorService.submit(() -> {
+						
+						
 							if (data.startsWith("https://www.youtu")) {
 			    	  
 								log("Receved a link from your clipboard : " + data);
-								YoutubeAudioDownloader.download(data, dir.getAbsolutePath());
+								
+								try {
+									
+									YoutubeAudioDownloader.download(data, dir.getAbsolutePath());
+									
+								} catch (Exception e1) {
+									
+									log(e1);
+									
+								}
 
 							}
 						
-						} catch(Exception err) {
 						
-							log(err);
+						});
 						
-						}
-			   
-					});
+						
+					} catch (InterruptedException | HeadlessException | UnsupportedFlavorException | IOException e1) {
+						
+						log(e1);
+					
+					}
 					
 					isOkToStart = !isOkToStart;
 					
