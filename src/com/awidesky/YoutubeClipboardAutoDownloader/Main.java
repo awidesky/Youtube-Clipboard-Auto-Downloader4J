@@ -19,8 +19,7 @@ import javax.swing.JOptionPane;
 public class Main {
 
 	private static ExecutorService executorService = Executors.newFixedThreadPool(1);
-	private static boolean isOkToStart = false; /** I don't know why but when you copied something, <code>flavorsChanged</code> invoked twice and we should ignore the first one. */
-	
+	private static String clipboardBefore = "";
 	public static void main(String[] args) {
 		
 		YoutubeAudioDownloader.checkFiles();
@@ -37,17 +36,19 @@ public class Main {
 		
 				@Override 
 			    public void flavorsChanged(FlavorEvent e) {
-
-					if (!isOkToStart) { isOkToStart = true; return; } 
-
-					//System.err.println("CLIPBOARD CHANGED");
 					
+					//System.err.println("CLIPBOARD CHANGED");
+
 					try {
 						
 						Thread.sleep(50);
 						final String data = (String)Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+						//System.out.println("data : " + data + "\nex-clipboard : " + clipboardBefore);
 						
-					
+						if (data.equals(clipboardBefore)) {	clearClipboardBefore();	return;	}
+						
+						clipboardBefore = data;
+						
 						executorService.submit(() -> {
 						
 						
@@ -77,7 +78,6 @@ public class Main {
 					
 					}
 					
-					isOkToStart = !isOkToStart;
 					
 				}
 		
@@ -88,6 +88,14 @@ public class Main {
 	}
 	
 	
+	
+	protected static void clearClipboardBefore() {
+		
+		clipboardBefore = ""; //System.out.println("clearclipboard called");
+		
+	}
+
+
 	public static void log(String data) {
 		
 		System.out.println(data);

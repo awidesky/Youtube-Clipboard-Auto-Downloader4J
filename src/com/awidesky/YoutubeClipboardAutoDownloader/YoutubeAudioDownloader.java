@@ -146,7 +146,7 @@ public class YoutubeAudioDownloader {
 				
 			}
 			
-			Main.log("Done!");
+			Main.log("Done!\n");
 			
 		} catch (Exception e) {
 	        throw new RuntimeException(e);
