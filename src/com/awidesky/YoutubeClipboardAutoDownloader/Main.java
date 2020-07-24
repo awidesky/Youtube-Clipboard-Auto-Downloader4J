@@ -15,10 +15,6 @@ import java.io.ObjectOutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
 import com.awidesky.YoutubeClipboardAutoDownloader.view.SettingGUI;
 
 /** Main class */
@@ -26,24 +22,12 @@ public class Main {
 
 	private static ExecutorService executorService = Executors.newFixedThreadPool(1);
 	private static String clipboardBefore = "";
-	private static File savePath;
-	private static String extension;
-	private static String quality;
 	private static ConfigDTO properties;
 	
 	public static void main(String[] args) {
 		
 		YoutubeAudioDownloader.checkFiles();
 		readProperties();
-		
-		JFileChooser jfc = new JFileChooser();
-        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        jfc.setCurrentDirectory(Main.getSavePath());
-        jfc.setDialogTitle("Choose directory to save music!");
-        
-        if (jfc.showDialog(new JFrame(), null) != JFileChooser.APPROVE_OPTION) { JOptionPane.showMessageDialog(null, "Please choose a directory!","ERROR!",JOptionPane.WARNING_MESSAGE); System.exit(1);; }
-        
-        File dir = jfc.getSelectedFile();
 		
 		Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener(new FlavorListener() { 
 		
@@ -71,7 +55,7 @@ public class Main {
 								
 								try {
 									
-									YoutubeAudioDownloader.download(data, dir.getAbsolutePath());
+									YoutubeAudioDownloader.download(data, properties.getSaveto());
 									
 								} catch (Exception e1) {
 									
@@ -96,13 +80,9 @@ public class Main {
 		
 		});
 		
-		savePath = dir;
-		
 		log("Listening clipboard...");
 
 		SettingGUI.launch(args);
-		
-		Runtime.getRuntime().addShutdownHook(new Thread(() -> { writeProperties(); }));
 		
 	}
 	
@@ -116,10 +96,6 @@ public class Main {
         	
             properties = (ConfigDTO)oi.readObject();
             
-            savePath = new File(properties.getSaveto());
-            extension = properties.getExtension();
-            quality = properties.getQuality();
-            
         } catch (IOException | ClassNotFoundException e) {
         	
             log("Error when reading config.ini : " + e.getMessage() + "\nResetting config.ini ...");
@@ -128,24 +104,14 @@ public class Main {
     		properties.setExtension("mp3");
     		properties.setQuality("0");
     		
-    		savePath = new File(".\\");
-            extension = "mp3";
-            quality = "0";
-            
         }
         
 	}
 
 
-	private static void writeProperties() {
+	public static void writeProperties() {
 		
-		/** Save current properties to DTO instance */
-		properties.setSaveto(savePath.getAbsolutePath());
-		properties.setExtension(extension);
-		properties.setQuality(quality);
-		
-		
-		/** Write it */
+		/** Write <code>properties</code> */
 		try(ObjectOutputStream oo = new ObjectOutputStream(new FileOutputStream(new File(YoutubeAudioDownloader.projectpath + "\\YoutubeAudioAutoDownloader-resources\\config.bin")))) {
 			
 			oo.writeObject(properties);
@@ -157,26 +123,11 @@ public class Main {
 		}
 		
 	}
-
-	public static File getSavePath() {
-		
-		return savePath;
-	}
 	
-
-
-
-	public static String getExtension() {
+	
+	public static ConfigDTO getProperties() {
 		
-		return extension;
-		
-	}
-
-
-
-	public static String getQuality() {
-		
-		return quality;
+		return properties;
 		
 	}
 

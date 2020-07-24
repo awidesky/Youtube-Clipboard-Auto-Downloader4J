@@ -8,14 +8,14 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="100.0" prefWidth="600.0" styleClass="background" stylesheets="@dark_theme.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="100.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="606.0" styleClass="background" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                <children>
-                  <ComboBox layoutX="119.0" layoutY="14.0" prefHeight="22.0" prefWidth="96.0" styleClass="combo-box-base" />
-                  <ComboBox layoutX="402.0" layoutY="14.0" prefWidth="150.0" styleClass="combo-box-base" />
+                  <ComboBox fx:id="cb_format" layoutX="119.0" layoutY="14.0" onAction="#comboChange" prefHeight="22.0" prefWidth="96.0" styleClass="combo-box-base" />
+                  <ComboBox fx:id="cb_quality" layoutX="402.0" layoutY="14.0" onAction="#comboChange" prefWidth="150.0" styleClass="combo-box-base" />
                   <Label layoutX="34.0" layoutY="11.0" text="Format :">
                      <font>
                         <Font size="18.0" />
@@ -35,8 +35,8 @@
                         <Font size="18.0" />
                      </font>
                   </Label>
-                  <TextField layoutX="88.0" layoutY="12.0" prefHeight="22.0" prefWidth="417.0" styleClass="text-field" />
-                  <Button layoutX="513.0" layoutY="12.0" mnemonicParsing="false" text="Browse..." />
+                  <TextField fx:id="tf_path" layoutX="88.0" layoutY="12.0" prefHeight="22.0" prefWidth="417.0" styleClass="text-field" />
+                  <Button layoutX="513.0" layoutY="12.0" mnemonicParsing="false" onAction="#BrowsebtnClicked" text="Browse..." />
                </children>
             </AnchorPane>
         </items>
