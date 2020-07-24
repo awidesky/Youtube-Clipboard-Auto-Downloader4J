@@ -8,7 +8,7 @@ import java.nio.file.StandardCopyOption;
 
 public class YoutubeAudioDownloader {
 
-	private static final String projectpath = new File(YoutubeAudioDownloader.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
+	public static final String projectpath = new File(YoutubeAudioDownloader.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
 	private static final String youtubedlpath = projectpath + "\\YoutubeAudioAutoDownloader-resources\\ffmpeg\\bin";
 	private static File downloadPath;
 	
@@ -70,8 +70,8 @@ public class YoutubeAudioDownloader {
 		try {
 			
 			//Main.log(downloadPath.getAbsolutePath());
-																													// TODO : let user select format and quality!
-			ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", "-x", "--no-playlist", "--audio-format", "mp3", "--audio-quality", "0",  url);
+
+			ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", "-x", "--no-playlist", "--audio-format", Main.getExtension(), "--audio-quality", Main.getQuality(),  url);
 			Process p = pb.directory(new File(youtubedlpath)).inheritIO().start();
 
 			/*
@@ -90,7 +90,7 @@ public class YoutubeAudioDownloader {
 			 * 
 			 * } catch (IOException e) {
 			 * 
-			 * // TODO Auto-generated catch block Main.log(e.toString());
+			 * Main.log(e.toString());
 			 * 
 			 * }
 			 * 
@@ -111,7 +111,7 @@ public class YoutubeAudioDownloader {
 			 * 
 			 * } catch (IOException e) {
 			 * 
-			 * // TODO Auto-generated catch block Main.log(e.toString());
+			 * Main.log(e.toString());
 			 * 
 			 * }
 			 * 
@@ -131,7 +131,6 @@ public class YoutubeAudioDownloader {
 				
 				@Override
 				public boolean accept(File dir, String name) {
-					// TODO Auto-generated method stub
 					return name.endsWith("mp3");
 				}
 				
@@ -152,6 +151,10 @@ public class YoutubeAudioDownloader {
 	        throw new RuntimeException(e);
 	    }
 		
+	}
+
+	public static void setDownloadPath(File downloadPath) {
+		YoutubeAudioDownloader.downloadPath = downloadPath;
 	}
 	
 }
