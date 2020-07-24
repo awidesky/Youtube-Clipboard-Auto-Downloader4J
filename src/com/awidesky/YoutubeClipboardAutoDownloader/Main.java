@@ -19,6 +19,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import com.awidesky.YoutubeClipboardAutoDownloader.view.SettingGUI;
+
 /** Main class */
 public class Main {
 
@@ -97,6 +99,8 @@ public class Main {
 		savePath = dir;
 		
 		log("Listening clipboard...");
+
+		SettingGUI.launch(args);
 		
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> { writeProperties(); }));
 		
