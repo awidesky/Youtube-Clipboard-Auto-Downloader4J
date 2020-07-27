@@ -15,8 +15,6 @@ import java.io.ObjectOutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.awidesky.YoutubeClipboardAutoDownloader.view.SettingGUI;
-
 /** Main class */
 public class Main {
 
@@ -24,7 +22,7 @@ public class Main {
 	private static String clipboardBefore = "";
 	private static ConfigDTO properties;
 	
-	public static void main(String[] args) {
+	public static void start(String[] args) {
 		
 		YoutubeAudioDownloader.checkFiles();
 		readProperties();
@@ -82,8 +80,6 @@ public class Main {
 		
 		log("Listening clipboard...");
 
-		SettingGUI.launch(args);
-		
 	}
 	
 	
@@ -98,12 +94,10 @@ public class Main {
             
         } catch (IOException | ClassNotFoundException e) {
         	
-            log("Error when reading config.ini : " + e.getMessage() + "\nResetting config.ini ...");
+            log("Error when reading config.bin : " + e.getMessage() + "\nResetting config.bin ...");
     		
-            properties.setSaveto(".\\");
-    		properties.setExtension("mp3");
-    		properties.setQuality("0");
-    		
+            properties = new ConfigDTO(".\\", "mp3", "0");
+            
         }
         
 	}

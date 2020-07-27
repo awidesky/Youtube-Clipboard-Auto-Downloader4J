@@ -1,13 +1,14 @@
 package com.awidesky.YoutubeClipboardAutoDownloader.view;
 
 import java.io.File;
-import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 import com.awidesky.YoutubeClipboardAutoDownloader.ConfigDTO;
 import com.awidesky.YoutubeClipboardAutoDownloader.Main;
 import com.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
+import com.awidesky.YoutubeClipboardAutoDownloader.console.ConsoleView;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -24,6 +25,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
@@ -32,7 +34,11 @@ public class SettingGUI extends Application implements Initializable {
 
     private Stage primaryStage;
     private AnchorPane rootLayout;
- 
+    private ConsoleView console;
+    
+    @FXML
+    private BorderPane consolePane;
+    
     @FXML
     private ComboBox<String> cb_format;
     ObservableList<String> formatList = FXCollections.observableArrayList("mp3", "best", "aac", "flac", "m4a", "opus", "vorbis", "wav");
@@ -45,12 +51,12 @@ public class SettingGUI extends Application implements Initializable {
     private TextField tf_path;
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws MalformedURLException {
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("Setting (you can close this window)");
 
-        this.primaryStage.getIcons().add(new Image(YoutubeAudioDownloader.projectpath + "\\YoutubeAudioAutoDownloader-resources\\icon.ico"));
-        
+        this.primaryStage.getIcons().add(new Image("file:resources/icon/icon.jpg"));
+        System.out.println("start");
         initRootLayout();
 
         primaryStage.setOnCloseRequest(event -> {
@@ -64,19 +70,25 @@ public class SettingGUI extends Application implements Initializable {
 
     
     public void initRootLayout() {
-    	
+    	System.out.println("initstart");
         try {
         	
-            FXMLLoader loader = new FXMLLoader();
+            FXMLLoader loader = new FXMLLoader(); //SettingGUI.class.getResource("SettingLayout.fxml")
             loader.setLocation(SettingGUI.class.getResource("SettingLayout.fxml"));
             rootLayout = (AnchorPane)loader.load();
 
-            Scene scene = new Scene(rootLayout);
-            primaryStage.setScene(scene);
+            console = new ConsoleView();
+            System.setOut(console.getOut());
+            System.setIn(console.getIn());
+            System.setErr(console.getOut());
+            
+            consolePane.setCenter(console);
+            System.out.println("init");
+            primaryStage.setScene(new Scene(rootLayout));
             primaryStage.show();
             
-        } catch (IOException e) {
-        	
+        } catch (Exception e) {
+        	System.out.println("ex");
             e.printStackTrace();
             
         }
@@ -123,5 +135,11 @@ public class SettingGUI extends Application implements Initializable {
 	}
     
     
+    public static void main(String[] args) {
+    	
+    	Main.start(args);
+    	launch(args);
+    	
+    }
 
 }  

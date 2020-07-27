@@ -6,13 +6,14 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="100.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.awidesky.YoutubeClipboardAutoDownloader.view.SettingGUI">
    <children>
-      <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="606.0" styleClass="background" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <SplitPane dividerPositions="0.13819095477386933" orientation="VERTICAL" prefHeight="200.0" prefWidth="606.0" styleClass="background" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="93.0" prefWidth="598.0">
                <children>
                   <ComboBox fx:id="cb_format" layoutX="119.0" layoutY="14.0" onAction="#comboChange" prefHeight="22.0" prefWidth="96.0" styleClass="combo-box-base" />
                   <ComboBox fx:id="cb_quality" layoutX="402.0" layoutY="14.0" onAction="#comboChange" prefWidth="150.0" styleClass="combo-box-base" />
@@ -28,17 +29,22 @@
                   </Label>
                </children>
             </AnchorPane>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-               <children>
-                  <Label layoutX="14.0" layoutY="9.0" prefHeight="22.0" prefWidth="75.0" text="Save to :">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                  </Label>
-                  <TextField fx:id="tf_path" layoutX="88.0" layoutY="12.0" prefHeight="22.0" prefWidth="417.0" styleClass="text-field" />
-                  <Button layoutX="513.0" layoutY="12.0" mnemonicParsing="false" onAction="#BrowsebtnClicked" text="Browse..." />
-               </children>
-            </AnchorPane>
+            <SplitPane dividerPositions="0.1411764705882353" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+              <items>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                     <children>
+                        <Label layoutX="14.0" layoutY="9.0" prefHeight="22.0" prefWidth="75.0" text="Save to :">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                        <TextField fx:id="tf_path" layoutX="88.0" layoutY="12.0" prefHeight="22.0" prefWidth="417.0" styleClass="text-field" />
+                        <Button layoutX="513.0" layoutY="12.0" mnemonicParsing="false" onAction="#BrowsebtnClicked" text="Browse..." />
+                     </children>
+                  </AnchorPane>
+                  <BorderPane fx:id="consolePane" prefHeight="264.0" prefWidth="598.0" />
+              </items>
+            </SplitPane>
         </items>
       </SplitPane>
    </children>
