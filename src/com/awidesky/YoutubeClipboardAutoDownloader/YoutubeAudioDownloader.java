@@ -1,7 +1,10 @@
 package com.awidesky.YoutubeClipboardAutoDownloader;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -9,7 +12,7 @@ import java.nio.file.StandardCopyOption;
 public class YoutubeAudioDownloader {
 
 	private static final String projectpath = new File(YoutubeAudioDownloader.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
-	private static final String youtubedlpath = projectpath + "\\YoutubeAudioAutoDownloader-resources\\ffmpeg\\bin";
+	private static final String youtubedlpath = getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\ffmpeg\\bin";
 	private static File downloadPath;
 	
 	static void checkFiles() {
@@ -63,62 +66,66 @@ public class YoutubeAudioDownloader {
 		}
 	}
 	
-	static void download(String url, String path) throws Exception {
+	public static String getProjectpath() {
+		return projectpath;
+	}
+
+	static void download(String url) throws Exception {
 		
-		downloadPath = new File(path);
+		downloadPath = new File(Main.getProperties().getSaveto());
 		
 		try {
 			
 			//Main.log(downloadPath.getAbsolutePath());
-																													// TODO : let user select format and quality!
-			ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", "-x", "--no-playlist", "--audio-format", "mp3", "--audio-quality", "0",  url);
-			Process p = pb.directory(new File(youtubedlpath)).inheritIO().start();
+																													
+			ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", "-x", "--no-playlist", "--audio-format", Main.getProperties().getFormat(), "--audio-quality", Main.getProperties().getQuality(),  url);
+			Process p = pb.directory(new File(youtubedlpath)).start();
 
-			/*
-			 * Thread stdout = new Thread(() -> {
-			 * 
-			 * BufferedReader br = new BufferedReader(new
-			 * InputStreamReader(p.getInputStream())); String line = null;
-			 * 
-			 * try {
-			 * 
-			 * while((line = br.readLine ()) != null) {
-			 * 
-			 * Main.log(line);
-			 * 
-			 * }
-			 * 
-			 * } catch (IOException e) {
-			 * 
-			 * // TODO Auto-generated catch block Main.log(e.toString());
-			 * 
-			 * }
-			 * 
-			 * });
-			 * 
-			 * Thread stderr = new Thread(() -> {
-			 * 
-			 * BufferedReader br = new BufferedReader(new
-			 * InputStreamReader(p.getErrorStream())); String line = null;
-			 * 
-			 * try {
-			 * 
-			 * while((line = br.readLine ()) != null) {
-			 * 
-			 * Main.log(line);
-			 * 
-			 * }
-			 * 
-			 * } catch (IOException e) {
-			 * 
-			 * // TODO Auto-generated catch block Main.log(e.toString());
-			 * 
-			 * }
-			 * 
-			 * });
-			 * 
-			 * stdout.start(); stderr.start();
-			 */
+			
+			  Thread stdout = new Thread(() -> {
+			  
+			  BufferedReader br = new BufferedReader(new
+			  InputStreamReader(p.getInputStream())); String line = null;
+			  
+			  try {
+			  
+			  while((line = br.readLine ()) != null) {
+			  
+			  Main.log(line);
+			  
+			  }
+			  
+			  } catch (IOException e) {
+			  
+			  // TODO Auto-generated catch block Main.log(e.toString());
+			  
+			  }
+			  
+			  });
+			  
+			  Thread stderr = new Thread(() -> {
+			  
+			  BufferedReader br = new BufferedReader(new
+			  InputStreamReader(p.getErrorStream())); String line = null;
+			  
+			  try {
+			  
+			  while((line = br.readLine ()) != null) {
+			  
+			  Main.log(line);
+			  
+			  }
+			  
+			  } catch (IOException e) {
+			  
+			  // TODO Auto-generated catch block Main.log(e.toString());
+			  
+			  }
+			  
+			  });
+			  
+			  stdout.start(); stderr.start();
+			 
 			 
 			p.waitFor();
 			
@@ -132,7 +139,7 @@ public class YoutubeAudioDownloader {
 				@Override
 				public boolean accept(File dir, String name) {
 					// TODO Auto-generated method stub
-					return name.endsWith("mp3");
+					return name.endsWith(Main.getProperties().getFormat());
 				}
 				
 			});
