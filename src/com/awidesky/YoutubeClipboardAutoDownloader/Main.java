@@ -59,7 +59,7 @@ public class Main {
 									
 								} catch (Exception e1) {
 									
-									log(e1);
+									log("Error! : " + e1.getMessage());
 									
 								}
 
@@ -71,7 +71,7 @@ public class Main {
 						
 					} catch (InterruptedException | HeadlessException | UnsupportedFlavorException | IOException e1) {
 						
-						log(e1);
+						log("Error! : " + e1.getMessage());
 					
 					}
 					
@@ -139,12 +139,6 @@ public class Main {
 	public static void log(String data) {
 		
 		System.out.println(data);
-		
-	}
-	
-	public static void log(Exception e) {
-		
-		System.out.println(e);
 		
 	}
 

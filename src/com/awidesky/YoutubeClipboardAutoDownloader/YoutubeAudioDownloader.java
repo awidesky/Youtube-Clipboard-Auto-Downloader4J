@@ -18,51 +18,7 @@ public class YoutubeAudioDownloader {
 	static void checkFiles() {
 		//System.out.println(youtubedlpath);
 		if (!new File(youtubedlpath + "\\youtube-dl.exe").exists()) { throw new Error("youtube-dl.exe does not exist in " + youtubedlpath);
-			/*
-			try {
-			
-				File file = File.createTempFile("tempfile", ".zip");
-			
-				InputStream input = YoutubeAudioDownloader.class.getResourceAsStream("/com/awidesky/YoutubeClipboardAutoDownlader/resources.zip");
-				OutputStream out = new FileOutputStream(file);
-	        	int read;
-	        	byte[] bytes = new byte[1024];
 
-	        	while ((read = input.read(bytes)) != -1) {
-	        		out.write(bytes, 0, read);
-	        	}
-	        	out.close();
-	        	file.deleteOnExit();
-	        
-	    
-	        	// unzip it
-	        	ZipInputStream zis = new ZipInputStream(new FileInputStream(file));
-	        	ZipEntry ze = zis.getNextEntry();
-	        	while(ze!=null){
-	        		String entryName = ze.getName();
-	        		System.out.print("Extracting " + entryName + " -> " + projectpath + File.separator +  entryName + "...");
-            		File f = new File(projectpath + File.separator +  entryName);
-            		//create all folder needed to store in correct relative path.
-            		f.getParentFile().mkdirs();
-            		FileOutputStream fos = new FileOutputStream(f);
-            		int len;
-            		byte buffer[] = new byte[1024];
-            		while ((len = zis.read(buffer)) > 0) {
-            			fos.write(buffer, 0, len);
-            		}
-            		fos.close();  
-            		System.out.println("OK!");
-            		ze = zis.getNextEntry();
-	        	}
-        	
-	        	zis.closeEntry();
-	        	zis.close();
-
-			} catch (IOException ex) {
-	    	
-				Main.log(ex);
-	        
-			}*/
 		}
 	}
 	
@@ -89,15 +45,23 @@ public class YoutubeAudioDownloader {
 			  
 			  try {
 			  
-			  while((line = br.readLine ()) != null) {
+				  while((line = br.readLine ()) != null) {
 			  
-			  Main.log(line);
+					  if (line.startsWith("[download]") && !line.startsWith("[download] 100%")) { continue; }
+					  if (line.equals("")) {
+						  
+						  String temp = line;
+						  if ((line = br.readLine()).startsWith("[download]")) { continue; }
+						  Main.log(temp);
+						  
+					  }
+					  Main.log(line);
 			  
-			  }
+				  }
 			  
 			  } catch (IOException e) {
 			  
-			  // TODO Auto-generated catch block Main.log(e.toString());
+			  // Main.log(e.toString());
 			  
 			  }
 			  
@@ -118,7 +82,7 @@ public class YoutubeAudioDownloader {
 			  
 			  } catch (IOException e) {
 			  
-			  // TODO Auto-generated catch block Main.log(e.toString());
+			  // Main.log(e.toString());
 			  
 			  }
 			  
@@ -132,13 +96,12 @@ public class YoutubeAudioDownloader {
 			
 			//Thread.currentThread().sleep(100);
 			
-			Main.log("finding downloaded file...");
+			Main.log("Finding downloaded file...");
 			
 			File[] fileList = new File(youtubedlpath).listFiles(new FilenameFilter() {
 				
 				@Override
 				public boolean accept(File dir, String name) {
-					// TODO Auto-generated method stub
 					return name.endsWith(Main.getProperties().getFormat());
 				}
 				

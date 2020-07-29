@@ -44,6 +44,7 @@ public class GUI extends JFrame {
 				
 				new Thread(() -> { Main.writeProperties(); }).start();
 		        e.getWindow().dispose();
+		        System.exit(0);
 
 			}
 			
@@ -57,6 +58,12 @@ public class GUI extends JFrame {
         tlb_path = new JLabel("Save to :");
         jft_path = new JTextField(Main.getProperties().getSaveto());
        
+        jft_path.addActionListener((e) -> {
+        	
+        	Main.getProperties().setSaveto(jft_path.getText());
+        	
+        });
+        
         btn_browse = new JButton("Browse...");
 		btn_browse.addActionListener((e) -> {
 			
@@ -87,6 +94,7 @@ public class GUI extends JFrame {
 		});
 		
 		jta_console = new JTextArea();
+		jta_console.setEditable(false);
 		jta_console.setFont(jta_console.getFont().deriveFont(15f));
 		PrintStream ps = new PrintStream(new TextAreaOutputStream(jta_console));
 		System.setOut(ps);
