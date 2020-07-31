@@ -2,8 +2,10 @@ package com.awidesky.YoutubeClipboardAutoDownloader;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.PrintStream;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -13,8 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-// https://m.blog.naver.com/PostView.nhn?blogId=javaking75&logNo=140157948347&proxyReferer=https:%2F%2Fwww.google.com%2F 
-// https://m.blog.naver.com/PostView.nhn?blogId=sks6624&logNo=150165603219&proxyReferer=https:%2F%2Fwww.google.com%2F
+
 public class GUI extends JFrame {
 
 	/**
@@ -32,7 +33,8 @@ public class GUI extends JFrame {
 	
 	public GUI() {
 		
-		setTitle("Setting");
+		setTitle("Youtube Audio Auto Downloader");
+		setIconImage(new ImageIcon(YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\icon.jpg").getImage());
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setSize(630,450);
 		setLayout(null);
@@ -52,6 +54,7 @@ public class GUI extends JFrame {
 		
         jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         jfc.setDialogTitle("Choose directory to save music!");
+        jfc.setCurrentDirectory(new File(Main.getProperties().getSaveto()));
         
         tlb_format = new JLabel("Format :");
         tlb_quality = new JLabel("Audio Quality :");
@@ -67,11 +70,12 @@ public class GUI extends JFrame {
         btn_browse = new JButton("Browse...");
 		btn_browse.addActionListener((e) -> {
 			
-			 if (jfc.showDialog(new JFrame(), null) != JFileChooser.APPROVE_OPTION) { JOptionPane.showMessageDialog(null, "Please choose a directory!","ERROR!",JOptionPane.WARNING_MESSAGE); }
+			 if (jfc.showDialog(new JFrame(), null) != JFileChooser.APPROVE_OPTION) { JOptionPane.showMessageDialog(null, "Please choose a directory!","ERROR!",JOptionPane.WARNING_MESSAGE); return; }
 		        
 			 String path = jfc.getSelectedFile().getAbsolutePath();
 		     Main.getProperties().setSaveto(path);
 		     jft_path.setText(path);
+		     jfc.setCurrentDirectory(new File(path));
 			
 		});
 		

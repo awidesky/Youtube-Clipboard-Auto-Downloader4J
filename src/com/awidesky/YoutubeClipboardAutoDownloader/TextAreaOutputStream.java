@@ -1,11 +1,13 @@
 package com.awidesky.YoutubeClipboardAutoDownloader;
 
-import java.awt.*;
-import java.io.*;
+import java.awt.EventQueue;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import javax.swing.*;
+
+import javax.swing.JTextArea;
 
 /** Reference : https://stackoverflow.com/questions/342990/create-java-console-inside-a-gui-panel */
 public class TextAreaOutputStream extends OutputStream {
