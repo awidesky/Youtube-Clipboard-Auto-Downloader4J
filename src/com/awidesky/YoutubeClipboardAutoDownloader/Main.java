@@ -20,7 +20,7 @@ import javax.swing.SwingUtilities;
 /** Main class */
 public class Main {
 
-	private static ExecutorService executorService = Executors.newFixedThreadPool(1);
+	private static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	private static String clipboardBefore = "";
 	private static ConfigDTO properties;
 	
@@ -53,9 +53,12 @@ public class Main {
 			    	  
 								log("Received a link from your clipboard : " + data);
 								
+								TaskStatusModel t = new TaskStatusModel(null, "Starting", 0, null);
+								//TODO : put t to Table
+								
 								try {
 									
-									YoutubeAudioDownloader.download(data);
+									YoutubeAudioDownloader.download(data, t);
 									
 								} catch (Exception e1) {
 									
