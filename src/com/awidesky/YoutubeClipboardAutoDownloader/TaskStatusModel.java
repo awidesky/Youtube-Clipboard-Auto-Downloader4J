@@ -1,5 +1,7 @@
 package com.awidesky.YoutubeClipboardAutoDownloader;
 
+import java.util.function.Consumer;
+
 public class TaskStatusModel {
 
 	public TaskStatusModel(String videoName, String status, int progress, String dest) {
@@ -13,6 +15,9 @@ public class TaskStatusModel {
 	private String status;
 	private int progress;
 	private String dest;
+	private Runnable whenDone;
+	private Consumer<Integer> processUpdater;
+	
 	
 	public String getVideoName() {
 		return videoName;
@@ -36,6 +41,7 @@ public class TaskStatusModel {
 	
 	public void setProgress(int progress) {
 		this.progress = progress;
+		processUpdater.accept(progress);
 	}
 	
 	public String getDest() {
@@ -44,6 +50,25 @@ public class TaskStatusModel {
 	
 	public void setDest(String dest) {
 		this.dest = dest;
+	}
+
+	public void done() {
+		
+		status = "Done!";
+		whenDone.run();
+		
+	}
+
+	public void setWhenDone(Runnable whenDone) {
+		
+		this.whenDone = whenDone;
+		
+	}
+
+	public void setProcessUpdater(Consumer<Integer> processUpdater) {
+		
+		this.processUpdater = processUpdater;
+		
 	}
 	
 	

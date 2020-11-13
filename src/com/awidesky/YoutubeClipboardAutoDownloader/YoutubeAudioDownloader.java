@@ -12,7 +12,7 @@ public class YoutubeAudioDownloader {
 			YoutubeAudioDownloader.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
 	private static final String youtubedlpath = projectpath + "\\YoutubeAudioAutoDownloader-resources\\ffmpeg\\bin";
 	private static File downloadPath;
-	private static Pattern pattern = Pattern.compile("^[0-9]+(%)$");
+	private static Pattern pattern = Pattern.compile("^[0-9]+%$");
 	
 	static void checkFiles() {
 		// System.out.println(youtubedlpath);
@@ -32,16 +32,24 @@ public class YoutubeAudioDownloader {
 
 		try {
 
-			// Main.log(downloadPath.getAbsolutePath());
-
-			task.setDest(Main.getProperties().getSaveto());//TODO : get video name
+			task.setDest(Main.getProperties().getSaveto());
 			
+			
+			/* get video name */
+			ProcessBuilder pbGetName = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", "--get-filename -o \"%(title)s\"", url);
+			Process p1 = pbGetName.directory(null).start();
+			BufferedReader br1 = new BufferedReader(new InputStreamReader(p1.getInputStream()));
+			task.setVideoName(br1.readLine());
+			p1.waitFor();
+			
+			
+			/* download video */
 			ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", "-x",
-					"-o \'" + downloadPath + "/%(title)s.%(ext)s\'", "--no-playlist", "--audio-format",
+					"-o" + "\"%(title)s.%(ext)s\"", Main.getProperties().getPlaylistOption(), "--audio-format",
 					Main.getProperties().getFormat(), "--audio-quality", Main.getProperties().getQuality(), url);
-			Process p = pb.directory(new File(youtubedlpath)).start();
+			Process p = pb.directory(downloadPath).start();
 
-			task.setStatus("Downloading...");
+			task.setStatus("Downloading");
 			
 			Thread stdout = new Thread(() -> {
 
@@ -71,24 +79,30 @@ public class YoutubeAudioDownloader {
 
 			});
 
+			
 			Thread stderr = new Thread(() -> {
 
 				BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 				String line = null;
-
+				StringBuilder sb = new StringBuilder("");
+				
 				try {
 
 					while ((line = br.readLine()) != null) {
-
-						Main.log(line);
+						
+						task.setStatus("ERROR");
+						sb.append(line);
 
 					}
+					
+					if (!sb.toString().equals("")) throw new RuntimeException(sb.toString());
 
 				} catch (IOException e) {
 
 					// Main.log(e.toString());
 
 				}
+				
 
 			});
 
@@ -96,6 +110,8 @@ public class YoutubeAudioDownloader {
 			stderr.start();
 
 			p.waitFor();
+			
+			task.done();
 
 			// Thread.currentThread().sleep(100);
 			/*

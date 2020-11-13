@@ -9,13 +9,14 @@ public class ConfigDTO implements Serializable{
 	private String saveto;
 	private String format;
 	private String quality;
-
-	public ConfigDTO(String saveto, String extension, String quality) {
+	private String playlistOption;
+	
+	public ConfigDTO(String saveto, String extension, String quality, String playlistOption) {
 
 		this.saveto = saveto;
 		this.format = extension;
 		this.quality = quality;
-	
+		this.setPlaylistOption(playlistOption);
 	}
 
 	
@@ -52,6 +53,20 @@ public class ConfigDTO implements Serializable{
 	public void setQuality(String quality) {
 		
 		this.quality = quality;
+		
+	}
+
+
+	public String getPlaylistOption() {
+		
+		return (Boolean.parseBoolean(playlistOption)) ? "--yes-playlist" : "--no-playlist";
+		
+	}
+
+
+	public void setPlaylistOption(String playlistOption) {
+		
+		this.playlistOption = playlistOption;
 		
 	}
 	

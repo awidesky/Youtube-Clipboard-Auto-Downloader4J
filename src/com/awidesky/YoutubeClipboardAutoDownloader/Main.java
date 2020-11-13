@@ -22,7 +22,8 @@ public class Main {
 
 	private static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	private static String clipboardBefore = "";
-	private static ConfigDTO properties;
+	private static ConfigDTO properties = null;
+	private static GUI gui;
 	
 	public static void main(String[] args) {
 		
@@ -53,8 +54,8 @@ public class Main {
 			    	  
 								log("Received a link from your clipboard : " + data);
 								
-								TaskStatusModel t = new TaskStatusModel(null, "Starting", 0, null);
-								//TODO : put t to Table
+								TaskStatusModel t = new TaskStatusModel("", "Starting", 0, "");
+								gui.addTaskModel(t);
 								
 								try {
 									
@@ -83,7 +84,7 @@ public class Main {
 		
 		});
 		
-		SwingUtilities.invokeLater(() -> { new GUI(); log("Listening clipboard..."); });
+		SwingUtilities.invokeLater(() -> { gui = new GUI(); log("Listening clipboard..."); });
 		
 	}
 	
@@ -93,13 +94,13 @@ public class Main {
 		
         try(BufferedReader br = new BufferedReader(new FileReader(new File(YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\config.txt")))) {
         	
-            properties = new ConfigDTO(br.readLine().substring(9), br.readLine().substring(7), br.readLine().substring(8));
+            properties = new ConfigDTO(br.readLine().substring(9), br.readLine().substring(7), br.readLine().substring(8), br.readLine().substring(17));
             
         } catch (IOException e) {
         	
             log("Error when reading config.txt : " + e.getMessage() + "\nInitiating config.txt ...");
     		
-            properties = new ConfigDTO(".\\", "mp3", "0");
+            properties = new ConfigDTO(".\\", "mp3", "0", "false");
             
         }
         

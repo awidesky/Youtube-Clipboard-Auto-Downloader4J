@@ -134,4 +134,12 @@ public class GUI extends JFrame {
 		setVisible(true);
 		
 	}
+
+	public void addTaskModel(TaskStatusModel t) {
+
+		//TODO : give t a whenDone object
+		//TODO : give t a processUpdater object
+		//TODO : put t to Table
+		
+	}
 }
