@@ -23,68 +23,88 @@ public class Main {
 	private static ExecutorService executorService = Executors.newFixedThreadPool(1);
 	private static String clipboardBefore = "";
 	private static ConfigDTO properties;
+	private static boolean isSecondtime = false;
+	private static ClipBoardCheckerThread clipChecker = new ClipBoardCheckerThread();
 	
 	public static void main(String[] args) {
-		
+
 		YoutubeAudioDownloader.checkFiles();
 		readProperties();
-		
-		Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener(new FlavorListener() { 
-		
-				@Override 
-			    public void flavorsChanged(FlavorEvent e) {
-					
-					//System.err.println("CLIPBOARD CHANGED");
 
+		clipChecker.start();
+
+		Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener(new FlavorListener() {
+
+			@Override
+			public void flavorsChanged(FlavorEvent e) { // This code is invoked in EDT!!
+
+				// System.err.println("CLIPBOARD CHANGED");
+
+				clipChecker.submit(() -> {
+					
 					try {
-						
+
 						Thread.sleep(50);
-						final String data = (String)Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
-						//System.out.println("data : " + data + "\nex-clipboard : " + clipboardBefore);
-						
-						if (data.equals(clipboardBefore)) {	clearClipboardBefore();	return;	}
-						
+						final String data = (String) Toolkit.getDefaultToolkit().getSystemClipboard()
+								.getData(DataFlavor.stringFlavor);
+						// System.out.println("data : " + data + "\nex-clipboard : " + clipboardBefore);
+
+						if (data.equals(clipboardBefore)) {
+
+							if (!isSecondtime) {
+
+								Thread.sleep(50);
+								clearClipboardBefore();
+								return;
+
+							} else {
+
+								return;
+
+							}
+
+						}
+
 						clipboardBefore = data;
-						
+
 						executorService.submit(() -> {
-						
-						
+
 							if (data.startsWith("https://www.youtu")) {
-			    	  
+
 								log("Received a link from your clipboard : " + data);
-								
+
 								try {
-									
+
 									YoutubeAudioDownloader.download(data);
-									
+
 								} catch (Exception e1) {
-									
+
 									log("Error! : " + e1.getMessage());
-									
+
 								}
 
 							}
-						
-						
-						});
-						
-						
-					} catch (InterruptedException | HeadlessException | UnsupportedFlavorException | IOException e1) {
-						
-						log("Error! : " + e1.getMessage());
-					
-					}
-					
-					
-				}
-		
-		});
-		
-		SwingUtilities.invokeLater(() -> { new GUI(); log("Listening clipboard..."); });
-		
-	}
-	
 
+						});
+
+					} catch (InterruptedException | HeadlessException | UnsupportedFlavorException | IOException e1) {
+
+						log("Error! : " + e1.getMessage());
+
+					} //try end
+
+				}); //submit end
+
+			} //flavorsChanged end
+
+		}); //FlavorListener enc
+
+		SwingUtilities.invokeLater(() -> {
+			new GUI();
+			log("Listening clipboard...");
+		});
+
+	}
 
 	private static void readProperties() {
 		
