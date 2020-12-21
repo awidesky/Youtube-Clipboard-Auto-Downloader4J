@@ -11,7 +11,7 @@ import java.nio.file.StandardCopyOption;
 
 public class YoutubeAudioDownloader {
 
-	private static final String projectpath = new File(YoutubeAudioDownloader.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
+	private static final String projectpath = new File(YoutubeAudioDownloader.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
 	private static final String youtubedlpath = projectpath + "\\YoutubeAudioAutoDownloader-resources\\ffmpeg\\bin";
 	private static File downloadPath;
 	
