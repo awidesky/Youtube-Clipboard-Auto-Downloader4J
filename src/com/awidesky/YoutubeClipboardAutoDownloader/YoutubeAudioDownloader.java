@@ -5,20 +5,36 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 public class YoutubeAudioDownloader {
 
-	private static final String projectpath = new File(YoutubeAudioDownloader.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
-	private static final String youtubedlpath = projectpath + "\\YoutubeAudioAutoDownloader-resources\\ffmpeg\\bin";
+	private static String projectpath;
+	private static String youtubedlpath;
 	private static File downloadPath;
+	
+	static {
+		
+		try {
+			
+			projectpath = new File(YoutubeAudioDownloader.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
+			youtubedlpath  = projectpath + "\\YoutubeAudioAutoDownloader-resources\\ffmpeg\\bin";
+			
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			GUI.error("Error!", e.getMessage());
+		}
+	}
 	
 	static void checkFiles() {
 		//System.out.println(youtubedlpath);
-		if (!new File(youtubedlpath + "\\youtube-dl.exe").exists()) { throw new Error("youtube-dl.exe does not exist in " + youtubedlpath);
-
+		if (!new File(youtubedlpath + "\\youtube-dl.exe").exists()) {
+			
+			GUI.error("Error!", "youtube-dl.exe does not exist in\n" + youtubedlpath);
+			throw new Error();
 		}
 	}
 	
@@ -61,7 +77,7 @@ public class YoutubeAudioDownloader {
 			  
 			  } catch (IOException e) {
 			  
-			  // Main.log(e.toString());
+				  Main.log(e.getMessage());
 			  
 			  }
 			  
@@ -82,7 +98,7 @@ public class YoutubeAudioDownloader {
 			  
 			  } catch (IOException e) {
 			  
-			  // Main.log(e.toString());
+			   Main.log(e.getMessage());
 			  
 			  }
 			  

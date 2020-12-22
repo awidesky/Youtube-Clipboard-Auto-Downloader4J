@@ -28,7 +28,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 
-		YoutubeAudioDownloader.checkFiles();
+		YoutubeAudioDownloader.checkFiles(); //TODO : this three should print error
 		readProperties();
 
 		clipChecker.start();
@@ -79,7 +79,7 @@ public class Main {
 
 								} catch (Exception e1) {
 
-									log("Error! : " + e1.getMessage());
+									log("Error in downloading! : " + e1.getMessage());
 
 								}
 
@@ -114,7 +114,7 @@ public class Main {
             
         } catch (IOException e) {
         	
-            log("Error when reading config.txt : " + e.getMessage() + "\nInitiating config.txt ...");
+            GUI.warning("Error when reading config.txt", e.getMessage() + "\nInitiating config.txt anyway...");
     		
             properties = new ConfigDTO(".\\", "mp3", "0");
             
@@ -134,7 +134,7 @@ public class Main {
 			
 		} catch (IOException e) {
 			
-			log("Error when writing config.txt file : " + e.getMessage());
+			GUI.error("Error when writing config.txt file : ", e.getMessage());
 			
 		}
 		

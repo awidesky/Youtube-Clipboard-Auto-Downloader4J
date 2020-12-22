@@ -134,5 +134,19 @@ public class GUI extends JFrame {
 		setVisible(true);
 		
 	}
+	
+	
+	public static void error(String title, String content) {
+		
+		JOptionPane.showMessageDialog(null, content ,title,JOptionPane.ERROR_MESSAGE);
+		
+	}
+
+
+	public static void warning(String title, String content) {
+		
+		JOptionPane.showMessageDialog(null, content ,title,JOptionPane.WARNING_MESSAGE);
+		
+	}
 
 }
