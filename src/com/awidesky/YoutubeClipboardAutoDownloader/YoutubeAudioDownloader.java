@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -17,16 +16,8 @@ public class YoutubeAudioDownloader {
 	private static File downloadPath;
 	
 	static {
-		
-		try {
-			
-			projectpath = new File(YoutubeAudioDownloader.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
-			youtubedlpath  = projectpath + "\\YoutubeAudioAutoDownloader-resources\\ffmpeg\\bin";
-			
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			GUI.error("Error!", e.getMessage());
-		}
+		projectpath = new File(new File(YoutubeAudioDownloader.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getAbsolutePath()).getParentFile().getAbsolutePath();
+		youtubedlpath = projectpath + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "ffmpeg" + File.separator + "bin";
 	}
 	
 	static void checkFiles() {
@@ -36,6 +27,7 @@ public class YoutubeAudioDownloader {
 			GUI.error("Error!", "youtube-dl.exe does not exist in\n" + youtubedlpath);
 			throw new Error();
 		}
+		//GUI.warning("PathCheck", youtubedlpath);
 	}
 	
 	public static String getProjectpath() {
@@ -50,7 +42,7 @@ public class YoutubeAudioDownloader {
 			
 			//Main.log(downloadPath.getAbsolutePath());
 																													
-			ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", "-x", "--no-playlist", "--audio-format", Main.getProperties().getFormat(), "--audio-quality", Main.getProperties().getQuality(),  url);
+			ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe","--verbose", "--newline", "-x", "--no-playlist", "--audio-format", Main.getProperties().getFormat(), "--audio-quality", Main.getProperties().getQuality(),  url);
 			Process p = pb.directory(new File(youtubedlpath)).start();
 
 			
