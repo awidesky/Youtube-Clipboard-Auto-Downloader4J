@@ -31,6 +31,13 @@ public class Main {
 		YoutubeAudioDownloader.checkFiles(); //TODO : this three should print error
 		readProperties();
 
+		StringBuilder sb = new StringBuilder("--newLine");
+		
+		for(String s : args) {
+			sb.append(" " + s);
+		}
+		YoutubeAudioDownloader.setArgsOptions(sb.toString());
+		
 		clipChecker.start();
 
 		Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener(new FlavorListener() {

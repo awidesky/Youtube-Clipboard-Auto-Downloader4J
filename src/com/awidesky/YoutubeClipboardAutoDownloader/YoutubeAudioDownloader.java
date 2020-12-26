@@ -14,12 +14,17 @@ public class YoutubeAudioDownloader {
 	private static String projectpath;
 	private static String youtubedlpath;
 	private static File downloadPath;
+	private static String options;
 	
 	static {
 		projectpath = new File(new File(YoutubeAudioDownloader.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getAbsolutePath()).getParentFile().getAbsolutePath();
 		youtubedlpath = projectpath + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "ffmpeg" + File.separator + "bin";
 	}
 	
+	public static void setArgsOptions(String options) {
+		YoutubeAudioDownloader.options = options;
+	}
+
 	static void checkFiles() {
 		//System.out.println(youtubedlpath);
 		if (!new File(youtubedlpath + "\\youtube-dl.exe").exists()) {
@@ -34,7 +39,7 @@ public class YoutubeAudioDownloader {
 		return projectpath;
 	}
 
-	static void download(String url) throws Exception {
+	public static void download(String url) throws Exception {
 		
 		downloadPath = new File(Main.getProperties().getSaveto());
 		
@@ -42,7 +47,7 @@ public class YoutubeAudioDownloader {
 			
 			//Main.log(downloadPath.getAbsolutePath());
 																													
-			ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe","--verbose", "--newline", "-x", "--no-playlist", "--audio-format", Main.getProperties().getFormat(), "--audio-quality", Main.getProperties().getQuality(),  url);
+			ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", options, "-x", "--no-playlist", "--audio-format", Main.getProperties().getFormat(), "--audio-quality", Main.getProperties().getQuality(),  url);
 			Process p = pb.directory(new File(youtubedlpath)).start();
 
 			
