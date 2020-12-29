@@ -134,7 +134,7 @@ public class GUI extends JFrame {
 		setVisible(true);
 		
 	}
-	
+
 	
 	public static void error(String title, String content) {
 		
@@ -146,6 +146,15 @@ public class GUI extends JFrame {
 	public static void warning(String title, String content) {
 		
 		JOptionPane.showMessageDialog(null, content ,title,JOptionPane.WARNING_MESSAGE);
+		
+	}
+
+
+	public void addTaskModel(TaskStatusModel t) {
+
+		//TODO : give t a whenDone object
+		//TODO : give t a processUpdater object
+		//TODO : put t to Table
 		
 	}
 

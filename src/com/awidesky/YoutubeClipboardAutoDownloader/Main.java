@@ -20,12 +20,15 @@ import javax.swing.SwingUtilities;
 /** Main class */
 public class Main {
 
-	private static ExecutorService executorService = Executors.newFixedThreadPool(1);
+	private static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	private static String clipboardBefore = "";
 	private static ConfigDTO properties;
 	private static boolean isSecondtime = false;
 	private static ClipBoardCheckerThread clipChecker = new ClipBoardCheckerThread();
-	
+
+	private static GUI gui; //TODO: Do we need this?
+
+
 	public static void main(String[] args) {
 
 		YoutubeAudioDownloader.checkFiles(); //TODO : this three should print error
@@ -79,11 +82,22 @@ public class Main {
 							if (data.startsWith("https://www.youtu")) {
 
 								log("Received a link from your clipboard : " + data);
+//<<<<<<< HEAD
 
 								try {
 
 									YoutubeAudioDownloader.download(data);
 
+//=======
+								
+								TaskStatusModel t = new TaskStatusModel("", "Starting", 0, "");
+								gui.addTaskModel(t);
+								
+								try {
+									
+									YoutubeAudioDownloader.download(data, t);
+									
+//>>>>>>> feature-MultuThreading
 								} catch (Exception e1) {
 
 									log("Error in downloading! : " + e1.getMessage());
@@ -111,19 +125,20 @@ public class Main {
 			log("Listening clipboard...");
 		});
 
+
 	}
 
 	private static void readProperties() {
 		
         try(BufferedReader br = new BufferedReader(new FileReader(new File(YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\config.txt")))) {
         	
-            properties = new ConfigDTO(br.readLine().substring(9), br.readLine().substring(7), br.readLine().substring(8));
+            properties = new ConfigDTO(br.readLine().substring(9), br.readLine().substring(7), br.readLine().substring(8), br.readLine().substring(17));
             
         } catch (IOException e) {
         	
             GUI.warning("Error when reading config.txt", e.getMessage() + "\nInitiating config.txt anyway...");
     		
-            properties = new ConfigDTO(".\\", "mp3", "0");
+            properties = new ConfigDTO(".\\", "mp3", "0", "false");
             
         }
         
