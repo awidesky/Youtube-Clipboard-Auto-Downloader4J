@@ -74,6 +74,7 @@ public class GUI extends JFrame {
 		        
 			 String path = jfc.getSelectedFile().getAbsolutePath();
 		     Main.getProperties().setSaveto(path);
+		     YoutubeAudioDownloader.setDownloadPath(path);
 		     jft_path.setText(path);
 		     jfc.setCurrentDirectory(new File(path));
 			
@@ -150,7 +151,7 @@ public class GUI extends JFrame {
 	}
 
 
-	public void addTaskModel(TaskStatusModel t) {
+	public void addTaskModel(TaskStatusViewerModel t) {
 
 		//TODO : give t a whenDone object
 		//TODO : give t a processUpdater object

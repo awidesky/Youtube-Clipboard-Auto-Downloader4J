@@ -82,28 +82,19 @@ public class Main {
 							if (data.startsWith("https://www.youtu")) {
 
 								log("Received a link from your clipboard : " + data);
-//<<<<<<< HEAD
 
-								try {
-
-									YoutubeAudioDownloader.download(data);
-
-//=======
-								
-								TaskStatusModel t = new TaskStatusModel("", "Starting", 0, "");
-								gui.addTaskModel(t);
 								
 								try {
-									
+									TaskStatusViewerModel t = new TaskStatusViewerModel("", "Starting", 0, "");
 									YoutubeAudioDownloader.download(data, t);
-									
-//>>>>>>> feature-MultuThreading
+									gui.addTaskModel(t);
+								
 								} catch (Exception e1) {
 
 									log("Error in downloading! : " + e1.getMessage());
 
 								}
-
+								
 							}
 
 						});
@@ -133,7 +124,7 @@ public class Main {
         try(BufferedReader br = new BufferedReader(new FileReader(new File(YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\config.txt")))) {
         	
             properties = new ConfigDTO(br.readLine().substring(9), br.readLine().substring(7), br.readLine().substring(8), br.readLine().substring(17));
-            
+            YoutubeAudioDownloader.setDownloadPath(properties.getSaveto()); 
         } catch (IOException e) {
         	
             GUI.warning("Error when reading config.txt", e.getMessage() + "\nInitiating config.txt anyway...");
@@ -171,7 +162,7 @@ public class Main {
 
 
 	
-	protected static void clearClipboardBefore() {
+	private static void clearClipboardBefore() {
 		
 		clipboardBefore = ""; //System.out.println("clearclipboard called");
 		

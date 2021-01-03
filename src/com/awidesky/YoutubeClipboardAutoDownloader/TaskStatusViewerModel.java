@@ -2,9 +2,9 @@ package com.awidesky.YoutubeClipboardAutoDownloader;
 
 import java.util.function.Consumer;
 
-public class TaskStatusModel {
+public class TaskStatusViewerModel {
 
-	public TaskStatusModel(String videoName, String status, int progress, String dest) {
+	public TaskStatusViewerModel(String videoName, String status, int progress, String dest) {
 		this.videoName = videoName;
 		this.status = status;
 		this.progress = progress;

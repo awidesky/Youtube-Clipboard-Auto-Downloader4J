@@ -11,9 +11,8 @@ public class YoutubeAudioDownloader {
 
 	private static String projectpath;
 	private static String youtubedlpath;
-	private static File downloadPath;
+	private static File downloadPath = null;
 	private static String options;
-	private static File downloadPath;
 	private static Pattern pattern = Pattern.compile("^[0-9]+%$");
 
 	
@@ -22,6 +21,10 @@ public class YoutubeAudioDownloader {
 		youtubedlpath = projectpath + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "ffmpeg" + File.separator + "bin";
 	}
 	
+	public static void setDownloadPath(String downloadPath) {
+		YoutubeAudioDownloader.downloadPath = new File(downloadPath);
+	}
+
 	public static void setArgsOptions(String options) {
 		YoutubeAudioDownloader.options = options;
 	}
@@ -43,78 +46,13 @@ public class YoutubeAudioDownloader {
 	}
 
 
-	static void download(String url, TaskStatusModel task) throws Exception {
+	public static void download(String url, TaskStatusViewerModel task) throws Exception {
 
-
-		downloadPath = new File(Main.getProperties().getSaveto());
 
 		try {
 
 			
 			//Main.log(downloadPath.getAbsolutePath());
-																													
-			ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", options, "-x", "--no-playlist", "--audio-format", Main.getProperties().getFormat(), "--audio-quality", Main.getProperties().getQuality(),  url);
-			Process p = pb.directory(new File(youtubedlpath)).start();
-
-
-			task.setDest(Main.getProperties().getSaveto());
-			
-
-			  Thread stdout = new Thread(() -> {
-			  
-			  BufferedReader br = new BufferedReader(new
-			  InputStreamReader(p.getInputStream())); String line = null;
-			  
-			  try {
-			  
-				  while((line = br.readLine ()) != null) {
-			  
-					  if (line.startsWith("[download]") && !line.startsWith("[download] 100%")) { continue; }
-					  if (line.equals("")) {
-						  
-						  String temp = line;
-						  if ((line = br.readLine()).startsWith("[download]")) { continue; }
-						  Main.log(temp);
-						  
-					  }
-					  Main.log(line);
-			  
-				  }
-			  
-			  } catch (IOException e) {
-			  
-				  Main.log(e.getMessage());
-			  
-			  }
-			  
-			  });
-			  
-			  Thread stderr = new Thread(() -> {
-			  
-			  BufferedReader br = new BufferedReader(new
-			  InputStreamReader(p.getErrorStream())); String line = null;
-			  
-			  try {
-			  
-			  while((line = br.readLine ()) != null) {
-			  
-			  Main.log(line);
-			  
-			  }
-			  
-			  } catch (IOException e) {
-			  
-			   Main.log(e.getMessage());
-			  
-			  }
-			  
-			  });
-			  
-			  stdout.start(); stderr.start();
-			 
-			 
-			p.waitFor();
-
 			
 			/* get video name */
 			ProcessBuilder pbGetName = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", "--get-filename -o \"%(title)s\"", url);
@@ -122,15 +60,16 @@ public class YoutubeAudioDownloader {
 			BufferedReader br1 = new BufferedReader(new InputStreamReader(p1.getInputStream()));
 			task.setVideoName(br1.readLine());
 			p1.waitFor();
+								
 			
-			
-			/* download video */
-			ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", "-x",
-					"-o" + "\"%(title)s.%(ext)s\"", Main.getProperties().getPlaylistOption(), "--audio-format",
-					Main.getProperties().getFormat(), "--audio-quality", Main.getProperties().getQuality(), url);
+			/* download video */                                                                   //TODO: name "-o" + "\"%(title)s.%(ext)s\""
+			ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", options, "-x", Main.getProperties().getPlaylistOption(), "--audio-format", Main.getProperties().getFormat(), "--audio-quality", Main.getProperties().getQuality(),  url);
 			Process p = pb.directory(downloadPath).start();
 
+
+			task.setDest(downloadPath.getAbsolutePath());
 			task.setStatus("Downloading");
+			
 			
 			Thread stdout = new Thread(() -> {
 
