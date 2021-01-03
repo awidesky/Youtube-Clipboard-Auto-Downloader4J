@@ -2,7 +2,7 @@ package com.awidesky.YoutubeClipboardAutoDownloader;
 
 import java.io.Serializable;
 
-public class ConfigDTO implements Serializable{
+public class ConfigDTO implements Serializable{ //TODO: Use Properties instead!
 
 	private static final long serialVersionUID = 1184293966501697035L;
 	

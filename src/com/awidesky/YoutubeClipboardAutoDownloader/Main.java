@@ -31,7 +31,7 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		YoutubeAudioDownloader.checkFiles(); //TODO : this three should print error
+		YoutubeAudioDownloader.checkFiles(); //TODO : check another files like ffmpeg
 		readProperties();
 
 		StringBuilder sb = new StringBuilder("--newLine");
