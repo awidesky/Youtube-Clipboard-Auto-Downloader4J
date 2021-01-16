@@ -16,7 +16,7 @@ public class YoutubeAudioDownloader {
 	private static Pattern pattern = Pattern.compile("^[0-9]+%$");
 
 	
-	static {
+	static { // TODO : absolutepath 여러번 호출 안 되게, windows용인데 Fule. Separate r..?
 		projectpath = new File(new File(YoutubeAudioDownloader.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getAbsolutePath()).getParentFile().getAbsolutePath();
 		youtubedlpath = projectpath + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "ffmpeg" + File.separator + "bin";
 	}
