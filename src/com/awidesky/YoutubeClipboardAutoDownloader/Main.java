@@ -125,7 +125,13 @@ public class Main {
         	
             properties = new ConfigDTO(br.readLine().substring(9), br.readLine().substring(7), br.readLine().substring(8), br.readLine().substring(17));
             YoutubeAudioDownloader.setDownloadPath(properties.getSaveto()); 
-        } catch (IOException e) {
+        } catch (NoSuchFileException e1) { 
+		
+	    GUI.warning("Error when reading config.txt", e.getMessage() + "\nDon't worry! I'll make one...");
+	    new File(YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\config.txt").createNewFile();
+	    properties = new ConfigDTO(".\\", "mp3", "0", "false");
+		
+	} catch (IOException e) {
         	
             GUI.warning("Error when reading config.txt", e.getMessage() + "\nInitiating config.txt anyway...");
     		
