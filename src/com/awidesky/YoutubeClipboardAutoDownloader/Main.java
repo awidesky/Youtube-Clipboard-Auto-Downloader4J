@@ -34,9 +34,9 @@ public class Main {
 		YoutubeAudioDownloader.checkFiles(); //TODO : check another files like ffmpeg
 		readProperties();
 
-		StringBuilder sb = new StringBuilder("--newLine");
+		StringBuilder sb = new StringBuilder("--newline");
 		
-		for(String s : args) {
+		for(String s : args) { //for test
 			sb.append(" " + s);
 		}
 		YoutubeAudioDownloader.setArgsOptions(sb.toString());
