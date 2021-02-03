@@ -93,7 +93,7 @@ public class YoutubeAudioDownloader {
 
 				} catch (IOException e) {
 
-					Main.log(e.toString());
+					GUI.error("Error when redirecting output of youtube-dl.exe", e.getMessage());
 
 				}
 
@@ -119,7 +119,7 @@ public class YoutubeAudioDownloader {
 
 				} catch (IOException e) {
 
-					// Main.log(e.toString());
+					GUI.error("Error when redirecting error output of youtube-dl.exe", e.getMessage());
 
 				}
 				
@@ -157,7 +157,7 @@ public class YoutubeAudioDownloader {
 			Main.log("Done!\n");
 
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new Exception(e);
 		}
 
 	}

@@ -12,6 +12,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.NoSuchFileException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -83,17 +84,20 @@ public class Main {
 
 								log("Received a link from your clipboard : " + data);
 
+								TaskStatusViewerModel t = new TaskStatusViewerModel("", "Starting", 0, "");
 								
 								try {
-									TaskStatusViewerModel t = new TaskStatusViewerModel("", "Starting", 0, "");
+									
 									YoutubeAudioDownloader.download(data, t);
-									gui.addTaskModel(t);
 								
 								} catch (Exception e1) {
 
-									log("Error in downloading! : " + e1.getMessage());
-
+									GUI.error("Error in downloading! : " , e1.getMessage());
+									return;
+									
 								}
+								
+								gui.addTaskModel(t);
 								
 							}
 
@@ -101,7 +105,7 @@ public class Main {
 
 					} catch (InterruptedException | HeadlessException | UnsupportedFlavorException | IOException e1) {
 
-						log("Error! : " + e1.getMessage());
+						GUI.error("Error! : " , e1.getMessage());
 
 					} //try end
 
@@ -109,10 +113,10 @@ public class Main {
 
 			} //flavorsChanged end
 
-		}); //FlavorListener enc
+		}); //FlavorListener end
 
 		SwingUtilities.invokeLater(() -> {
-			new GUI();
+			gui = new GUI();
 			log("Listening clipboard...");
 		});
 
@@ -125,17 +129,18 @@ public class Main {
         	
             properties = new ConfigDTO(br.readLine().substring(9), br.readLine().substring(7), br.readLine().substring(8), br.readLine().substring(17));
             YoutubeAudioDownloader.setDownloadPath(properties.getSaveto()); 
+            
         } catch (NoSuchFileException e1) { 
 		
-	    GUI.warning("Error when reading config.txt", e.getMessage() + "\nDon't worry! I'll make one...");
-	    new File(YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\config.txt").createNewFile();
-	    properties = new ConfigDTO(".\\", "mp3", "0", "false");
+        	GUI.warning("config.txt not exists!", e1.getMessage() + "\nDon't worry! I'll make one later...");
+	    
+		    properties = new ConfigDTO(new File(".\\").getAbsolutePath(), "mp3", "0", "false");
 		
-	} catch (IOException e) {
+        } catch (IOException e) {
         	
             GUI.warning("Error when reading config.txt", e.getMessage() + "\nInitiating config.txt anyway...");
     		
-            properties = new ConfigDTO(".\\", "mp3", "0", "false");
+            properties = new ConfigDTO(new File(".\\").getAbsolutePath(), "mp3", "0", "false");
             
         }
         
@@ -146,6 +151,9 @@ public class Main {
 		
 		/** Write <code>properties</code> */
 		try(PrintWriter pw = new PrintWriter(new FileWriter(new File(YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\config.txt")))) {
+			
+			File cfg = new File(YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\config.txt");
+			if(!cfg.exists()) cfg.createNewFile();
 			
 			pw.println("SavePath=" + properties.getSaveto());
 			pw.println("Format=" + properties.getFormat());
