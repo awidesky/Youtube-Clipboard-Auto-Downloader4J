@@ -4,11 +4,11 @@ import java.util.function.Consumer;
 
 public class TaskStatusViewerModel {
 
-	public TaskStatusViewerModel(String videoName, String status, int progress, String dest) {
+	public TaskStatusViewerModel(String videoName, String dest, String status, int progress) {
 		this.videoName = videoName;
+		this.dest = dest;
 		this.status = status;
 		this.progress = progress;
-		this.dest = dest;
 	}
 	
 	private String videoName;

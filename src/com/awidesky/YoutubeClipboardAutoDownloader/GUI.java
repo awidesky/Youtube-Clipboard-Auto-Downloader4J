@@ -3,7 +3,6 @@ package com.awidesky.YoutubeClipboardAutoDownloader;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.PrintStream;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -13,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -28,12 +28,13 @@ public class GUI extends JFrame {
 	private JTextField jft_path;
 	private JComboBox<String> cb_format, cb_quality;
 	private JFileChooser jfc = new JFileChooser();
-	private JTextArea jta_console;
+	private JTable table;
+	private static final String[] table_header = {"Video", "Destination", "Status", "Progress"};
 	private JScrollPane scrollPane;
 	
 	public GUI() {
 		
-		setTitle("Youtube Audio Auto Downloader");
+		setTitle("Youtube Audio Auto Downloader " + Main.version);
 		setIconImage(new ImageIcon(YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\icon.jpg").getImage());
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setSize(630,450);
@@ -98,13 +99,11 @@ public class GUI extends JFrame {
 			
 		});
 		
+		table = new JTable();
 		jta_console = new JTextArea();
 		jta_console.setEditable(false);
 		jta_console.setFont(jta_console.getFont().deriveFont(15f));
-		PrintStream ps = new PrintStream(new TextAreaOutputStream(jta_console));
-		System.setOut(ps);
-		System.setErr(ps);
-		
+
 		scrollPane = new JScrollPane(jta_console, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setBounds(8, 122, 600, 278);
 		

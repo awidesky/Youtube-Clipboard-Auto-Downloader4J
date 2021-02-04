@@ -27,8 +27,10 @@ public class Main {
 	private static boolean isSecondtime = false;
 	private static ClipBoardCheckerThread clipChecker = new ClipBoardCheckerThread();
 
-	private static GUI gui; //TODO: Do we need this?
-
+	private static GUI gui;
+	
+	public static final String version = "v1.2.5-beta";
+	
 
 	public static void main(String[] args) {
 
