@@ -10,14 +10,17 @@ public class ClipBoardCheckerThread extends Thread {
 
 		super(() -> {
 
+			while(true) {
 			try {
 
 				queue.take().run();
 
 			} catch (InterruptedException e) {
 				Main.log("ClipBoardCheckerThread Interrupted! : " + e.getMessage());
+				break;
 			}
 
+			}
 		});
 		
 		this.setDaemon(true);
