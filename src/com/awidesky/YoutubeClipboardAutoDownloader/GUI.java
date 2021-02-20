@@ -43,41 +43,42 @@ public class GUI extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			
 			@Override
-		    public void windowClosing(WindowEvent e) {
+			public void windowClosing(WindowEvent e) {
 				
-				new Thread(() -> { Main.writeProperties(); }).start();
-		        e.getWindow().dispose();
-		        System.exit(0);
+				Thread t = new Thread(() -> { Main.writeProperties(); });
+				t.start(); t.join();
+		        	e.getWindow().dispose();
+		       	 	System.exit(0);
 
 			}
 			
 		});
 		
-        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        jfc.setDialogTitle("Choose directory to save music!");
-        jfc.setCurrentDirectory(new File(Main.getProperties().getSaveto()));
+        	jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+      	 	jfc.setDialogTitle("Choose directory to save music!");
+        	jfc.setCurrentDirectory(new File(Main.getProperties().getSaveto()));
         
-        tlb_format = new JLabel("Format :");
-        tlb_quality = new JLabel("Audio Quality :");
-        tlb_path = new JLabel("Save to :");
-        jft_path = new JTextField(Main.getProperties().getSaveto());
+		tlb_format = new JLabel("Format :");
+		tlb_quality = new JLabel("Audio Quality :");
+		tlb_path = new JLabel("Save to :");
+		jft_path = new JTextField(Main.getProperties().getSaveto());
        
-        jft_path.addActionListener((e) -> {
+        	jft_path.addActionListener((e) -> {
         	
-        	Main.getProperties().setSaveto(jft_path.getText());
+       		 	Main.getProperties().setSaveto(jft_path.getText());
         	
-        });
+       	 	});
         
-        btn_browse = new JButton("Browse...");
+       		btn_browse = new JButton("Browse...");
 		btn_browse.addActionListener((e) -> {
 			
 			 if (jfc.showDialog(new JFrame(), null) != JFileChooser.APPROVE_OPTION) { JOptionPane.showMessageDialog(null, "Please choose a directory!","ERROR!",JOptionPane.WARNING_MESSAGE); return; }
 		        
 			 String path = jfc.getSelectedFile().getAbsolutePath();
-		     Main.getProperties().setSaveto(path);
-		     YoutubeAudioDownloader.setDownloadPath(path);
-		     jft_path.setText(path);
-		     jfc.setCurrentDirectory(new File(path));
+			 Main.getProperties().setSaveto(path);
+		     	 YoutubeAudioDownloader.setDownloadPath(path);
+		     	 jft_path.setText(path);
+		     	 jfc.setCurrentDirectory(new File(path));
 			
 		});
 		
@@ -131,11 +132,15 @@ public class GUI extends JFrame {
 		
 		add(scrollPane);
 		
-		setVisible(true);
-		
 	}
 
-	
+	public void show() {
+
+		setVisible(true);
+
+	}
+
+
 	public static void error(String title, String content) {
 		
 		JOptionPane.showMessageDialog(null, content ,title,JOptionPane.ERROR_MESSAGE);
