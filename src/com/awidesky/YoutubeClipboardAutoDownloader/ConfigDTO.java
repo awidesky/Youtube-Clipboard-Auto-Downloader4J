@@ -16,7 +16,8 @@ public class ConfigDTO implements Serializable{ //TODO: Use Properties instead!
 		this.saveto = saveto;
 		this.format = extension;
 		this.quality = quality;
-		this.setPlaylistOption(playlistOption);
+		this.playlistOption = playlistOption;
+		
 	}
 
 	
@@ -59,15 +60,9 @@ public class ConfigDTO implements Serializable{ //TODO: Use Properties instead!
 
 	public String getPlaylistOption() {
 		
-		return (Boolean.parseBoolean(playlistOption)) ? "--yes-playlist" : "--no-playlist";
+		return playlistOption;
 		
 	}
 
-
-	public void setPlaylistOption(String playlistOption) {
-		
-		this.playlistOption = playlistOption;
-		
-	}
 	
 }

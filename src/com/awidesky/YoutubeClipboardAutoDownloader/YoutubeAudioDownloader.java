@@ -11,19 +11,16 @@ public class YoutubeAudioDownloader {
 
 	private static String projectpath;
 	private static String youtubedlpath;
-	private static File downloadPath = null;
 	private static String options;
 	private static Pattern pattern = Pattern.compile("^[0-9]+%$");
 
 	
 	static {
 		projectpath = new File(new File(YoutubeAudioDownloader.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getAbsolutePath()).getParentFile().getAbsolutePath();
+		projectpath = projectpath.replaceAll("%20", " ");
 		youtubedlpath = projectpath + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "ffmpeg" + File.separator + "bin";
 	}
 	
-	public static void setDownloadPath(String downloadPath) {
-		YoutubeAudioDownloader.downloadPath = new File(downloadPath);
-	}
 
 	public static void setArgsOptions(String options) {
 		YoutubeAudioDownloader.options = options;
@@ -31,7 +28,9 @@ public class YoutubeAudioDownloader {
 
 	static void checkFiles() {
 
-		//System.out.println(youtubedlpath);
+		Main.log("projectpath = " + projectpath);
+		Main.log("youtubedlpath = " + youtubedlpath);
+		
 		if (!new File(youtubedlpath + "\\youtube-dl.exe").exists()) {
 			
 			GUI.error("Error!", "youtube-dl.exe does not exist in\n" + youtubedlpath);
@@ -50,26 +49,32 @@ public class YoutubeAudioDownloader {
 
 
 		try {
-
 			
-			//Main.log(downloadPath.getAbsolutePath());
+			Main.log(String.format("Current properties :\n downloadpath-%s\n format-%s\n quality-%s\n playlistoption-%s", Main.getProperties().getSaveto(), Main.getProperties().getFormat(), Main.getProperties().getQuality(), Main.getProperties().getPlaylistOption()));
+			
 			
 			/* get video name */
-			ProcessBuilder pbGetName = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", "--get-filename -o \"%(title)s\"", url);
+			String nameCommand = youtubedlpath + "\\youtube-dl.exe --get-filename -o \"%(title)s\" " + url;
+			Main.log("Getting video name by \"" + nameCommand + "\"");
+			ProcessBuilder pbGetName = new ProcessBuilder(nameCommand);
 			Process p1 = pbGetName.directory(null).start();
 			BufferedReader br1 = new BufferedReader(new InputStreamReader(p1.getInputStream()));
-			task.setVideoName(br1.readLine());
+			String name = br1.readLine();
+			task.setVideoName(name);
+			Main.log("Video name : " + name);
 			p1.waitFor();
 								
 			
 			/* download video */                                                                   //TODO: name "-o" + "\"%(title)s.%(ext)s\""
-			ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", options, "-x", Main.getProperties().getPlaylistOption(), "--audio-format", Main.getProperties().getFormat(), "--audio-quality", Main.getProperties().getQuality(),  url);
-			Process p = pb.directory(downloadPath).start();
+			String downCommand = youtubedlpath + "\\youtube-dl.exe" + options + " " + "--newline" + " " + "-x" + " " + Main.getProperties().getPlaylistOption() + " " + "--audio-format" + " " + Main.getProperties().getFormat() + " " + "--audio-quality" + " " + Main.getProperties().getQuality() + " " + url;
+			Main.log("Donwloading video by \"" + downCommand + "\"");
+			ProcessBuilder pb = new ProcessBuilder(downCommand);
+			Process p = pb.directory(new File(Main.getProperties().getSaveto())).start();
 
 
-			task.setDest(downloadPath.getAbsolutePath());
+			task.setDest(Main.getProperties().getSaveto());
 			task.setStatus("Downloading");
-			
+			task.setProgress(0);
 			
 			Thread stdout = new Thread(() -> {
 
@@ -87,7 +92,7 @@ public class YoutubeAudioDownloader {
 							
 						}
 						
-						Main.log(line);
+						Main.log("youtube-dl stdout : " + line);
 
 					}
 
@@ -112,10 +117,15 @@ public class YoutubeAudioDownloader {
 						
 						task.setStatus("ERROR");
 						sb.append(line);
+						Main.log("youtube-dl stderr : " + line);
 
 					}
 					
-					if (!sb.toString().equals("")) throw new RuntimeException(sb.toString());
+					if (!sb.toString().equals("")) {
+						
+						throw new RuntimeException("Exception in youtube-dl.exe proccess!");
+						
+					}
 
 				} catch (IOException e) {
 
