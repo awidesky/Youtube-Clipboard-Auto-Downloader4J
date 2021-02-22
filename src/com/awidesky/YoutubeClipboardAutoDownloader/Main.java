@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 import javax.swing.SwingUtilities;
 
 /** Main class */
-public class Main {
+public class Main { //TODO: write log to file
 
 	private static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	private static String clipboardBefore = "";
