@@ -7,32 +7,37 @@ import java.awt.datatransfer.FlavorEvent;
 import java.awt.datatransfer.FlavorListener;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.swing.SwingUtilities;
 
 /** Main class */
-public class Main { //TODO: write log to file
+public class Main { 
 
 	private static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	private static String clipboardBefore = "";
 	private static ConfigDTO properties;
 	private static boolean isSecondtime = false;
 	private static ClipBoardCheckerThread clipChecker = new ClipBoardCheckerThread();
-
+	private static PrintWriter logTo;
 	private static GUI gui;
 
 	public static final String version = "v1.2.5-beta";
 
 	public static void main(String[] args) {
 
+		prepareLogFile();
+		
 		YoutubeAudioDownloader.checkFiles(); // TODO : check another files like ffmpeg
 		readProperties();
 
@@ -135,9 +140,26 @@ public class Main { //TODO: write log to file
 
 	}
 
+	private static void prepareLogFile() {
+		try {
+			
+			File logFile = new File(YoutubeAudioDownloader.getProjectpath() + "\\logs\\log-"
+					+ new SimpleDateFormat("yyyyMMddkkmmss").format(new Date()) + ".txt");
+			logFile.getParentFile().mkdirs();
+			logFile.createNewFile();
+			logTo = new PrintWriter(logFile);
+			
+		} catch (IOException e) {
+			
+			GUI.error("Error when creating log flie", e.getMessage());
+			logTo = new PrintWriter(System.out);
+			
+		}
+	}
+
 	private static void readProperties() {
 
-		String p = new File(".\\").getParentFile().getAbsolutePath();
+		String p = YoutubeAudioDownloader.getProjectpath();
 		String f = "mp3";
 		String q = "0";
 		String l = "--no-playlist";
@@ -177,7 +199,7 @@ public class Main { //TODO: write log to file
 	public static void writeProperties() {
 
 		/** Write <code>properties</code> */
-		try (PrintWriter pw = new PrintWriter(new FileWriter(new File(
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
 				YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\config.txt")))) {
 
 			File cfg = new File(
@@ -185,10 +207,10 @@ public class Main { //TODO: write log to file
 			if (!cfg.exists())
 				cfg.createNewFile();
 
-			pw.println("SavePath=" + properties.getSaveto());
-			pw.println("Format=" + properties.getFormat());
-			pw.println("Quality=" + properties.getQuality());
-			pw.println("Playlist=" + properties.getPlaylistOption());
+			bw.write("SavePath=" + properties.getSaveto() + "\n");
+			bw.write("Format=" + properties.getFormat() + "\n");
+			bw.write("Quality=" + properties.getQuality() + "\n");
+			bw.write("Playlist=" + properties.getPlaylistOption() + "\n");
 			
 			Main.log(String.format("Final properties :\n downloadpath-%s\n format-%s\n quality-%s\n playlistoption-%s", properties.getSaveto(), properties.getFormat(), properties.getQuality(), properties.getPlaylistOption()));
 			
@@ -214,7 +236,7 @@ public class Main { //TODO: write log to file
 
 	public static void log(String data) {
 
-		System.out.println(data);
+		logTo.println(data);
 
 	}
 
