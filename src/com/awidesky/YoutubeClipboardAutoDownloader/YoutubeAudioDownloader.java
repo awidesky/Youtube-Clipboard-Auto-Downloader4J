@@ -28,12 +28,13 @@ public class YoutubeAudioDownloader {
 
 	static void checkFiles() {
 
-		Main.log("projectpath = " + projectpath);
-		Main.log("youtubedlpath = " + youtubedlpath);
+		Main.log("[init] projectpath = " + projectpath);
+		Main.log("[init] youtubedlpath = " + youtubedlpath);
+		Main.log("\n");
 		
 		if (!new File(youtubedlpath + "\\youtube-dl.exe").exists()) {
 			
-			GUI.error("Error!", "youtube-dl.exe does not exist in\n" + youtubedlpath);
+			GUI.error("Error!", "youtube-dl.exe does not exist in :\n" + youtubedlpath);
 			throw new Error();
 
 		}
