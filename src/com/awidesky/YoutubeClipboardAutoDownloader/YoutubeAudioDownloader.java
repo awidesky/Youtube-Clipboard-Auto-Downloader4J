@@ -50,7 +50,7 @@ public class YoutubeAudioDownloader {
 
 		try {
 			
-			Main.log(String.format("Current properties :\n downloadpath-%s\n format-%s\n quality-%s\n playlistoption-%s", Main.getProperties().getSaveto(), Main.getProperties().getFormat(), Main.getProperties().getQuality(), Main.getProperties().getPlaylistOption()));
+			Main.logProperties("Current");
 			
 			StringBuilder sb = new StringBuilder(""); //to retrieve command line argument
 			
@@ -91,7 +91,6 @@ public class YoutubeAudioDownloader {
 
 				BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
 				String line = null;
-
 				
 				try {
 

@@ -46,16 +46,8 @@ public class GUI extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent e) {
 
-				Thread t = new Thread(() -> {
-					Main.writeProperties();
-				});
-				t.start();
-				try {
-					t.join();
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				Main.writeProperties();
+				
 				e.getWindow().dispose();
 				System.exit(0);
 

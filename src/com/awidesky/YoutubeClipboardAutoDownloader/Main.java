@@ -189,7 +189,7 @@ public class Main {
 
 		} finally {
 			
-			Main.log(String.format("Initial properties :\n downloadpath-%s\n format-%s\n quality-%s\n playlistoption-%s", p, f, q, l));
+			Main.logProperties("Initial");
 			properties = new ConfigDTO(p, f, q, l);
 			
 		}
@@ -212,7 +212,7 @@ public class Main {
 			bw.write("Quality=" + properties.getQuality() + "\n");
 			bw.write("Playlist=" + properties.getPlaylistOption() + "\n");
 			
-			Main.log(String.format("Final properties :\n downloadpath-%s\n format-%s\n quality-%s\n playlistoption-%s", properties.getSaveto(), properties.getFormat(), properties.getQuality(), properties.getPlaylistOption()));
+			Main.logProperties("Final");
 			
 		} catch (IOException e) {
 
@@ -220,6 +220,12 @@ public class Main {
 
 		}
 
+	}
+	
+	public static void logProperties(String status) {
+		
+		Main.log(String.format(status + " properties :\n downloadpath-%s\n format-%s\n quality-%s\n playlistoption-%s", Main.getProperties().getSaveto(), Main.getProperties().getFormat(), Main.getProperties().getQuality(), Main.getProperties().getPlaylistOption()));
+		
 	}
 
 	public static ConfigDTO getProperties() {
