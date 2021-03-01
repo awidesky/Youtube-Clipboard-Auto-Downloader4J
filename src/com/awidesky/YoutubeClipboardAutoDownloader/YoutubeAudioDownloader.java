@@ -52,11 +52,16 @@ public class YoutubeAudioDownloader {
 			
 			Main.log(String.format("Current properties :\n downloadpath-%s\n format-%s\n quality-%s\n playlistoption-%s", Main.getProperties().getSaveto(), Main.getProperties().getFormat(), Main.getProperties().getQuality(), Main.getProperties().getPlaylistOption()));
 			
+			StringBuilder sb = new StringBuilder(""); //to retrieve command line argument
 			
-			/* get video name */
-			String nameCommand = youtubedlpath + "\\youtube-dl.exe --get-filename -o \"%(title)s\" " + url;
-			Main.log("Getting video name by \"" + nameCommand + "\"");
-			ProcessBuilder pbGetName = new ProcessBuilder(nameCommand);
+			/* get video name */ 
+			ProcessBuilder pbGetName = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", "--get-filename", "-output", "\"%(title)s\"" , url);
+			
+			//retrieve command line argument
+			pbGetName.command().stream().forEach((s) -> sb.append(s).append(' '));
+			Main.log("Getting video name by \"" + sb.toString().trim() + "\"");
+			
+			//start process
 			Process p1 = pbGetName.directory(null).start();
 			BufferedReader br1 = new BufferedReader(new InputStreamReader(p1.getInputStream()));
 			String name = br1.readLine();
@@ -65,13 +70,19 @@ public class YoutubeAudioDownloader {
 			p1.waitFor();
 								
 			
-			/* download video */                                                                   //TODO: name "-o" + "\"%(title)s.%(ext)s\""
-			String downCommand = youtubedlpath + "\\youtube-dl.exe" + options + " " + "--newline" + " " + "-x" + " " + Main.getProperties().getPlaylistOption() + " " + "--audio-format" + " " + Main.getProperties().getFormat() + " " + "--audio-quality" + " " + Main.getProperties().getQuality() + " " + url;
-			Main.log("Donwloading video by \"" + downCommand + "\"");
-			ProcessBuilder pb = new ProcessBuilder(downCommand);
+			
+			/* download video */
+			ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", options, "--newline", "--extract-audio", Main.getProperties().getPlaylistOption(), "--audio-format", Main.getProperties().getFormat(), "--output", "\"%(title)s.%(ext)s\"", "--audio-quality", Main.getProperties().getQuality(),  url);
+			
+			//retrieve command line argument
+			pb.command().stream().forEach((s) -> sb.append(s).append(' '));
+			Main.log("Donwloading video name by \"" + sb.toString().trim() + "\"");
+			
+			//start process
 			Process p = pb.directory(new File(Main.getProperties().getSaveto())).start();
 
 
+			
 			task.setDest(Main.getProperties().getSaveto());
 			task.setStatus("Downloading");
 			task.setProgress(0);
@@ -109,19 +120,19 @@ public class YoutubeAudioDownloader {
 
 				BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 				String line = null;
-				StringBuilder sb = new StringBuilder("");
+				StringBuilder sb1 = new StringBuilder("");
 				
 				try {
 
 					while ((line = br.readLine()) != null) {
 						
 						task.setStatus("ERROR");
-						sb.append(line);
+						sb1.append(line);
 						Main.log("youtube-dl stderr : " + line);
 
 					}
 					
-					if (!sb.toString().equals("")) {
+					if (!sb1.toString().equals("")) {
 						
 						throw new RuntimeException("Exception in youtube-dl.exe proccess!");
 						
