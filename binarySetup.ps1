@@ -2,6 +2,7 @@
 
 Set-Location $PSScriptRoot
 $ErrorActionPreference = "Inquire"
+$youtubedl_version=""
 
 if (!(Test-Path -Path '.\YoutubeAudioAutoDownloader-resources')) {
     Write-output "  Making Directory..."
@@ -29,6 +30,19 @@ Remove-Item -Path ".\YoutubeAudioAutoDownloader-resources\ffmpeg.zip"
 
 Write-output "  Downloading youtube-dl..."
 Invoke-WebRequest -Uri "https://youtube-dl.org/downloads/latest/youtube-dl.exe" -OutFile  '.\YoutubeAudioAutoDownloader-resources\ffmpeg\bin\youtube-dl.exe'
+
+
+if (Test-Path -Path '.\YoutubeAudioAutoDownloader-resources\ydlver.txt') {
+    #$youtubedl_version = Get-Content ".\YoutubeAudioAutoDownloader-resources\ydlver.txt" -Encoding UTF8 -Raw
+    Remove-Item -Path '.\YoutubeAudioAutoDownloader-resources\ydlver.txt'
+}
+
+$youtubedl_version = (.\YoutubeAudioAutoDownloader-resources\ffmpeg\bin\youtube-dl.exe --version) -join "`n"
+
+Set-content  -NoNewline -Path '.\YoutubeAudioAutoDownloader-resources\ydlver.txt' -Value "$youtubedl_version" -Encoding UTF8
+
+Write-output "  youtube-dl version : $youtubedl_version"
+
 
 
 Write-output "  Done!"
