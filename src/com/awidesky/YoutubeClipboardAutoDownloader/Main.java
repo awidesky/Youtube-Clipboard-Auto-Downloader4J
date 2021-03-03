@@ -38,7 +38,7 @@ public class Main {
 
 		prepareLogFile();
 		
-		YoutubeAudioDownloader.checkFiles(); // TODO : check another files like ffmpeg
+		YoutubeAudioDownloader.checkFiles();
 		readProperties();
 
 		SwingUtilities.invokeLater(() -> {
@@ -102,7 +102,8 @@ public class Main {
 
 								TaskStatusViewerModel t = new TaskStatusViewerModel();
 								t.setStatus("Preparing...");
-
+								gui.addTaskModel(t);
+								
 								try {
 
 									YoutubeAudioDownloader.download(data, t);
@@ -113,8 +114,6 @@ public class Main {
 									return;
 
 								}
-
-								gui.addTaskModel(t);
 
 							}
 

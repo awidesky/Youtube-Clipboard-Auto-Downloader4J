@@ -28,6 +28,7 @@ public class YoutubeAudioDownloader {
 
 	static void checkFiles() {
 
+		/* check youtube-dl */
 		Main.log("projectpath = " + projectpath);
 		Main.log("youtubedlpath = " + youtubedlpath);
 		
@@ -37,7 +38,37 @@ public class YoutubeAudioDownloader {
 			throw new Error();
 
 		}
-		//GUI.warning("PathCheck", youtubedlpath);
+		
+		
+		/* check ffmpeg */
+		//ffmpeg -version
+		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\ffmpeg.exe", "-version");
+
+		// retrieve command line argument
+		StringBuilder sb = new StringBuilder("");
+		pb.command().stream().forEach((s) -> sb.append(s).append(' '));
+		Main.log("Checking ffmpeg installation by \"" + sb.toString().trim() + "\"");
+
+		// start process
+		try {
+			
+			Process p = pb.directory(null).start();
+			
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+				String output;
+				if (!(output = br.readLine()).startsWith("ffmpeg version"))
+					throw new Exception("ffmpeg.exe does not exist in\n" + youtubedlpath);
+				Main.log("ffmpeg version : " + output);
+			} catch(IOException e1) { throw e1; }
+			
+			p.waitFor();
+			
+		} catch (Exception e) {
+			
+			GUI.error("Error when checking ffmpeg.exe : ", e.getMessage());
+			
+		}
+		
 	}
 
 	public static String getProjectpath() {
@@ -66,7 +97,9 @@ public class YoutubeAudioDownloader {
 		task.setVideoName(name);
 		Main.log("Video name : " + name);
 		p1.waitFor();
-
+		try { br1.close(); } catch (IOException i) { GUI.error("Error when closing process stream", i.getMessage()); }
+		
+		
 		/* download video */
 		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", options, "--newline",
 				"--extract-audio", Main.getProperties().getPlaylistOption(), "--audio-format",
@@ -86,11 +119,9 @@ public class YoutubeAudioDownloader {
 
 		Thread stdout = new Thread(() -> {
 
-			BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String line = null;
+			try(BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));) {
 
-			try {
-
+				String line = null;
 				while ((line = br.readLine()) != null) {
 
 					if (line.startsWith("[download]")) {
@@ -113,12 +144,11 @@ public class YoutubeAudioDownloader {
 
 		Thread stderr = new Thread(() -> {
 
-			BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-			String line = null;
-			StringBuilder sb1 = new StringBuilder("");
-
-			try {
-
+			try(BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));) {
+				
+				String line = null;
+				StringBuilder sb1 = new StringBuilder("");
+				
 				while ((line = br.readLine()) != null) {
 
 					task.setStatus("ERROR");
@@ -148,27 +178,7 @@ public class YoutubeAudioDownloader {
 
 		task.done();
 
-		// Thread.currentThread().sleep(100);
-		/*
-		 * Main.log("Finding downloaded file...");
-		 * 
-		 * File[] fileList = new File(youtubedlpath).listFiles(new FilenameFilter() {
-		 * 
-		 * @Override public boolean accept(File dir, String name) { return
-		 * name.endsWith(Main.getProperties().getFormat()); }
-		 * 
-		 * });
-		 * 
-		 * if(fileList.length ==0 ) { throw new
-		 * RuntimeException("Youtube-dl didn't dowload any files!"); }
-		 * 
-		 * for(File f : fileList) {
-		 * 
-		 * Files.copy(f.toPath(), Paths.get(downloadPath.getAbsolutePath() + "\\" +
-		 * f.getName()) ,StandardCopyOption.REPLACE_EXISTING); Files.delete(f.toPath());
-		 * 
-		 * }
-		 */
+
 		Main.log("Done!\n");
 
 	}
