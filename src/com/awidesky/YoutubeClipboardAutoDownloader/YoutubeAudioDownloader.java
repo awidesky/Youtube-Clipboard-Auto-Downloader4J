@@ -18,7 +18,7 @@ public class YoutubeAudioDownloader {
 	static {
 		projectpath = new File(new File(YoutubeAudioDownloader.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getAbsolutePath()).getParentFile().getAbsolutePath();
 		projectpath = projectpath.replaceAll("%20", " ");
-		youtubedlpath = projectpath + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "ffmpeg" + File.separator + "bin";
+		youtubedlpath = projectpath + "\\YoutubeAudioAutoDownloader-resources\\ffmpeg\\bin";
 	}
 	
 
@@ -47,138 +47,129 @@ public class YoutubeAudioDownloader {
 
 	public static void download(String url, TaskStatusViewerModel task) throws Exception {
 
+		Main.logProperties("Current");
 
-		try {
-			
-			Main.logProperties("Current");
-			
-			StringBuilder sb = new StringBuilder(""); //to retrieve command line argument
-			
-			/* get video name */ 
-			ProcessBuilder pbGetName = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", "--get-filename", "-output", "\"%(title)s\"" , url);
-			
-			//retrieve command line argument
-			pbGetName.command().stream().forEach((s) -> sb.append(s).append(' '));
-			Main.log("Getting video name by \"" + sb.toString().trim() + "\"");
-			
-			//start process
-			Process p1 = pbGetName.directory(null).start();
-			BufferedReader br1 = new BufferedReader(new InputStreamReader(p1.getInputStream()));
-			String name = br1.readLine();
-			task.setVideoName(name);
-			Main.log("Video name : " + name);
-			p1.waitFor();
-								
-			
-			
-			/* download video */
-			ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", options, "--newline", "--extract-audio", Main.getProperties().getPlaylistOption(), "--audio-format", Main.getProperties().getFormat(), "--output", "\"%(title)s.%(ext)s\"", "--audio-quality", Main.getProperties().getQuality(),  url);
-			
-			//retrieve command line argument
-			pb.command().stream().forEach((s) -> sb.append(s).append(' '));
-			Main.log("Donwloading video name by \"" + sb.toString().trim() + "\"");
-			
-			//start process
-			Process p = pb.directory(new File(Main.getProperties().getSaveto())).start();
+		StringBuilder sb = new StringBuilder(""); // to retrieve command line argument
 
+		/* get video name */
+		ProcessBuilder pbGetName = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", "--get-filename", "-output",
+				"\"%(title)s\"", url);
 
-			
-			task.setDest(Main.getProperties().getSaveto());
-			task.setStatus("Downloading");
-			task.setProgress(0);
-			
-			Thread stdout = new Thread(() -> {
+		// retrieve command line argument
+		pbGetName.command().stream().forEach((s) -> sb.append(s).append(' '));
+		Main.log("Getting video name by \"" + sb.toString().trim() + "\"");
 
-				BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-				String line = null;
-				
-				try {
+		// start process
+		Process p1 = pbGetName.directory(null).start();
+		BufferedReader br1 = new BufferedReader(new InputStreamReader(p1.getInputStream()));
+		String name = br1.readLine();
+		task.setVideoName(name);
+		Main.log("Video name : " + name);
+		p1.waitFor();
 
-					while ((line = br.readLine()) != null) {
+		/* download video */
+		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "\\youtube-dl.exe", options, "--newline",
+				"--extract-audio", Main.getProperties().getPlaylistOption(), "--audio-format",
+				Main.getProperties().getFormat(), "--output", "\"%(title)s.%(ext)s\"", "--audio-quality",
+				Main.getProperties().getQuality(), url);
 
-						if (line.startsWith("[download]")) {
-							
-							task.setProgress(Integer.parseInt(pattern.matcher(line).group().replace("%", "")));
-							
-						}
-						
-						Main.log("youtube-dl stdout : " + line);
+		// retrieve command line argument
+		pb.command().stream().forEach((s) -> sb.append(s).append(' '));
+		Main.log("Donwloading video name by \"" + sb.toString().trim() + "\"");
+
+		// start process
+		Process p = pb.directory(new File(Main.getProperties().getSaveto())).start();
+
+		task.setDest(Main.getProperties().getSaveto());
+		task.setStatus("Downloading");
+		task.setProgress(0);
+
+		Thread stdout = new Thread(() -> {
+
+			BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line = null;
+
+			try {
+
+				while ((line = br.readLine()) != null) {
+
+					if (line.startsWith("[download]")) {
+
+						task.setProgress(Integer.parseInt(pattern.matcher(line).group().replace("%", "")));
 
 					}
 
-				} catch (IOException e) {
-
-					GUI.error("Error when redirecting output of youtube-dl.exe", e.getMessage());
+					Main.log("youtube-dl stdout : " + line);
 
 				}
 
-			});
+			} catch (IOException e) {
 
-			
-			Thread stderr = new Thread(() -> {
+				GUI.error("Error when redirecting output of youtube-dl.exe", e.getMessage());
 
-				BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-				String line = null;
-				StringBuilder sb1 = new StringBuilder("");
-				
-				try {
+			}
 
-					while ((line = br.readLine()) != null) {
-						
-						task.setStatus("ERROR");
-						sb1.append(line);
-						Main.log("youtube-dl stderr : " + line);
+		});
 
-					}
-					
-					if (!sb1.toString().equals("")) {
-						
-						throw new RuntimeException("Exception in youtube-dl.exe proccess!");
-						
-					}
+		Thread stderr = new Thread(() -> {
 
-				} catch (IOException e) {
+			BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+			String line = null;
+			StringBuilder sb1 = new StringBuilder("");
 
-					GUI.error("Error when redirecting error output of youtube-dl.exe", e.getMessage());
+			try {
+
+				while ((line = br.readLine()) != null) {
+
+					task.setStatus("ERROR");
+					sb1.append(line);
+					Main.log("youtube-dl stderr : " + line);
 
 				}
-				
 
-			});
+				if (!sb1.toString().equals("")) {
 
-			stdout.start();
-			stderr.start();
+					throw new RuntimeException("Exception in youtube-dl.exe proccess!");
 
-			p.waitFor();
-			
-			task.done();
+				}
 
-			// Thread.currentThread().sleep(100);
-			/*
-			 * Main.log("Finding downloaded file...");
-			 * 
-			 * File[] fileList = new File(youtubedlpath).listFiles(new FilenameFilter() {
-			 * 
-			 * @Override public boolean accept(File dir, String name) { return
-			 * name.endsWith(Main.getProperties().getFormat()); }
-			 * 
-			 * });
-			 * 
-			 * if(fileList.length ==0 ) { throw new
-			 * RuntimeException("Youtube-dl didn't dowload any files!"); }
-			 * 
-			 * for(File f : fileList) {
-			 * 
-			 * Files.copy(f.toPath(), Paths.get(downloadPath.getAbsolutePath() + "\\" +
-			 * f.getName()) ,StandardCopyOption.REPLACE_EXISTING); Files.delete(f.toPath());
-			 * 
-			 * }
-			 */
-			Main.log("Done!\n");
+			} catch (IOException e) {
 
-		} catch (Exception e) {
-			throw new Exception(e);
-		}
+				GUI.error("Error when redirecting error output of youtube-dl.exe", e.getMessage());
+
+			}
+
+		});
+
+		stdout.start();
+		stderr.start();
+
+		p.waitFor();
+
+		task.done();
+
+		// Thread.currentThread().sleep(100);
+		/*
+		 * Main.log("Finding downloaded file...");
+		 * 
+		 * File[] fileList = new File(youtubedlpath).listFiles(new FilenameFilter() {
+		 * 
+		 * @Override public boolean accept(File dir, String name) { return
+		 * name.endsWith(Main.getProperties().getFormat()); }
+		 * 
+		 * });
+		 * 
+		 * if(fileList.length ==0 ) { throw new
+		 * RuntimeException("Youtube-dl didn't dowload any files!"); }
+		 * 
+		 * for(File f : fileList) {
+		 * 
+		 * Files.copy(f.toPath(), Paths.get(downloadPath.getAbsolutePath() + "\\" +
+		 * f.getName()) ,StandardCopyOption.REPLACE_EXISTING); Files.delete(f.toPath());
+		 * 
+		 * }
+		 */
+		Main.log("Done!\n");
 
 	}
 
