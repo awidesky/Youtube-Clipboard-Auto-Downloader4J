@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 public class YoutubeAudioDownloader {
@@ -91,20 +93,29 @@ public class YoutubeAudioDownloader {
 		// start process
 		try {
 			
+			String line = null; 
 			Process p = pb_ydl.directory(null).start();
 			
 			try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
 				
-				return versionPtn.matcher(br.readLine()).matches();
+				if (versionPtn.matcher(line = br.readLine()).matches()) { // vaild path
+					
+					if ( (Integer.parseInt(new SimpleDateFormat("yyyyMM").format(new Date())) - Integer.parseInt(line.substring(0, 7).replace(".", ""))) > 1 ) //update if yputube-dl version is older than a month 
+						try { new ProcessBuilder(ydlfile, "--update").start().waitFor(); } catch (Exception e) { GUI.error("Error when updating youtube-dl", e.getMessage()); }
+					
+					return true;
+					
+				} else { return false; }
 				
 			} catch(IOException e1) { throw e1; }
 			
 		} catch (Exception e) {
 					
-			GUI.error("Error when checking youtube-dl : ", e.getMessage());
-			return false;
+			GUI.error("Error when checking youtube-dl", e.getMessage());
 			
 		}
+		
+		return false;
 		
 	}
 	
