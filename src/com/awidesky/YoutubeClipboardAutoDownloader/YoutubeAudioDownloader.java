@@ -16,8 +16,7 @@ public class YoutubeAudioDownloader {
 
 	
 	static {
-		projectpath = new File(new File(YoutubeAudioDownloader.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getAbsolutePath()).getParentFile().getAbsolutePath();
-		projectpath = projectpath.replaceAll("%20", " ");
+		projectpath = new File(new File(".").getAbsolutePath()).getParent();
 		youtubedlpath = projectpath + "\\YoutubeAudioAutoDownloader-resources\\ffmpeg\\bin";
 	}
 	
