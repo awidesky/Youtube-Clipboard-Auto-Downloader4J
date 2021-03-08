@@ -12,7 +12,7 @@ public class YoutubeAudioDownloader {
 	private static String projectpath;
 	private static String youtubedlpath;
 	private static String options;
-	private static Pattern pattern = Pattern.compile("^[0-9]+%$");
+	private static Pattern percentPattern = Pattern.compile("^[0-9]+%$");
 
 	
 	static {
@@ -125,7 +125,7 @@ public class YoutubeAudioDownloader {
 
 					if (line.startsWith("[download]")) {
 
-						task.setProgress(Integer.parseInt(pattern.matcher(line).group().replace("%", "")));
+						task.setProgress(Integer.parseInt(percentPattern.matcher(line).group().replace("%", "")));
 
 					}
 
