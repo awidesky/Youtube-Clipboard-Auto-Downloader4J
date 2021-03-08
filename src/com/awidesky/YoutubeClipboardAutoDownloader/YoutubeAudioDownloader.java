@@ -118,7 +118,7 @@ public class YoutubeAudioDownloader {
 		StringBuilder sb = new StringBuilder(""); // to retrieve command line argument
 
 		/* get video name */
-		ProcessBuilder pbGetName = new ProcessBuilder(youtubedlpath + "youtube-dle", "--get-filename", "-output",
+		ProcessBuilder pbGetName = new ProcessBuilder(youtubedlpath + "youtube-dl", "--get-filename", "-output",
 				"\"%(title)s\"", url);
 
 		// retrieve command line argument
