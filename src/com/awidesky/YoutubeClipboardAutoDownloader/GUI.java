@@ -22,7 +22,7 @@ public class GUI extends JFrame {
 	 */
 	private static final long serialVersionUID = 7447706573178166218L;
 
-	private JButton btn_browse;
+	private JButton btn_browse, btn_cleanCompleted, btn_cleanAll;
 	private JLabel tlb_format, tlb_quality, tlb_path;
 	private JTextField jft_path;
 	private JComboBox<String> cb_format, cb_quality;
@@ -38,7 +38,7 @@ public class GUI extends JFrame {
 				YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\icon.jpg")
 						.getImage());
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		setSize(630, 450);
+		setSize(630, 455);
 		setLayout(null);
 		setResizable(false);
 		addWindowListener(new WindowAdapter() {
@@ -85,6 +85,8 @@ public class GUI extends JFrame {
 			jfc.setCurrentDirectory(new File(path));
 
 		});
+		btn_cleanCompleted = new JButton("clean completed"); //TODO: listner
+		btn_cleanAll = new JButton("clean all");
 
 		cb_format = new JComboBox<>(new String[] { "mp3", "best", "aac", "flac", "m4a", "opus", "vorbis", "wav" });
 		cb_quality = new JComboBox<>(new String[] { "0(best)", "1", "2", "3", "4", "5", "6", "7", "8", "9(worst)" });
@@ -105,21 +107,24 @@ public class GUI extends JFrame {
 		});
 
 		table = new JTable();
+		table.setFillsViewportHeight(true);
+		table.getColumnModel().getColumn(0).setPreferredWidth(1);
+		
+		scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setBounds(8, 122, 600, 280);
 
-		scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scrollPane.setBounds(8, 122, 600, 278);
-
-		btn_browse.setBounds(523, 83, btn_browse.getPreferredSize().width, btn_browse.getPreferredSize().height);
-
+		btn_browse.setBounds(523, 76, btn_browse.getPreferredSize().width, btn_browse.getPreferredSize().height);
+		btn_cleanCompleted.setBounds(14, 418, btn_cleanCompleted.getPreferredSize().width, btn_cleanCompleted.getPreferredSize().height);
+		btn_cleanAll.setBounds(142, 418, btn_cleanAll.getPreferredSize().width, btn_cleanAll.getPreferredSize().height);
+		
 		tlb_format.setBounds(26, 23, tlb_format.getPreferredSize().width, tlb_format.getPreferredSize().height);
 		tlb_quality.setBounds(273, 23, tlb_quality.getPreferredSize().width, tlb_quality.getPreferredSize().height);
-		tlb_path.setBounds(11, 80, tlb_path.getPreferredSize().width, tlb_path.getPreferredSize().height);
+		tlb_path.setBounds(14, 80, tlb_path.getPreferredSize().width, tlb_path.getPreferredSize().height);
 
-		jft_path.setBounds(92, 83, 417, 22);
+		jft_path.setBounds(65, 76, 456, 22);
 
-		cb_format.setBounds(117, 26, 96, 22);
-		cb_quality.setBounds(420, 26, 150, 22);
+		cb_format.setBounds(83, 19, 96, 22);
+		cb_quality.setBounds(365, 19, 150, 22);
 
 		add(btn_browse);
 
@@ -145,14 +150,14 @@ public class GUI extends JFrame {
 	public static void error(String title, String content) {
 
 		JOptionPane.showMessageDialog(null, content, title, JOptionPane.ERROR_MESSAGE);
-		Main.log("[GUI,error] " + title + " / " + content);
+		Main.log("[GUI.error] " + title + " / " + content);
 		
 	}
 
 	public static void warning(String title, String content) {
 
 		JOptionPane.showMessageDialog(null, content, title, JOptionPane.WARNING_MESSAGE);
-		Main.log("[GUI,warning] " + title + " / " + content);
+		Main.log("[GUI.warning] " + title + " / " + content);
 		
 	}
 

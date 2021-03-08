@@ -46,10 +46,10 @@ public class YoutubeAudioDownloader {
 
 		}
 		
-		Main.log("projectpath = " + projectpath);
-		Main.log("youtubedlpath = " + (youtubedlpath.equals("") ? "system %path%" : youtubedlpath));
-		
-		
+		Main.log("[init] projectpath = " + projectpath);
+		Main.log("[init] youtubedlpath = " + (youtubedlpath.equals("") ? "system %path%" : youtubedlpath));
+
+
 		/* check ffmpeg */
 		//ffmpeg -version
 		ProcessBuilder pb_ffmpeg = new ProcessBuilder(youtubedlpath + "ffmpeg", "-version");
@@ -89,6 +89,7 @@ public class YoutubeAudioDownloader {
 		ProcessBuilder pb_ydl = new ProcessBuilder(ydlfile, "--version");
 
 		Main.log("Checking youtube-dl path by \"" + ydlfile + " --version\"");
+
 
 		// start process
 		try {

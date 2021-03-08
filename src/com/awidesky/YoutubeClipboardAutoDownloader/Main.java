@@ -157,10 +157,13 @@ public class Main {
 			logTo = new PrintWriter(logFile);
 			
 		} catch (IOException e) {
-			
-			GUI.error("Error when creating log flie", e.getMessage());
+
 			logTo = new PrintWriter(System.out);
+			GUI.error("Error when creating log flie", e.getMessage());
 			
+		} finally {
+			
+			Runtime.getRuntime().addShutdownHook(new Thread(() -> { logTo.close(); }));
 		}
 	}
 
