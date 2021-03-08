@@ -99,9 +99,9 @@ public class Main {
 
 						executorService.submit(() -> { //download worker thread
 
-							int num = taskNum++;
 							if (data.startsWith("https://www.youtu")) {
 
+								int num = taskNum++;
 								log("[Task" + num + "] " + "Received a link from your clipboard : " + data);
 
 								if (YoutubeAudioDownloader.checkURL(data, num)) {
