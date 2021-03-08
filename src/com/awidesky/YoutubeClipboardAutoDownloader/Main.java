@@ -158,7 +158,7 @@ public class Main {
 
 	private static void readProperties() {
 
-		String p = YoutubeAudioDownloader.getProjectpath();
+		String p = YoutubeAudioDownloader.getProjectpath(); //Default path for save is project root path
 		String f = "mp3";
 		String q = "0";
 		String l = "--no-playlist";
