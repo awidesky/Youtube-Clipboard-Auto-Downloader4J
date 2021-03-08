@@ -115,7 +115,9 @@ public class GUI extends JFrame {
 		});
 
 		table = new JTable();
-
+		table.setFillsViewportHeight(true);
+		table.getColumnModel().getColumn(0).setPreferredWidth(1);
+		
 		scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBounds(8, 122, 600, 280);
 
@@ -156,14 +158,14 @@ public class GUI extends JFrame {
 	public static void error(String title, String content) {
 
 		JOptionPane.showMessageDialog(null, content, title, JOptionPane.ERROR_MESSAGE);
-		Main.log("[GUI,error] " + title + " / " + content);
+		Main.log("[GUI.error] " + title + " / " + content);
 		
 	}
 
 	public static void warning(String title, String content) {
 
 		JOptionPane.showMessageDialog(null, content, title, JOptionPane.WARNING_MESSAGE);
-		Main.log("[GUI,warning] " + title + " / " + content);
+		Main.log("[GUI.warning] " + title + " / " + content);
 		
 	}
 
