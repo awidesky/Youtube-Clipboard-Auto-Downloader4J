@@ -218,4 +218,27 @@ public class YoutubeAudioDownloader {
 
 	}
 
+
+	public static boolean checkURL(String url) {
+
+
+		Main.log("Check if youtube-dl path is in system path");
+		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "youtube-dl", url,"--skip-download");
+
+		Main.log("Checking url validation by \"" + youtubedlpath + "youtube-dl " + url +" --skip-download" + "\"");
+
+		// start process
+		try {
+			
+			return pb.directory(null).start().waitFor() == 0 ? true : false;
+			
+		} catch (Exception e) {
+					
+			GUI.error("Error when checking url : ", e.getMessage());
+			return false;
+			
+		}
+		
+	}
+
 }

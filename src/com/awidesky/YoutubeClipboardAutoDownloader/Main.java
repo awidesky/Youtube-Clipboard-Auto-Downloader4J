@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
 
 import javax.swing.SwingUtilities;
 
@@ -100,20 +101,24 @@ public class Main {
 
 								log("Received a link from your clipboard : " + data);
 
-								TaskStatusViewerModel t = new TaskStatusViewerModel();
-								t.setStatus("Preparing...");
-								gui.addTaskModel(t);
-								
-								try {
+								if (YoutubeAudioDownloader.checkURL(data)) {
+									
+									TaskStatusViewerModel t = new TaskStatusViewerModel();
+									t.setStatus("Preparing...");
+									gui.addTaskModel(t);
 
-									YoutubeAudioDownloader.download(data, t);
+									try {
 
-								} catch (Exception e1) {
+										YoutubeAudioDownloader.download(data, t);
 
-									GUI.error("Error in downloading! : ", e1.getMessage());
-									return;
+									} catch (Exception e1) {
 
-								}
+										GUI.error("Error when downloading! : ", e1.getMessage());
+										return;
+
+									}
+									
+								} else { GUI.error("Not a valid url!", data + "\nis not valid or unsupported url!"); return; }
 
 							}
 
