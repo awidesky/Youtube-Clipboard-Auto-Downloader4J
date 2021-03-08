@@ -85,7 +85,7 @@ public class YoutubeAudioDownloader {
 	
 	private static boolean checkYoutubedl(String ydlfile){
 		
-		Main.log("Check if youtube-dl path is in system path");
+		Main.log("Check if youtube-dl path is in " + ydlfile);
 		ProcessBuilder pb_ydl = new ProcessBuilder(ydlfile, "--version");
 
 		Main.log("Checking youtube-dl path by \"" + ydlfile + " --version\"");

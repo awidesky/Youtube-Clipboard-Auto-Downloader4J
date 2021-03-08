@@ -15,6 +15,7 @@ public class TaskStatusViewerModel {
 	
 	public TaskStatusViewerModel(int num) {
 		this.taskNum = num;
+		
 	}
 	
 
