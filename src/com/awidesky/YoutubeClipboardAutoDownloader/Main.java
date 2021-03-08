@@ -18,7 +18,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.regex.Pattern;
 
 import javax.swing.SwingUtilities;
 
@@ -33,6 +32,9 @@ public class Main {
 	private static PrintWriter logTo;
 	private static GUI gui;
 
+	private static volatile int taskNum = 0;
+	
+	private static int exitcode;
 	public static final String version = "v1.2.5-beta";
 
 	public static void main(String[] args) {
@@ -59,7 +61,7 @@ public class Main {
 			
 		}
 
-		clipChecker.start();
+		clipChecker.start(); //A daemon thread that will check clipboard
 
 		Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener(new FlavorListener() {
 
@@ -68,7 +70,7 @@ public class Main {
 
 				// System.err.println("CLIPBOARD CHANGED");
 
-				clipChecker.submit(() -> {
+				clipChecker.submit(() -> { //To avoid overhead in EDT, put task in clipCheckerThread.
 
 					try {
 
@@ -95,15 +97,16 @@ public class Main {
 
 						clipboardBefore = data;
 
-						executorService.submit(() -> {
+						executorService.submit(() -> { //download worker thread
 
+							int num = taskNum++;
 							if (data.startsWith("https://www.youtu")) {
 
-								log("Received a link from your clipboard : " + data);
+								log("[Task" + num + "] " + "Received a link from your clipboard : " + data);
 
-								if (YoutubeAudioDownloader.checkURL(data)) {
+								if (YoutubeAudioDownloader.checkURL(data, num)) {
 									
-									TaskStatusViewerModel t = new TaskStatusViewerModel();
+									TaskStatusViewerModel t = new TaskStatusViewerModel(num);
 									t.setStatus("Preparing...");
 									gui.addTaskModel(t);
 
@@ -113,12 +116,12 @@ public class Main {
 
 									} catch (Exception e1) {
 
-										GUI.error("Error when downloading! : ", e1.getMessage());
+										GUI.error("[Task" + num + "] " +"Error when downloading! : ", e1.getMessage());
 										return;
 
 									}
 									
-								} else { GUI.error("Not a valid url!", data + "\nis not valid or unsupported url!"); return; }
+								} else { GUI.error("[Task" + num + "] " +"Not a valid url!", data + "\nis not valid or unsupported url!"); return; }
 
 							}
 
@@ -248,6 +251,25 @@ public class Main {
 
 		logTo.println(data);
 
+	}
+
+	public static int getExitcode() {
+		return exitcode;
+	}
+
+	public static void setExitcode(int exitcode) {
+		Main.exitcode = exitcode;
+	}
+	
+	
+	/*
+	 * Close the window and kills the application.
+	 * 
+	 * */
+	public static void kill() {
+		
+		gui.kill();
+		
 	}
 
 }

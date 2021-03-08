@@ -17,7 +17,7 @@ public class ClipBoardCheckerThread extends Thread {
 
 				} catch (InterruptedException e) {
 					 Main.log("ClipBoardCheckerThread Interrupted! : " + e.getMessage());
-					 break;
+					 //break;
 				}
 			}
 

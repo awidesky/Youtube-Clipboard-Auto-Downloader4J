@@ -37,8 +37,9 @@ public class YoutubeAudioDownloader {
 			if (!checkYoutubedl(youtubedlpath + "youtube-dl")) {
 
 				GUI.error("Error!", "youtube-dl does not exist in\n\t" + youtubedlpath + "\tor system %path%!");
-				throw new Error();
-
+				Main.setExitcode(1);
+				Main.kill();
+				
 			}
 
 		}
@@ -72,7 +73,9 @@ public class YoutubeAudioDownloader {
 			
 		} catch (Exception e) {
 			
-			GUI.error("Error when checking ffmpeg : ", e.getMessage());
+			GUI.error("Error!", "ffmpeg does not exist in\n\t" + youtubedlpath + "\tor system %path%!");
+			Main.setExitcode(1);
+			Main.kill();
 			
 		}
 		
@@ -113,7 +116,7 @@ public class YoutubeAudioDownloader {
 
 	public static void download(String url, TaskStatusViewerModel task) throws Exception {
 
-		Main.logProperties("Current");
+		Main.logProperties("[Task" + task.getTaskNum() + "] " + "Current");
 
 		StringBuilder sb = new StringBuilder(""); // to retrieve command line argument
 
@@ -123,16 +126,16 @@ public class YoutubeAudioDownloader {
 
 		// retrieve command line argument
 		pbGetName.command().stream().forEach((s) -> sb.append(s).append(' '));
-		Main.log("Getting video name by \"" + sb.toString().trim() + "\"");
+		Main.log("[Task" + task.getTaskNum() + "] " + "Getting video name by \"" + sb.toString().trim() + "\"");
 
 		// start process
 		Process p1 = pbGetName.directory(null).start();
 		BufferedReader br1 = new BufferedReader(new InputStreamReader(p1.getInputStream()));
 		String name = br1.readLine();
 		task.setVideoName(name);
-		Main.log("Video name : " + name);
+		Main.log("[Task" + task.getTaskNum() + "] " + "Video name : " + name);
 		p1.waitFor();
-		try { br1.close(); } catch (IOException i) { GUI.error("Error when closing process stream", i.getMessage()); }
+		try { br1.close(); } catch (IOException i) { GUI.error("[Task" + task.getTaskNum() + "] " + "Error when closing process stream", i.getMessage()); }
 		
 		
 		/* download video */
@@ -143,7 +146,7 @@ public class YoutubeAudioDownloader {
 
 		// retrieve command line argument
 		pb.command().stream().forEach((s) -> sb.append(s).append(' '));
-		Main.log("Donwloading video name by \"" + sb.toString().trim() + "\"");
+		Main.log("[Task" + task.getTaskNum() + "] " + "Donwloading video name by \"" + sb.toString().trim() + "\"");
 
 		// start process
 		Process p = pb.directory(new File(Main.getProperties().getSaveto())).start();
@@ -165,13 +168,13 @@ public class YoutubeAudioDownloader {
 
 					}
 
-					Main.log("youtube-dl stdout : " + line);
+					Main.log("[Task" + task.getTaskNum() + "] " + "youtube-dl stdout : " + line);
 
 				}
 
 			} catch (IOException e) {
 
-				GUI.error("Error when redirecting output of youtube-dl", e.getMessage());
+				GUI.error("[Task" + task.getTaskNum() + "] " + "Error when redirecting output of youtube-dl", e.getMessage());
 
 			}
 
@@ -188,19 +191,19 @@ public class YoutubeAudioDownloader {
 
 					task.setStatus("ERROR");
 					sb1.append(line);
-					Main.log("youtube-dl stderr : " + line);
+					Main.log("[Task" + task.getTaskNum() + "] " + "youtube-dl stderr : " + line);
 
 				}
 
 				if (!sb1.toString().equals("")) {
 
-					throw new RuntimeException("Exception in youtube-dl proccess!");
+					GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum() + "] " + "There's Error(s) in youtube-dl proccess!");
 
 				}
 
 			} catch (IOException e) {
 
-				GUI.error("Error when redirecting error output of youtube-dl", e.getMessage());
+				GUI.error("[Task" + task.getTaskNum() + "] " + "Error when redirecting error output of youtube-dl", e.getMessage());
 
 			}
 
@@ -214,18 +217,18 @@ public class YoutubeAudioDownloader {
 		task.done();
 
 
-		Main.log("Done!\n");
+		Main.log("[Task" + task.getTaskNum() + "] " + "Done!\n");
 
 	}
 
 
-	public static boolean checkURL(String url) {
+	public static boolean checkURL(String url, int taskNum) {
 
 
-		Main.log("Check if youtube-dl path is in system path");
+		Main.log("[Task" + taskNum + "] " +"Check if youtube-dl path is in system path");
 		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "youtube-dl", url,"--skip-download");
 
-		Main.log("Checking url validation by \"" + youtubedlpath + "youtube-dl " + url +" --skip-download" + "\"");
+		Main.log("[Task" + taskNum + "] " +"Checking url validation by \"" + youtubedlpath + "youtube-dl " + url +" --skip-download" + "\"");
 
 		// start process
 		try {
@@ -234,7 +237,7 @@ public class YoutubeAudioDownloader {
 			
 		} catch (Exception e) {
 					
-			GUI.error("Error when checking url : ", e.getMessage());
+			GUI.error("[Task" + taskNum + "] " +"Error when checking url : ", e.getMessage());
 			return false;
 			
 		}

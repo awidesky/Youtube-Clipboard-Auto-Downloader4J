@@ -49,7 +49,7 @@ public class GUI extends JFrame {
 				Main.writeProperties();
 				
 				e.getWindow().dispose();
-				System.exit(0);
+				System.exit(Main.getExitcode());
 
 			}
 
@@ -141,7 +141,7 @@ public class GUI extends JFrame {
 		setVisible(true);
 
 	}
-
+	
 	public static void error(String title, String content) {
 
 		JOptionPane.showMessageDialog(null, content, title, JOptionPane.ERROR_MESSAGE);
@@ -162,6 +162,16 @@ public class GUI extends JFrame {
 		// TODO : give t a processUpdater object
 		// TODO : put t to Table
 
+	}
+	
+	/*
+	 * Close the window and kills the application.
+	 * 
+	 * */
+	public void kill() {
+		
+		dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+		
 	}
 
 }

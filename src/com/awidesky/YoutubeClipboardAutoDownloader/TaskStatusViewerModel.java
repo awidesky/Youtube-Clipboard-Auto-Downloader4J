@@ -4,14 +4,19 @@ import java.util.function.Consumer;
 
 public class TaskStatusViewerModel {
 
-	private String videoName;
+	private String videoName; //TODO : √ ±‚»≠
 	private String status;
 	private int progress;
 	private String dest;
 	private Runnable whenDone;
 	private Consumer<Integer> processUpdater;
+	private int taskNum;
 	
 	
+	public TaskStatusViewerModel(int num) {
+		this.taskNum = num;
+	}
+
 	public String getVideoName() {
 		return videoName;
 	}
@@ -43,6 +48,10 @@ public class TaskStatusViewerModel {
 	
 	public void setDest(String dest) {
 		this.dest = dest;
+	}
+
+	public int getTaskNum() {
+		return taskNum;
 	}
 
 	public void done() {
