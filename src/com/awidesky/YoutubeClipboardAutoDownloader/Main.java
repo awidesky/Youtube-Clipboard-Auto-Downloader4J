@@ -47,10 +47,10 @@ public class Main {
 
 		if (args != null && args.length != 0) { // For test
 			
-			StringBuilder sb = new StringBuilder();
+			StringBuilder sb = new StringBuilder("");
 
 			for (String s : args) {
-				sb.append(" " + s);
+				sb.append(' ' + s);
 			}
 			
 			log("Extra arguments : " + sb.toString());

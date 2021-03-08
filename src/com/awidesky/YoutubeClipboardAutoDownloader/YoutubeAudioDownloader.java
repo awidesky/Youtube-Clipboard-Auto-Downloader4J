@@ -11,7 +11,7 @@ public class YoutubeAudioDownloader {
 
 	private static String projectpath = new File(new File(".").getAbsolutePath()).getParent();;
 	private static String youtubedlpath;
-	private static String options;
+	private static String options = "";
 	private static Pattern percentPtn = Pattern.compile("^[0-9]+%$");
 	private static Pattern versionPtn = Pattern.compile("^\\d{4}\\.\\d{2}\\.\\d{2}$");
 
@@ -136,7 +136,7 @@ public class YoutubeAudioDownloader {
 		
 		
 		/* download video */
-		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "youtube-dl", options, "--newline",
+		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "youtube-dl" + options, "--newline",
 				"--extract-audio", Main.getProperties().getPlaylistOption(), "--audio-format",
 				Main.getProperties().getFormat(), "--output", "\"%(title)s.%(ext)s\"", "--audio-quality",
 				Main.getProperties().getQuality(), url);
