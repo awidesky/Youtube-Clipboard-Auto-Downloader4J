@@ -63,7 +63,7 @@ public class GUI {
 		loadingFrame.setResizable(false);
 		
 		tlb_loadingStatus = new JLabel("");
-		tlb_loadingStatus.setBounds(14, 7, tlb_loadingStatus.getPreferredSize().width, tlb_loadingStatus.getPreferredSize().height);
+		tlb_loadingStatus.setBounds(14, 8, 370, 18);
 		
 		jpb_initProgress = new JProgressBar();
 		jpb_initProgress.setBounds(15, 27, 370, 18);

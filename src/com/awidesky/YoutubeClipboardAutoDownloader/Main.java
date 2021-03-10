@@ -212,12 +212,12 @@ public class Main {
 		} catch (IOException e) {
 
 			GUI.warning("Exception occurred when reading config.txt",
-					e.getMessage() + "\nInitiating config.txt anyway...");
+					e.getMessage() + "\nI'll initiate config.txt with default...");
 
-		} catch (Exception e2) {
-
-			GUI.warning(e2.getClass() + " occurred when reading config.txt",
-					e2.getMessage() + "\nInitiating config.txt anyway...");
+		} catch (NullPointerException e2) {
+			
+			GUI.warning("config.txt has no or invalid data!",
+					e2.getMessage() + "\nI'll initiate config.txt with default...");
 
 		} finally {
 			
