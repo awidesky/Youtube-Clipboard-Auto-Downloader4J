@@ -14,6 +14,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
@@ -21,16 +22,22 @@ import java.util.concurrent.Executors;
 
 import javax.swing.SwingUtilities;
 
+import gui.ClipBoardCheckerThread;
+import gui.GUI;
+import gui.LoadingStatus;
+import gui.TaskStatusViewerModel;
+
 /** Main class */
 public class Main { 
 
-	private static final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+	private static ExecutorService executorService;
 	private static String clipboardBefore = "";
-	private static ConfigDTO properties;
+	private static ConfigDTO properties = null;
 	private static boolean isSecondtime = false;
-	private static ClipBoardCheckerThread clipChecker = new ClipBoardCheckerThread();
+	private static ClipBoardCheckerThread clipChecker;
 	private static PrintWriter logTo;
-	private static GUI gui;
+	private static GUI gui = new GUI();
 
 	private static volatile int taskNum = 0;
 	
@@ -40,13 +47,22 @@ public class Main {
 	public static void main(String[] args) {
 
 		prepareLogFile();
-		
-		YoutubeAudioDownloader.checkFiles();
-		readProperties();
 
-		SwingUtilities.invokeLater(() -> {
-			gui = new GUI();
-		});
+		try {
+			SwingUtilities.invokeAndWait(() -> {
+				gui.initLoadingFrame();
+			});
+		} catch (InvocationTargetException | InterruptedException e2) {
+			e2.printStackTrace();
+		}
+
+		gui.setLoadingStat(LoadingStatus.CHECKING_YDL);
+		YoutubeAudioDownloader.checkYoutubedl();
+		gui.setLoadingStat(LoadingStatus.CHECKING_FFMPEG);
+		YoutubeAudioDownloader.checkFfmpeg();
+		
+		gui.setLoadingStat(LoadingStatus.READING_PROPERTIES);
+		readProperties();
 
 		if (args != null && args.length != 0) { // For test
 			
@@ -61,6 +77,10 @@ public class Main {
 			
 		}
 
+		
+		gui.setLoadingStat(LoadingStatus.PREPARING_THREADS);
+		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+		clipChecker = new ClipBoardCheckerThread();
 		clipChecker.start(); //A daemon thread that will check clipboard
 
 		Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener(new FlavorListener() {
@@ -139,8 +159,9 @@ public class Main {
 
 		}); // FlavorListener end
 
+		gui.setLoadingStat(LoadingStatus.LOADING_WINDOW);
 		SwingUtilities.invokeLater(() -> {
-			gui.showWindow();
+			gui.initMainFrame();
 		});
 		
 		log("Listening clipboard...");
@@ -148,6 +169,7 @@ public class Main {
 	}
 
 	private static void prepareLogFile() {
+		
 		try {
 			
 			File logFile = new File(YoutubeAudioDownloader.getProjectpath() + "\\logs\\log-"
@@ -165,6 +187,7 @@ public class Main {
 			
 			Runtime.getRuntime().addShutdownHook(new Thread(() -> { logTo.close(); }));
 		}
+		
 	}
 
 	private static void readProperties() {
@@ -199,8 +222,8 @@ public class Main {
 
 		} finally {
 			
-			Main.logProperties("Initial");
 			properties = new ConfigDTO(p, f, q, l);
+			Main.logProperties("Initial");
 			
 		}
 
@@ -213,6 +236,8 @@ public class Main {
 	 * */
 	public static void writeProperties() {
 
+		if(properties == null) return;
+		
 		/** Write <code>properties</code> */
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
 				YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\config.txt")))) {
@@ -284,8 +309,9 @@ public class Main {
 	 * */
 	public static void kill() {
 		
-		executorService.shutdown();
-		gui.kill();
+		Main.writeProperties();
+		System.exit(Main.getExitcode());
+
 		
 	}
 

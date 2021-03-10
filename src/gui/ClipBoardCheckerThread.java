@@ -1,6 +1,8 @@
-package com.awidesky.YoutubeClipboardAutoDownloader;
+package gui;
 
 import java.util.concurrent.LinkedBlockingQueue;
+
+import com.awidesky.YoutubeClipboardAutoDownloader.Main;
 
 public class ClipBoardCheckerThread extends Thread {
 
