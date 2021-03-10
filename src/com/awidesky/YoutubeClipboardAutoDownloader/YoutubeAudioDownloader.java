@@ -167,7 +167,7 @@ public class YoutubeAudioDownloader {
 		task.setStatus("Downloading");
 		task.setProgress(0);
 
-		Thread stdout = new Thread(() -> {
+		Main.getExecutorservice().submit(() -> {
 
 			try(BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));) {
 
@@ -192,7 +192,7 @@ public class YoutubeAudioDownloader {
 
 		});
 
-		Thread stderr = new Thread(() -> {
+		Main.getExecutorservice().submit(() -> {
 
 			try(BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));) {
 				
@@ -221,10 +221,13 @@ public class YoutubeAudioDownloader {
 
 		});
 
-		stdout.start();
-		stderr.start();
 
-		p.waitFor();
+		int e;
+		if( (e = p.waitFor()) != 0) { 
+			task.setStatus("ERROR");
+			GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum() + "] " + " has executed with error code : " + e);
+			return;
+		}
 
 		task.done();
 

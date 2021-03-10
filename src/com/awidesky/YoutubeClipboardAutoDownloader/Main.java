@@ -24,7 +24,7 @@ import javax.swing.SwingUtilities;
 /** Main class */
 public class Main { 
 
-	private static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+	private static final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	private static String clipboardBefore = "";
 	private static ConfigDTO properties;
 	private static boolean isSecondtime = false;
@@ -125,7 +125,7 @@ public class Main {
 
 							}
 
-						});
+						}); // submit to executor service end
 
 					} catch (InterruptedException | HeadlessException | UnsupportedFlavorException | IOException e1) {
 
@@ -133,7 +133,7 @@ public class Main {
 
 					} // try end
 
-				}); // submit end
+				}); // submit to clipChecker end
 
 			} // flavorsChanged end
 
@@ -206,6 +206,11 @@ public class Main {
 
 	}
 
+	
+	/**
+	 * Writes properties to file.
+	 * This method should only invoked just before the termination of the program.
+	 * */
 	public static void writeProperties() {
 
 		/** Write <code>properties</code> */
@@ -228,6 +233,10 @@ public class Main {
 
 			GUI.error("Error when writing config.txt file : ", e.getMessage());
 
+		} finally {
+			
+			logTo.close();
+			
 		}
 
 	}
@@ -265,12 +274,17 @@ public class Main {
 	}
 	
 	
+	public static ExecutorService getExecutorservice() {
+		return executorService;
+	}
+
 	/*
 	 * Close the window and kills the application.
 	 * 
 	 * */
 	public static void kill() {
 		
+		executorService.shutdown();
 		gui.kill();
 		
 	}
