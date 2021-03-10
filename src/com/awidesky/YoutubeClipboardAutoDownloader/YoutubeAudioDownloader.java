@@ -8,6 +8,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Pattern;
 
+import gui.GUI;
+import gui.TaskStatusViewerModel;
+
 public class YoutubeAudioDownloader {
 
 
@@ -24,10 +27,10 @@ public class YoutubeAudioDownloader {
 	}
 	
 
-	static void checkFiles() {
+	public static void checkYoutubedl() {
 
 		/* check youtube-dl */
-		if (checkYoutubedl("youtube-dl")) {
+		if (checkYoutubedlPath("youtube-dl")) {
 			
 			youtubedlpath = "";
 			
@@ -36,7 +39,7 @@ public class YoutubeAudioDownloader {
 			
 			youtubedlpath = projectpath + "\\YoutubeAudioAutoDownloader-resources\\ffmpeg\\bin\\";
 			
-			if (!checkYoutubedl(youtubedlpath + "youtube-dl")) {
+			if (!checkYoutubedlPath(youtubedlpath + "youtube-dl")) {
 
 				GUI.error("Error!", "youtube-dl does not exist in\n\t" + youtubedlpath + "\tor system %path%!");
 				Main.setExitcode(1);
@@ -49,7 +52,10 @@ public class YoutubeAudioDownloader {
 		Main.log("[init] projectpath = " + projectpath);
 		Main.log("[init] youtubedlpath = " + (youtubedlpath.equals("") ? "system %path%" : youtubedlpath));
 
-
+	}
+	
+	public static void checkFfmpeg() {
+		
 		/* check ffmpeg */
 		//ffmpeg -version
 		ProcessBuilder pb_ffmpeg = new ProcessBuilder(youtubedlpath + "ffmpeg", "-version");
@@ -83,7 +89,7 @@ public class YoutubeAudioDownloader {
 		
 	}
 	
-	private static boolean checkYoutubedl(String ydlfile){
+	private static boolean checkYoutubedlPath(String ydlfile){System.out.println("1");
 		
 		Main.log("Check if youtube-dl path is in " + ydlfile);
 		ProcessBuilder pb_ydl = new ProcessBuilder(ydlfile, "--version");
@@ -101,6 +107,7 @@ public class YoutubeAudioDownloader {
 				
 				if (versionPtn.matcher(line = br.readLine()).matches()) { // vaild path
 					
+					Main.log("Found valid command to execute youtube-dl : " + ydlfile);
 					if ( (Integer.parseInt(new SimpleDateFormat("yyyyMM").format(new Date())) - Integer.parseInt(line.substring(0, 7).replace(".", ""))) > 1 ) //update if yputube-dl version is older than a month 
 						try { new ProcessBuilder(ydlfile, "--update").start().waitFor(); } catch (Exception e) { GUI.error("Error when updating youtube-dl", e.getMessage()); }
 					
@@ -112,11 +119,11 @@ public class YoutubeAudioDownloader {
 			
 		} catch (Exception e) {
 					
-			GUI.error("Error when checking youtube-dl", e.getMessage());
+			Main.log("Error when checking youtube-dl\n\t" + e.getMessage());
+			return false;
 			
 		}
 		
-		return false;
 		
 	}
 	

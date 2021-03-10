@@ -1,4 +1,4 @@
-package com.awidesky.YoutubeClipboardAutoDownloader;
+package gui;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -11,17 +11,23 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
-public class GUI extends JFrame {
+import com.awidesky.YoutubeClipboardAutoDownloader.Main;
+import com.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
 
-	/**
-	 * serial version UID
-	 */
-	private static final long serialVersionUID = 7447706573178166218L;
+public class GUI {
+	
+	
+	private JFrame loadingFrame;
+	private JLabel tlb_loadingStatus;
+	private JProgressBar jpb_initProgress;
+	
 
+	private JFrame mainFrame;
 	private JButton btn_browse, btn_cleanCompleted, btn_cleanAll;
 	private JLabel tlb_format, tlb_quality, tlb_path;
 	private JTextField jft_path;
@@ -30,26 +36,63 @@ public class GUI extends JFrame {
 	private JTable table;
 	private static final String[] table_header = { "Video", "Destination", "Status", "Progress" };
 	private JScrollPane scrollPane;
-
-	public GUI() {
-
-		setTitle("Youtube Audio Auto Downloader " + Main.version);
-		setIconImage(new ImageIcon(
+	
+	
+	public GUI() {}
+	
+	
+	/**
+	 * 
+	 * Make <code>loadingFrame</code>> and show <code>loadingFrame</code>> before making <code>mainFrame</code>
+	 * This does not show <code>mainFrame</code>.
+	 * To show <code>mainFrame</code>, use <code>showmMainFrame</code>
+	 * @see GUI#showmMainFrame() showmMainFrame
+	 * 
+	 * */
+	public void initLoadingFrame() {
+		
+		/** make <code>loadingFrame</code> */
+		loadingFrame = new JFrame();
+		loadingFrame.setTitle("loading...");
+		loadingFrame.setIconImage(new ImageIcon(
 				YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\icon.jpg")
 						.getImage());
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		setSize(630, 455);
-		setLayout(null);
-		setResizable(false);
-		addWindowListener(new WindowAdapter() {
+		loadingFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		loadingFrame.setSize(450, 100); //add more height than fxml because it does not think about title length
+		loadingFrame.setLayout(null);
+		loadingFrame.setResizable(false);
+		
+		tlb_loadingStatus = new JLabel("");
+		tlb_loadingStatus.setBounds(14, 7, tlb_loadingStatus.getPreferredSize().width, tlb_loadingStatus.getPreferredSize().height);
+		
+		jpb_initProgress = new JProgressBar();
+		jpb_initProgress.setBounds(15, 27, 370, 18);
+		
+		loadingFrame.add(tlb_loadingStatus);
+		loadingFrame.add(jpb_initProgress);
+		loadingFrame.setVisible(true);
+		
+	}
+	
+	public void initMainFrame() {
+		
+		/** make <code>mainFrame</code> */
+		mainFrame = new JFrame();
+		mainFrame.setTitle("Youtube Audio Auto Downloader " + Main.version);
+		mainFrame.setIconImage(new ImageIcon(
+				YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\icon.jpg")
+						.getImage());
+		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		mainFrame.setSize(630, 455);
+		mainFrame.setLayout(null);
+		mainFrame.setResizable(false);
+		mainFrame.addWindowListener(new WindowAdapter() {
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-
-				Main.writeProperties();
 				
 				e.getWindow().dispose();
-				System.exit(Main.getExitcode());
+				Main.kill();
 
 			}
 
@@ -126,38 +169,50 @@ public class GUI extends JFrame {
 		cb_format.setBounds(83, 19, 96, 22);
 		cb_quality.setBounds(365, 19, 150, 22);
 
-		add(btn_browse);
+		mainFrame.add(btn_browse);
 
-		add(tlb_format);
-		add(tlb_path);
-		add(tlb_quality);
+		mainFrame.add(tlb_format);
+		mainFrame.add(tlb_path);
+		mainFrame.add(tlb_quality);
 
-		add(jft_path);
+		mainFrame.add(jft_path);
 
-		add(cb_format);
-		add(cb_quality);
+		mainFrame.add(cb_format);
+		mainFrame.add(cb_quality);
 
-		add(scrollPane);
+		mainFrame.add(scrollPane);
 
+		
+
+		loadingFrame.setVisible(false);
+		loadingFrame.dispose();
+		mainFrame.setVisible(true);
+		
+		loadingFrame = null;
+		tlb_loadingStatus = null;
+		jpb_initProgress = null;
+		
 	}
 
-	public void showWindow() {
-
-		setVisible(true);
-
+	public void setLoadingStat(LoadingStatus stat) {
+		
+		tlb_loadingStatus.setText(stat.getStatus());
+		jpb_initProgress.setValue(stat.getProgress());
+		
 	}
+	
 	
 	public static void error(String title, String content) {
 
 		JOptionPane.showMessageDialog(null, content, title, JOptionPane.ERROR_MESSAGE);
-		Main.log("[GUI.error] " + title + " / " + content);
+		Main.log("[GUI.error] " + title + "\n\t" + content);
 		
 	}
 
 	public static void warning(String title, String content) {
 
 		JOptionPane.showMessageDialog(null, content, title, JOptionPane.WARNING_MESSAGE);
-		Main.log("[GUI.warning] " + title + " / " + content);
+		Main.log("[GUI.warning] " + title + "\n\t" + content);
 		
 	}
 
@@ -169,14 +224,5 @@ public class GUI extends JFrame {
 
 	}
 	
-	/*
-	 * Close the window and kills the application.
-	 * 
-	 * */
-	public void kill() {
-		
-		dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
-		
-	}
 
 }
