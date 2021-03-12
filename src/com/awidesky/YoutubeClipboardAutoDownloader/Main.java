@@ -22,10 +22,10 @@ import java.util.concurrent.Executors;
 
 import javax.swing.SwingUtilities;
 
-import gui.ClipBoardCheckerThread;
-import gui.GUI;
-import gui.LoadingStatus;
-import gui.TaskStatusViewerModel;
+import com.awidesky.YoutubeClipboardAutoDownloader.gui.ClipBoardCheckerThread;
+import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
+import com.awidesky.YoutubeClipboardAutoDownloader.gui.LoadingStatus;
+import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusViewerModel;
 
 /** Main class */
 public class Main { 
@@ -53,7 +53,8 @@ public class Main {
 				gui.initLoadingFrame();
 			});
 		} catch (InvocationTargetException | InterruptedException e2) {
-			e2.printStackTrace();
+			log("[init] failed wating EDT!");
+			log(e2);
 		}
 
 		gui.setLoadingStat(LoadingStatus.CHECKING_YDL);
@@ -136,12 +137,12 @@ public class Main {
 
 									} catch (Exception e1) {
 
-										GUI.error("[Task" + num + "] " +"Error when downloading! : ", e1.getMessage());
+										GUI.error("[Task" + num + "] " +"Error when downloading!", "%e%", e1);
 										return;
 
 									}
 									
-								} else { GUI.error("[Task" + num + "] " +"Not a valid url!", data + "\nis not valid or unsupported url!"); return; }
+								} else { GUI.error("[Task" + num + "] " +"Not a valid url!", data + "\nis not valid or unsupported url!", null); return; }
 
 							}
 
@@ -149,7 +150,7 @@ public class Main {
 
 					} catch (InterruptedException | HeadlessException | UnsupportedFlavorException | IOException e1) {
 
-						GUI.error("Error! : ", e1.getMessage());
+						GUI.error("Error! : ", "%e%", e1);
 
 					} // try end
 
@@ -181,11 +182,8 @@ public class Main {
 		} catch (IOException e) {
 
 			logTo = new PrintWriter(System.out);
-			GUI.error("Error when creating log flie", e.getMessage());
+			GUI.error("Error when creating log flie", "%e%", e);
 			
-		} finally {
-			
-			Runtime.getRuntime().addShutdownHook(new Thread(() -> { logTo.close(); }));
 		}
 		
 	}
@@ -208,17 +206,17 @@ public class Main {
 
 		} catch (FileNotFoundException e1) {
 
-			GUI.warning("config.txt not exists!", e1.getMessage() + "\nDon't worry! I'll make one later...");
+			GUI.warning("config.txt not exists!","%e%\nDon't worry! I'll make one later...", e1);
 
 		} catch (IOException e) {
 
 			GUI.warning("Exception occurred when reading config.txt",
-					e.getMessage() + "\nInitiating config.txt anyway...");
+					"%e%\nInitiating config.txt anyway...", e);
 
 		} catch (Exception e2) {
 
 			GUI.warning(e2.getClass() + " occurred when reading config.txt",
-					e2.getMessage() + "\nInitiating config.txt anyway...");
+					"%e%\nInitiating config.txt anyway...", e2);
 
 		} finally {
 			
@@ -256,7 +254,7 @@ public class Main {
 			
 		} catch (IOException e) {
 
-			GUI.error("Error when writing config.txt file : ", e.getMessage());
+			GUI.error("Error when writing config.txt file", "%e%", e);
 
 		} finally {
 			
@@ -289,6 +287,12 @@ public class Main {
 		logTo.println(data);
 
 	}
+	
+	public static void log(Exception e) {
+		
+		e.printStackTrace(logTo);
+		
+	}
 
 	public static int getExitcode() {
 		return exitcode;
@@ -310,8 +314,8 @@ public class Main {
 	public static void kill() {
 		
 		Main.writeProperties();
+		logTo.close();
 		System.exit(Main.getExitcode());
-
 		
 	}
 

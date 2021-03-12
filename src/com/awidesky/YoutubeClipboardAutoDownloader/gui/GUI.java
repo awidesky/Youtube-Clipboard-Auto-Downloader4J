@@ -1,4 +1,4 @@
-package gui;
+package com.awidesky.YoutubeClipboardAutoDownloader.gui;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -201,18 +201,28 @@ public class GUI {
 		
 	}
 	
-	
-	public static void error(String title, String content) {
+	/**
+	 * show error dialog.
+	 * String <code>"%e%"</code> in <code>content</code> will replaced by error message of given <code>Exception</code> if it's not <code>null</code>
+	 * */
+	public static void error(String title, String content, Exception e) {
 
 		JOptionPane.showMessageDialog(null, content, title, JOptionPane.ERROR_MESSAGE);
-		Main.log("[GUI.error] " + title + "\n\t" + content);
+		Main.log("[GUI.error] " + title + "\n\t" + content.replaceAll("%e%", (e == null) ? "" : e.getMessage()));
+		Main.log(e);
 		
 	}
 
-	public static void warning(String title, String content) {
+	/**
+	 * show warning dialog.
+	 * String <code>"%e%"</code> in <code>content</code> will replaced by warning message of given <code>Exception</code> if it's not <code>null</code>
+	 * 
+	 * */
+	public static void warning(String title, String content, Exception e) {
 
 		JOptionPane.showMessageDialog(null, content, title, JOptionPane.WARNING_MESSAGE);
-		Main.log("[GUI.warning] " + title + "\n\t" + content);
+		Main.log("[GUI.warning] " + title + "\n\t" + content.replaceAll("%e%", (e == null) ? "" : e.getMessage()));
+		Main.log(e);
 		
 	}
 

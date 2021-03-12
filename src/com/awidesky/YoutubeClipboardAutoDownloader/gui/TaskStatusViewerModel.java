@@ -1,4 +1,4 @@
-package gui;
+package com.awidesky.YoutubeClipboardAutoDownloader.gui;
 
 import java.util.function.Consumer;
 

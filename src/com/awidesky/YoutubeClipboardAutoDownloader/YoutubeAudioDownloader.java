@@ -8,8 +8,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Pattern;
 
-import gui.GUI;
-import gui.TaskStatusViewerModel;
+import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
+import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusViewerModel;
 
 public class YoutubeAudioDownloader {
 
@@ -37,11 +37,11 @@ public class YoutubeAudioDownloader {
 			
 		} else {
 			
-			youtubedlpath = projectpath + "\\YoutubeAudioAutoDownloader-resources\\ffmpeg\\bin\\";
+			youtubedlpath = projectpath + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "ffmpeg" + File.separator + "bin" + File.separator;
 			
 			if (!checkYoutubedlPath(youtubedlpath + "youtube-dl")) {
 
-				GUI.error("Error!", "youtube-dl does not exist in\n\t" + youtubedlpath + "\tor system %path%!");
+				GUI.error("Error!", "youtube-dl does not exist in\n\t" + youtubedlpath + "\tor system %path%!", null);
 				Main.setExitcode(1);
 				Main.kill();
 				
@@ -81,7 +81,7 @@ public class YoutubeAudioDownloader {
 			
 		} catch (Exception e) {
 			
-			GUI.error("Error!", "ffmpeg does not exist in\n\t" + youtubedlpath + "\tor system %path%!");
+			GUI.error("Error!", "ffmpeg does not exist in\n\t" + youtubedlpath + "\tor system %path%!", null);
 			Main.setExitcode(1);
 			Main.kill();
 			
@@ -109,7 +109,7 @@ public class YoutubeAudioDownloader {
 					
 					Main.log("Found valid command to execute youtube-dl : " + ydlfile);
 					if ( (Integer.parseInt(new SimpleDateFormat("yyyyMM").format(new Date())) - Integer.parseInt(line.substring(0, 7).replace(".", ""))) > 1 ) //update if yputube-dl version is older than a month 
-						try { new ProcessBuilder(ydlfile, "--update").start().waitFor(); } catch (Exception e) { GUI.error("Error when updating youtube-dl", e.getMessage()); }
+						try { new ProcessBuilder(ydlfile, "--update").start().waitFor(); } catch (Exception e) { GUI.error("Error when updating youtube-dl", "%e%\nI couldn't update youtube-dl!", e); }
 					
 					return true;
 					
@@ -154,7 +154,7 @@ public class YoutubeAudioDownloader {
 		task.setVideoName(name);
 		Main.log("[Task" + task.getTaskNum() + "] " + "Video name : " + name);
 		p1.waitFor();
-		try { br1.close(); } catch (IOException i) { GUI.error("[Task" + task.getTaskNum() + "] " + "Error when closing process stream", i.getMessage()); }
+		try { br1.close(); } catch (IOException i) { GUI.error("[Task" + task.getTaskNum() + "] " + "Error when closing process stream", "%e%", i); }
 		
 		
 		/* download video */
@@ -193,7 +193,7 @@ public class YoutubeAudioDownloader {
 
 			} catch (IOException e) {
 
-				GUI.error("[Task" + task.getTaskNum() + "] " + "Error when redirecting output of youtube-dl", e.getMessage());
+				GUI.error("[Task" + task.getTaskNum() + "] " + "Error when redirecting output of youtube-dl", "%e%", e);
 
 			}
 
@@ -216,13 +216,13 @@ public class YoutubeAudioDownloader {
 
 				if (!sb1.toString().equals("")) {
 
-					GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum() + "] " + "There's Error(s) in youtube-dl proccess!");
+					GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum() + "] " + "There's Error(s) in youtube-dl proccess!", null);
 
 				}
 
 			} catch (IOException e) {
 
-				GUI.error("[Task" + task.getTaskNum() + "] " + "Error when redirecting error output of youtube-dl", e.getMessage());
+				GUI.error("[Task" + task.getTaskNum() + "] " + "Error when redirecting error output of youtube-dl", "%e%", e);
 
 			}
 
@@ -232,7 +232,7 @@ public class YoutubeAudioDownloader {
 		int e;
 		if( (e = p.waitFor()) != 0) { 
 			task.setStatus("ERROR");
-			GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum() + "] " + " has executed with error code : " + e);
+			GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum() + "] " + " has executed with error code : " + e, null);
 			return;
 		}
 
@@ -259,7 +259,7 @@ public class YoutubeAudioDownloader {
 			
 		} catch (Exception e) {
 					
-			GUI.error("[Task" + taskNum + "] " +"Error when checking url : ", e.getMessage());
+			GUI.error("[Task" + taskNum + "] " +"Error when checking url", "%e%", e);
 			return false;
 			
 		}
