@@ -1,4 +1,4 @@
-package gui;
+package com.awidesky.YoutubeClipboardAutoDownloader.gui;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -34,7 +34,6 @@ public class GUI {
 	private JComboBox<String> cb_format, cb_quality;
 	private JFileChooser jfc = new JFileChooser();
 	private JTable table;
-	private static final String[] table_header = { "Video", "Destination", "Status", "Progress" };
 	private JScrollPane scrollPane;
 	
 	
@@ -128,8 +127,10 @@ public class GUI {
 			jfc.setCurrentDirectory(new File(path));
 
 		});
-		btn_cleanCompleted = new JButton("clean completed"); //TODO: listner
+		btn_cleanCompleted = new JButton("clean completed");
+		btn_cleanCompleted.addActionListener((e) -> { TaskStatusModel.getinstance().clearDone(); });
 		btn_cleanAll = new JButton("clean all");
+		btn_cleanAll.addActionListener((e) -> { TaskStatusModel.getinstance().clearAll(); });
 
 		cb_format = new JComboBox<>(new String[] { "mp3", "best", "aac", "flac", "m4a", "opus", "vorbis", "wav" });
 		cb_quality = new JComboBox<>(new String[] { "0(best)", "1", "2", "3", "4", "5", "6", "7", "8", "9(worst)" });
@@ -150,6 +151,8 @@ public class GUI {
 		});
 
 		table = new JTable();
+		table.setModel(TaskStatusModel.getinstance());
+		table.getColumn("Progress").setCellRenderer(new ProgressRenderer());
 		table.setFillsViewportHeight(true);
 		table.getColumnModel().getColumn(0).setPreferredWidth(1);
 		
@@ -216,7 +219,7 @@ public class GUI {
 		
 	}
 
-	public void addTaskModel(TaskStatusViewerModel t) {
+	public void addTaskModel(TaskData t) {
 
 		// TODO : give t a whenDone object
 		// TODO : give t a processUpdater object

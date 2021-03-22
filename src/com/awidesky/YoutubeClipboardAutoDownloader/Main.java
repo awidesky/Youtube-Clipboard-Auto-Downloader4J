@@ -22,10 +22,10 @@ import java.util.concurrent.Executors;
 
 import javax.swing.SwingUtilities;
 
-import gui.ClipBoardCheckerThread;
-import gui.GUI;
-import gui.LoadingStatus;
-import gui.TaskStatusViewerModel;
+import com.awidesky.YoutubeClipboardAutoDownloader.gui.ClipBoardCheckerThread;
+import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
+import com.awidesky.YoutubeClipboardAutoDownloader.gui.LoadingStatus;
+import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskData;
 
 /** Main class */
 public class Main { 
@@ -125,9 +125,9 @@ public class Main {
 
 								if (YoutubeAudioDownloader.checkURL(data, num)) {
 									
-									TaskStatusViewerModel t = new TaskStatusViewerModel(num);
-									t.setStatus("Preparing...");
+									TaskData t = new TaskData(num, data);
 									gui.addTaskModel(t);
+									t.setStatus("Preparing...");
 
 									try {
 

@@ -22,10 +22,10 @@
                <center>
                   <TableView maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="280.0" prefWidth="600.0" BorderPane.alignment="CENTER">
                     <columns>
-                      <TableColumn prefWidth="120.0" text="name" />
-                      <TableColumn prefWidth="324.0" text="path" />
-                        <TableColumn minWidth="0.0" prefWidth="73.0" text="progress" />
-                        <TableColumn prefWidth="82.0" text="Downloading" />
+                      <TableColumn prefWidth="120.0" text="File Name" />
+                      <TableColumn prefWidth="324.0" text="Destination" />
+                        <TableColumn minWidth="0.0" prefWidth="73.0" text="Progress" />
+                        <TableColumn prefWidth="82.0" text="Status" />
                     </columns>
                   </TableView>
                </center></BorderPane>

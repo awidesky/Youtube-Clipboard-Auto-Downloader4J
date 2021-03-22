@@ -8,8 +8,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Pattern;
 
-import gui.GUI;
-import gui.TaskStatusViewerModel;
+import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
+import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskData;
 
 public class YoutubeAudioDownloader {
 
@@ -133,7 +133,7 @@ public class YoutubeAudioDownloader {
 	}
 
 
-	public static void download(String url, TaskStatusViewerModel task) throws Exception {
+	public static void download(String url, TaskData task) throws Exception {
 
 		Main.logProperties("[Task" + task.getTaskNum() + "] " + "Current");
 

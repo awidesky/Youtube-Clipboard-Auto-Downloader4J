@@ -1,21 +1,20 @@
-package gui;
+package com.awidesky.YoutubeClipboardAutoDownloader.gui;
 
-import java.util.function.Consumer;
+import javax.swing.SwingUtilities;
 
-public class TaskStatusViewerModel {
-
+public class TaskData{
+	
 	private String videoName = ""; 
 	private String status = "";
 	private int progress = 0;
 	private String dest = "";
-	private Runnable whenDone;
-	private Consumer<Integer> processUpdater; //what will this do?
 	private int taskNum;
+	private String url; /** Show as tooltip */ //TODO: tooltip
 	
 	
-	public TaskStatusViewerModel(int num) {
+	public TaskData(int num, String url) {
 		this.taskNum = num;
-		
+		this.url = url;
 	}
 	
 
@@ -33,6 +32,7 @@ public class TaskStatusViewerModel {
 	
 	public void setStatus(String status) {
 		this.status = status;
+		SwingUtilities.invokeLater(() -> TaskStatusModel.getinstance().updated(this));
 	}
 	
 	public int getProgress() {
@@ -41,7 +41,7 @@ public class TaskStatusViewerModel {
 	
 	public void setProgress(int progress) {
 		this.progress = progress;
-		processUpdater.accept(progress);
+		SwingUtilities.invokeLater(() -> TaskStatusModel.getinstance().updated(this));
 	}
 	
 	public String getDest() {
@@ -56,30 +56,13 @@ public class TaskStatusViewerModel {
 		return taskNum;
 	}
 
+	public String getUrl() {
+		return url;
+	}
+
+
 	public void done() {
-		
-		status = "Done!";
-		whenDone.run();
-		
+		setStatus("Done!");
 	}
 
-	public void setWhenDone(Runnable whenDone) {
-		
-		this.whenDone = whenDone;
-		
-	}
-
-	public void setProcessUpdater(Consumer<Integer> processUpdater) {
-		
-		this.processUpdater = processUpdater;
-		
-	}
-	
-	public Consumer<Integer> getProcessUpdater() {
-		
-		return this.processUpdater;
-		
-	}
-	
-	
 }
