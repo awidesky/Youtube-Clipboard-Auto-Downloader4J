@@ -154,7 +154,7 @@ public class GUI {
 		table.setModel(TaskStatusModel.getinstance());
 		table.getColumn("Progress").setCellRenderer(new ProgressRenderer());
 		table.setFillsViewportHeight(true);
-		table.getColumnModel().getColumn(0).setPreferredWidth(1);
+		table.getColumnModel().getColumn(0).setPreferredWidth(1);//TODO: width
 		
 		scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBounds(8, 122, 600, 280);
