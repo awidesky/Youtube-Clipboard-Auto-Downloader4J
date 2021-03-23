@@ -1,8 +1,10 @@
 package com.awidesky.YoutubeClipboardAutoDownloader.gui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
 public class TaskStatusModel extends AbstractTableModel {
@@ -13,7 +15,7 @@ public class TaskStatusModel extends AbstractTableModel {
 	private static final long serialVersionUID = -7803447765391487650L;
 
 	private static TaskStatusModel instance = new TaskStatusModel();
-	private List<TaskData> rows = new ArrayList<>();
+	private List<TaskData> rows = Collections.synchronizedList(new ArrayList<>());
 	
 	private TaskStatusModel() {}
 	
@@ -82,6 +84,15 @@ public class TaskStatusModel extends AbstractTableModel {
 	public void updated(TaskData t) {
 		
 		fireTableRowsUpdated(rows.indexOf(t), rows.indexOf(t));
+		
+	}
+
+	public void addTask(TaskData t) {
+
+		SwingUtilities.invokeLater(() -> {
+			rows.add(t);
+			fireTableRowsInserted(rows.size() - 1, rows.size() - 1);
+		});
 		
 	}
 	

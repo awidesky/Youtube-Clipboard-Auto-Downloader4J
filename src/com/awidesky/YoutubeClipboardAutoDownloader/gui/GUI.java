@@ -219,13 +219,5 @@ public class GUI {
 		
 	}
 
-	public void addTaskModel(TaskData t) {
-
-		// TODO : give t a whenDone object
-		// TODO : give t a processUpdater object
-		// TODO : put t to Table
-
-	}
-	
 
 }

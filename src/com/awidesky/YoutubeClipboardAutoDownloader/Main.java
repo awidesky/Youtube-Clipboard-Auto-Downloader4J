@@ -26,6 +26,7 @@ import com.awidesky.YoutubeClipboardAutoDownloader.gui.ClipBoardCheckerThread;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.LoadingStatus;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskData;
+import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
 
 /** Main class */
 public class Main { 
@@ -126,7 +127,7 @@ public class Main {
 								if (YoutubeAudioDownloader.checkURL(data, num)) {
 									
 									TaskData t = new TaskData(num, data);
-									gui.addTaskModel(t);
+									TaskStatusModel.getinstance().addTask(t);
 									t.setStatus("Preparing...");
 
 									try {
