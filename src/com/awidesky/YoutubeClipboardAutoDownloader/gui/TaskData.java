@@ -9,7 +9,7 @@ public class TaskData {
 	private int progress = 0;
 	private String dest = "";
 	private int taskNum;
-	private String url; /** Show as tooltip */ //TODO: tooltip
+	private String url; /** Show as tooltip */ 
 	
 	
 	public TaskData(int num, String url) {
