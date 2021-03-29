@@ -28,10 +28,10 @@ public class GUI {
 	
 
 	private JFrame mainFrame;
-	private JButton browse, cleanCompleted, cleanAll;
-	private JLabel format, quality, path;
-	private JTextField pathField;
-	private JComboBox<String> cb_format, cb_quality;
+	private JButton browse, cleanCompleted, cleanAll, nameFormatHelp;
+	private JLabel format, quality, path, nameFormat, playList;
+	private JTextField pathField, nameFormatField;
+	private JComboBox<String> cb_format, cb_quality, cb_playList;
 	private JFileChooser jfc = new JFileChooser();
 	private JTable table;
 	private JScrollPane scrollPane;
@@ -97,13 +97,46 @@ public class GUI {
 
 		});
 
+		addFileChooser();
+		addLabels();
+		addTextFields();
+		addButtons();
+		addButtons();
+		addComboBoxes();
+		addTable();
+		
+		disposeLoadingFrame();
+		
+		mainFrame.setVisible(true);
+		
+	}
+	
+
+	private void addFileChooser() {
+		
 		jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		jfc.setDialogTitle("Choose directory to save music!");
 		jfc.setCurrentDirectory(new File(Main.getProperties().getSaveto()));
-
+	}
+	
+	private void addLabels() {
+		
 		format = new JLabel("Format :");
 		quality = new JLabel("Audio Quality :");
 		path = new JLabel("Save to :");
+		
+		format.setBounds(26, 23, format.getPreferredSize().width, format.getPreferredSize().height);
+		quality.setBounds(273, 23, quality.getPreferredSize().width, quality.getPreferredSize().height);
+		path.setBounds(14, 80, path.getPreferredSize().width, path.getPreferredSize().height);
+
+		mainFrame.add(format);
+		mainFrame.add(path);
+		mainFrame.add(quality);
+		
+	}
+	
+	private void addTextFields() {
+		
 		pathField = new JTextField(Main.getProperties().getSaveto());
 
 		pathField.addActionListener((e) -> {
@@ -111,8 +144,20 @@ public class GUI {
 			Main.getProperties().setSaveto(pathField.getText());
 
 		});
+		
+		pathField.setBounds(65, 76, 456, 22);
 
+		mainFrame.add(pathField);
+
+	}
+	
+	private void addButtons() {
+		
 		browse = new JButton("Browse...");
+		cleanCompleted = new JButton("clean completed");
+		cleanAll = new JButton("clean all");
+		nameFormatHelp = new JButton("<- help?");
+		
 		browse.addActionListener((e) -> {
 
 			if (jfc.showDialog(new JFrame(), null) != JFileChooser.APPROVE_OPTION) {
@@ -127,11 +172,24 @@ public class GUI {
 			jfc.setCurrentDirectory(new File(path));
 
 		});
-		cleanCompleted = new JButton("clean completed");
 		cleanCompleted.addActionListener((e) -> { TaskStatusModel.getinstance().clearDone(); });
-		cleanAll = new JButton("clean all");
 		cleanAll.addActionListener((e) -> { TaskStatusModel.getinstance().clearAll(); });
-
+		nameFormatHelp.addActionListener((e) -> { showNameFormatPage(); });
+		
+		browse.setBounds(523, 76, browse.getPreferredSize().width, browse.getPreferredSize().height);
+		cleanCompleted.setBounds(14, 418, cleanCompleted.getPreferredSize().width, cleanCompleted.getPreferredSize().height);
+		cleanAll.setBounds(142, 418, cleanAll.getPreferredSize().width, cleanAll.getPreferredSize().height);
+		nameFormatHelp.setBounds(298, 122, nameFormatHelp.getPreferredSize().width, nameFormatHelp.getPreferredSize().height);
+		
+		mainFrame.add(browse);
+		mainFrame.add(cleanCompleted);
+		mainFrame.add(cleanAll);
+		mainFrame.add(nameFormatHelp);
+		
+	}
+	
+	private void addComboBoxes() {
+		
 		cb_format = new JComboBox<>(new String[] { "mp3", "best", "aac", "flac", "m4a", "opus", "vorbis", "wav" });
 		cb_quality = new JComboBox<>(new String[] { "0(best)", "1", "2", "3", "4", "5", "6", "7", "8", "9(worst)" });
 
@@ -143,13 +201,22 @@ public class GUI {
 			Main.getProperties().setFormat(cb_format.getSelectedItem().toString());
 
 		});
-
 		cb_quality.addActionListener((e) -> {
 
 			Main.getProperties().setQuality(String.valueOf(cb_quality.getSelectedIndex()));
 
 		});
 
+		cb_format.setBounds(83, 19, 96, 22);
+		cb_quality.setBounds(365, 19, 150, 22);
+
+		mainFrame.add(cb_format);
+		mainFrame.add(cb_quality);
+		
+	}
+	
+	private void addTable() {
+		
 		table = new JTable();
 		table.setModel(TaskStatusModel.getinstance());
 		table.getColumn("Progress").setCellRenderer(new ProgressRenderer());
@@ -162,43 +229,26 @@ public class GUI {
 		scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBounds(8, 122, 600, 280);
 
-		browse.setBounds(523, 76, browse.getPreferredSize().width, browse.getPreferredSize().height);
-		cleanCompleted.setBounds(14, 418, cleanCompleted.getPreferredSize().width, cleanCompleted.getPreferredSize().height);
-		cleanAll.setBounds(142, 418, cleanAll.getPreferredSize().width, cleanAll.getPreferredSize().height);
-		
-		format.setBounds(26, 23, format.getPreferredSize().width, format.getPreferredSize().height);
-		quality.setBounds(273, 23, quality.getPreferredSize().width, quality.getPreferredSize().height);
-		path.setBounds(14, 80, path.getPreferredSize().width, path.getPreferredSize().height);
-
-		pathField.setBounds(65, 76, 456, 22);
-
-		cb_format.setBounds(83, 19, 96, 22);
-		cb_quality.setBounds(365, 19, 150, 22);
-
-		mainFrame.add(browse);
-
-		mainFrame.add(format);
-		mainFrame.add(path);
-		mainFrame.add(quality);
-
-		mainFrame.add(pathField);
-
-		mainFrame.add(cb_format);
-		mainFrame.add(cb_quality);
-
 		mainFrame.add(scrollPane);
 
-		
+	}
+
+	private void disposeLoadingFrame() {
 
 		loadingFrame.setVisible(false);
 		loadingFrame.dispose();
-		mainFrame.setVisible(true);
 		
 		loadingFrame = null;
 		tlb_loadingStatus = null;
 		jpb_initProgress = null;
 		
 	}
+	
+	private void showNameFormatPage() {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 	public void setLoadingStat(LoadingStatus stat) {
 		
