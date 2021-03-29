@@ -2,7 +2,7 @@ package com.awidesky.YoutubeClipboardAutoDownloader.gui;
 
 import javax.swing.SwingUtilities;
 
-public class TaskData{
+public class TaskData {
 	
 	private String videoName = ""; 
 	private String status = "";

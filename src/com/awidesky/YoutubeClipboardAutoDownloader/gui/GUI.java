@@ -1,8 +1,13 @@
 package com.awidesky.YoutubeClipboardAutoDownloader.gui;
 
+import java.awt.Desktop;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -220,7 +225,19 @@ public class GUI {
 	
 	private void addTable() {
 		
-		table = new JTable();
+		table = new JTable() {
+			
+			/**
+			 * serialVersionUID
+			 */
+			private static final long serialVersionUID = 6021131657635813356L;
+
+			@Override
+			public String getToolTipText(MouseEvent e) {
+				return TaskStatusModel.getinstance().getUrlOf(rowAtPoint(e.getPoint()));
+			}
+			
+		};
 		table.setModel(TaskStatusModel.getinstance());
 		table.getColumn("Progress").setCellRenderer(new ProgressRenderer());
 		table.setFillsViewportHeight(true);
@@ -247,9 +264,17 @@ public class GUI {
 		
 	}
 	
-	private void showNameFormatPage() {
-		// TODO Auto-generated method stub
-		
+	private void showNameFormatPage() { //TODO : GUI.warning updated!
+
+		try {
+			if(!Desktop.isDesktopSupported()) {  }
+			Desktop.getDesktop().browse(new URI("https://github.com/ytdl-org/youtube-dl#output-template"));
+		} catch (IOException e) {
+			GUI.warning("Cannot open default web browser!", "Please visit https://github.com/ytdl-org/youtube-dl#output-template");
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
 	}
 
 

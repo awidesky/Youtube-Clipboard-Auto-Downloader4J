@@ -95,5 +95,12 @@ public class TaskStatusModel extends AbstractTableModel {
 		});
 		
 	}
+
+	public String getUrlOf(int row) {
+		
+		return rows.get(row).getUrl();
+		
+	}
+	
 	
 }
