@@ -1,8 +1,13 @@
 package com.awidesky.YoutubeClipboardAutoDownloader.gui;
 
+import java.awt.Desktop;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -23,18 +28,17 @@ public class GUI {
 	
 	
 	private JFrame loadingFrame;
-	private JLabel tlb_loadingStatus;
-	private JProgressBar jpb_initProgress;
+	private JLabel loadingStatus;
+	private JProgressBar initProgress;
 	
 
 	private JFrame mainFrame;
-	private JButton btn_browse, btn_cleanCompleted, btn_cleanAll;
-	private JLabel tlb_format, tlb_quality, tlb_path;
-	private JTextField jft_path;
-	private JComboBox<String> cb_format, cb_quality;
+	private JButton browse, cleanCompleted, cleanAll, nameFormatHelp;
+	private JLabel format, quality, path, nameFormat, playList;
+	private JTextField pathField, nameFormatField;
+	private JComboBox<String> cb_format, cb_quality, cb_playList;
 	private JFileChooser jfc = new JFileChooser();
 	private JTable table;
-	private static final String[] table_header = { "Video", "Destination", "Status", "Progress" };
 	private JScrollPane scrollPane;
 	
 	
@@ -62,14 +66,14 @@ public class GUI {
 		loadingFrame.setLayout(null);
 		loadingFrame.setResizable(false);
 		
-		tlb_loadingStatus = new JLabel("");
-		tlb_loadingStatus.setBounds(14, 7, tlb_loadingStatus.getPreferredSize().width, tlb_loadingStatus.getPreferredSize().height);
+		loadingStatus = new JLabel("");
+		loadingStatus.setBounds(14, 8, 370, 18);
 		
-		jpb_initProgress = new JProgressBar();
-		jpb_initProgress.setBounds(15, 27, 370, 18);
+		initProgress = new JProgressBar();
+		initProgress.setBounds(15, 27, 370, 18);
 		
-		loadingFrame.add(tlb_loadingStatus);
-		loadingFrame.add(jpb_initProgress);
+		loadingFrame.add(loadingStatus);
+		loadingFrame.add(initProgress);
 		loadingFrame.setVisible(true);
 		
 	}
@@ -98,23 +102,74 @@ public class GUI {
 
 		});
 
+		addFileChooser();
+		addLabels();
+		addTextFields();
+		addButtons();
+		addButtons();
+		addComboBoxes();
+		addTable();
+		
+		disposeLoadingFrame();
+		
+		mainFrame.setVisible(true);
+		
+	}
+	
+
+	private void addFileChooser() {
+		
 		jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		jfc.setDialogTitle("Choose directory to save music!");
 		jfc.setCurrentDirectory(new File(Main.getProperties().getSaveto()));
+	}
+	
+	private void addLabels() {
+		
+		format = new JLabel("Format :");
+		quality = new JLabel("Audio Quality :");
+		path = new JLabel("Save to :");
+		nameFormat = new JLabel("Filename Format : ");
+		playList = new JLabel("Download Playlist?");
+		
+		format.setBounds(26, 23, format.getPreferredSize().width, format.getPreferredSize().height);
+		quality.setBounds(273, 23, quality.getPreferredSize().width, quality.getPreferredSize().height);
+		path.setBounds(14, 80, path.getPreferredSize().width, path.getPreferredSize().height);
+		nameFormat.setBounds(10, 126, nameFormat.getPreferredSize().width, nameFormat.getPreferredSize().height);
+		playList.setBounds(389, 126, playList.getPreferredSize().width, playList.getPreferredSize().height);
+		
+		mainFrame.add(format);
+		mainFrame.add(path);
+		mainFrame.add(quality);
+		mainFrame.add(nameFormat);
+		mainFrame.add(playList);
+		
+	}
+	
+	private void addTextFields() {
+		
+		pathField = new JTextField(Main.getProperties().getSaveto());
+		nameFormatField =  new JTextField(Main.getProperties().getSaveto());
+		
+		pathField.addActionListener((e) -> { Main.getProperties().setSaveto(pathField.getText()); });
+		nameFormatField.addActionListener((e) -> { Main.getProperties().setSaveto(nameFormat.getText()); });
+		
+		pathField.setBounds(65, 76, 456, 22); 
+		nameFormatField.setBounds(115, 122, 172, 22);
 
-		tlb_format = new JLabel("Format :");
-		tlb_quality = new JLabel("Audio Quality :");
-		tlb_path = new JLabel("Save to :");
-		jft_path = new JTextField(Main.getProperties().getSaveto());
+		mainFrame.add(pathField);
+		mainFrame.add(nameFormatField);
 
-		jft_path.addActionListener((e) -> {
-
-			Main.getProperties().setSaveto(jft_path.getText());
-
-		});
-
-		btn_browse = new JButton("Browse...");
-		btn_browse.addActionListener((e) -> {
+	}
+	
+	private void addButtons() {
+		
+		browse = new JButton("Browse...");
+		cleanCompleted = new JButton("clean completed");
+		cleanAll = new JButton("clean all");
+		nameFormatHelp = new JButton("<- help?");
+		
+		browse.addActionListener((e) -> {
 
 			if (jfc.showDialog(new JFrame(), null) != JFileChooser.APPROVE_OPTION) {
 				JOptionPane.showMessageDialog(null, "Please choose a directory!", "ERROR!",
@@ -124,83 +179,113 @@ public class GUI {
 
 			String path = jfc.getSelectedFile().getAbsolutePath();
 			Main.getProperties().setSaveto(path);
-			jft_path.setText(path);
+			pathField.setText(path);
 			jfc.setCurrentDirectory(new File(path));
 
 		});
-		btn_cleanCompleted = new JButton("clean completed"); //TODO: listner
-		btn_cleanAll = new JButton("clean all");
-
+		cleanCompleted.addActionListener((e) -> { TaskStatusModel.getinstance().clearDone(); });
+		cleanAll.addActionListener((e) -> { TaskStatusModel.getinstance().clearAll(); });
+		nameFormatHelp.addActionListener((e) -> { showNameFormatPage(); });
+		
+		browse.setBounds(523, 76, browse.getPreferredSize().width, browse.getPreferredSize().height);
+		cleanCompleted.setBounds(14, 418, cleanCompleted.getPreferredSize().width, cleanCompleted.getPreferredSize().height);
+		cleanAll.setBounds(142, 418, cleanAll.getPreferredSize().width, cleanAll.getPreferredSize().height);
+		nameFormatHelp.setBounds(298, 122, nameFormatHelp.getPreferredSize().width, nameFormatHelp.getPreferredSize().height);
+		
+		mainFrame.add(browse);
+		mainFrame.add(cleanCompleted);
+		mainFrame.add(cleanAll);
+		mainFrame.add(nameFormatHelp);
+		
+	}
+	
+	private void addComboBoxes() {
+		
 		cb_format = new JComboBox<>(new String[] { "mp3", "best", "aac", "flac", "m4a", "opus", "vorbis", "wav" });
 		cb_quality = new JComboBox<>(new String[] { "0(best)", "1", "2", "3", "4", "5", "6", "7", "8", "9(worst)" });
+		cb_playList = new JComboBox<>(new String[] { "yes", "no" });
 
 		cb_format.setSelectedItem(Main.getProperties().getFormat());
 		cb_quality.setSelectedIndex(Integer.parseInt(Main.getProperties().getQuality()));
+		cb_playList.setSelectedItem(Main.getProperties().getPlaylistOption().toComboBox());
 
-		cb_format.addActionListener((e) -> {
+		cb_format.addActionListener((e) -> { Main.getProperties().setFormat(cb_format.getSelectedItem().toString()); });
+		cb_quality.addActionListener((e) -> { Main.getProperties().setQuality(String.valueOf(cb_quality.getSelectedIndex())); });
+		cb_playList.addActionListener((e) -> { Main.getProperties().setPlaylistOption(cb_playList.getSelectedItem().toString()); });
+		
+		cb_format.setBounds(83, 19, 96, 22);
+		cb_quality.setBounds(365, 19, 150, 22);
+		cb_playList.setBounds(499, 122, 109, 22);
 
-			Main.getProperties().setFormat(cb_format.getSelectedItem().toString());
+		mainFrame.add(cb_format);
+		mainFrame.add(cb_quality);
+		mainFrame.add(cb_playList);
+		
+	}
+	
+	private void addTable() {
+		
+		table = new JTable() {
+			
+			/**
+			 * serialVersionUID
+			 */
+			private static final long serialVersionUID = 6021131657635813356L;
 
-		});
-
-		cb_quality.addActionListener((e) -> {
-
-			Main.getProperties().setQuality(String.valueOf(cb_quality.getSelectedIndex()));
-
-		});
-
-		table = new JTable();
+			@Override
+			public String getToolTipText(MouseEvent e) {
+				return TaskStatusModel.getinstance().getUrlOf(rowAtPoint(e.getPoint()));
+			}
+			
+		};
+		table.setModel(TaskStatusModel.getinstance());
+		table.getColumn("Progress").setCellRenderer(new ProgressRenderer());
 		table.setFillsViewportHeight(true);
-		table.getColumnModel().getColumn(0).setPreferredWidth(1);
+		table.getColumnModel().getColumn(0).setPreferredWidth(120);
+		table.getColumnModel().getColumn(1).setPreferredWidth(324);
+		table.getColumnModel().getColumn(2).setPreferredWidth(73);
+		table.getColumnModel().getColumn(3).setPreferredWidth(82);
 		
 		scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBounds(8, 122, 600, 280);
 
-		btn_browse.setBounds(523, 76, btn_browse.getPreferredSize().width, btn_browse.getPreferredSize().height);
-		btn_cleanCompleted.setBounds(14, 418, btn_cleanCompleted.getPreferredSize().width, btn_cleanCompleted.getPreferredSize().height);
-		btn_cleanAll.setBounds(142, 418, btn_cleanAll.getPreferredSize().width, btn_cleanAll.getPreferredSize().height);
-		
-		tlb_format.setBounds(26, 23, tlb_format.getPreferredSize().width, tlb_format.getPreferredSize().height);
-		tlb_quality.setBounds(273, 23, tlb_quality.getPreferredSize().width, tlb_quality.getPreferredSize().height);
-		tlb_path.setBounds(14, 80, tlb_path.getPreferredSize().width, tlb_path.getPreferredSize().height);
-
-		jft_path.setBounds(65, 76, 456, 22);
-
-		cb_format.setBounds(83, 19, 96, 22);
-		cb_quality.setBounds(365, 19, 150, 22);
-
-		mainFrame.add(btn_browse);
-
-		mainFrame.add(tlb_format);
-		mainFrame.add(tlb_path);
-		mainFrame.add(tlb_quality);
-
-		mainFrame.add(jft_path);
-
-		mainFrame.add(cb_format);
-		mainFrame.add(cb_quality);
-
 		mainFrame.add(scrollPane);
 
-		
+	}
+
+	private void disposeLoadingFrame() {
 
 		loadingFrame.setVisible(false);
 		loadingFrame.dispose();
-		mainFrame.setVisible(true);
 		
 		loadingFrame = null;
-		tlb_loadingStatus = null;
-		jpb_initProgress = null;
-		
-	}
-
-	public void setLoadingStat(LoadingStatus stat) {
-		
-		tlb_loadingStatus.setText(stat.getStatus());
-		jpb_initProgress.setValue(stat.getProgress());
+		loadingStatus = null;
+		initProgress = null;
 		
 	}
 	
+	private void showNameFormatPage() { //TODO : GUI.warning updated!
+
+		try {
+			if(!Desktop.isDesktopSupported()) {  }
+			Desktop.getDesktop().browse(new URI("https://github.com/ytdl-org/youtube-dl#output-template"));
+		} catch (IOException e) {
+			GUI.warning("Cannot open default web browser!", "Please visit https://github.com/ytdl-org/youtube-dl#output-template", null);
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	public void setLoadingStat(LoadingStatus stat) {
+		
+		loadingStatus.setText(stat.getStatus());
+		initProgress.setValue(stat.getProgress());
+		
+	}
+	
+
 	/**
 	 * show error dialog.
 	 * String <code>"%e%"</code> in <code>content</code> will replaced by error message of given <code>Exception</code> if it's not <code>null</code>
@@ -226,13 +311,5 @@ public class GUI {
 		
 	}
 
-	public void addTaskModel(TaskStatusViewerModel t) {
-
-		// TODO : give t a whenDone object
-		// TODO : give t a processUpdater object
-		// TODO : put t to Table
-
-	}
-	
 
 }

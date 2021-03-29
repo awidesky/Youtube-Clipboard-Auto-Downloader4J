@@ -25,11 +25,12 @@ import javax.swing.SwingUtilities;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.ClipBoardCheckerThread;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.LoadingStatus;
-import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusViewerModel;
+import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskData;
+import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
+
 
 /** Main class */
 public class Main { 
-
 
 	private static ExecutorService executorService;
 	private static String clipboardBefore = "";
@@ -53,8 +54,10 @@ public class Main {
 				gui.initLoadingFrame();
 			});
 		} catch (InvocationTargetException | InterruptedException e2) {
+
 			log("[init] failed wating EDT!");
 			log(e2);
+
 		}
 
 		gui.setLoadingStat(LoadingStatus.CHECKING_YDL);
@@ -127,9 +130,9 @@ public class Main {
 
 								if (YoutubeAudioDownloader.checkURL(data, num)) {
 									
-									TaskStatusViewerModel t = new TaskStatusViewerModel(num);
+									TaskData t = new TaskData(num, data);
+									TaskStatusModel.getinstance().addTask(t);
 									t.setStatus("Preparing...");
-									gui.addTaskModel(t);
 
 									try {
 
@@ -194,33 +197,33 @@ public class Main {
 		String f = "mp3";
 		String q = "0";
 		String l = "--no-playlist";
-		
+		String n = "%(title)s.%(ext)s";
 		
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
 				YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\config.txt")))) {
 
-			p = br.readLine().substring(9);
-			f = br.readLine().substring(7);
-			q = br.readLine().substring(8);
-			l = br.readLine().substring(9);
-
+			p = br.readLine().split("=")[1];
+			f = br.readLine().split("=")[1];
+			q = br.readLine().split("=")[1];
+			l = br.readLine().split("=")[1];
+			n = br.readLine().split("=")[1];
+			
 		} catch (FileNotFoundException e1) {
 
 			GUI.warning("config.txt not exists!","%e%\nDon't worry! I'll make one later...", e1);
 
 		} catch (IOException e) {
 
-			GUI.warning("Exception occurred when reading config.txt",
-					"%e%\nInitiating config.txt anyway...", e);
+			GUI.warning("Exception occurred when reading config.txt", "%e%\nI'll initiate config.txt with default...", e);
 
-		} catch (Exception e2) {
+		} catch (NullPointerException e2) {
+			
+			GUI.warning("config.txt has no or invalid data!", "%e%\nI'll initiate config.txt with default...", e2);
 
-			GUI.warning(e2.getClass() + " occurred when reading config.txt",
-					"%e%\nInitiating config.txt anyway...", e2);
 
 		} finally {
 			
-			properties = new ConfigDTO(p, f, q, l);
+			properties = new ConfigDTO(p, f, q, l, n);
 			Main.logProperties("Initial");
 			
 		}
@@ -249,6 +252,7 @@ public class Main {
 			bw.write("Format=" + properties.getFormat() + "\n");
 			bw.write("Quality=" + properties.getQuality() + "\n");
 			bw.write("Playlist=" + properties.getPlaylistOption() + "\n");
+			bw.write("FileNameFormat=" + properties.getFileNameFormat() + "\n");
 			
 			Main.logProperties("Final");
 			
@@ -266,7 +270,7 @@ public class Main {
 	
 	public static void logProperties(String status) {
 		
-		Main.log(String.format(status + " properties :\n downloadpath-%s\n format-%s\n quality-%s\n playlistoption-%s", Main.getProperties().getSaveto(), Main.getProperties().getFormat(), Main.getProperties().getQuality(), Main.getProperties().getPlaylistOption()));
+		Main.log(status + getProperties().toString());
 		
 	}
 
@@ -314,7 +318,6 @@ public class Main {
 	public static void kill() {
 		
 		Main.writeProperties();
-		logTo.close();
 		System.exit(Main.getExitcode());
 		
 	}

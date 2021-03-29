@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.regex.Pattern;
 
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
-import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusViewerModel;
+import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskData;
 
 public class YoutubeAudioDownloader {
 
@@ -89,7 +89,8 @@ public class YoutubeAudioDownloader {
 		
 	}
 	
-	private static boolean checkYoutubedlPath(String ydlfile){System.out.println("1");
+
+	private static boolean checkYoutubedlPath(String ydlfile){
 		
 		Main.log("Check if youtube-dl path is in " + ydlfile);
 		ProcessBuilder pb_ydl = new ProcessBuilder(ydlfile, "--version");
@@ -133,7 +134,7 @@ public class YoutubeAudioDownloader {
 	}
 
 
-	public static void download(String url, TaskStatusViewerModel task) throws Exception {
+	public static void download(String url, TaskData task) throws Exception {
 
 		Main.logProperties("[Task" + task.getTaskNum() + "] " + "Current");
 
@@ -159,8 +160,8 @@ public class YoutubeAudioDownloader {
 		
 		/* download video */
 		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "youtube-dl" + options, "--newline",
-				"--extract-audio", Main.getProperties().getPlaylistOption(), "--audio-format",
-				Main.getProperties().getFormat(), "--output", "\"%(title)s.%(ext)s\"", "--audio-quality",
+				"--extract-audio", Main.getProperties().getPlaylistOption().toCommandArgm(), "--audio-format",
+				Main.getProperties().getFormat(), "--output", "\"" + Main.getProperties().getFileNameFormat() + "\"", "--audio-quality",
 				Main.getProperties().getQuality(), url);
 
 		// retrieve command line argument
