@@ -196,16 +196,17 @@ public class Main {
 		String f = "mp3";
 		String q = "0";
 		String l = "--no-playlist";
-		
+		String n = "%(title)s.%(ext)s";
 		
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
 				YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\config.txt")))) {
 
-			p = br.readLine().substring(9);
-			f = br.readLine().substring(7);
-			q = br.readLine().substring(8);
-			l = br.readLine().substring(9);
-
+			p = br.readLine().split("=")[1];
+			f = br.readLine().split("=")[1];
+			q = br.readLine().split("=")[1];
+			l = br.readLine().split("=")[1];
+			n = br.readLine().split("=")[1];
+			
 		} catch (FileNotFoundException e1) {
 
 			GUI.warning("config.txt not exists!", e1.getMessage() + "\nDon't worry! I'll make one later...");
@@ -222,7 +223,7 @@ public class Main {
 
 		} finally {
 			
-			properties = new ConfigDTO(p, f, q, l);
+			properties = new ConfigDTO(p, f, q, l, n);
 			Main.logProperties("Initial");
 			
 		}
@@ -246,6 +247,7 @@ public class Main {
 			bw.write("Format=" + properties.getFormat() + "\n");
 			bw.write("Quality=" + properties.getQuality() + "\n");
 			bw.write("Playlist=" + properties.getPlaylistOption() + "\n");
+			bw.write("FileNameFormat=" + properties.getFileNameFormat() + "\n");
 			
 			Main.logProperties("Final");
 			
@@ -259,7 +261,7 @@ public class Main {
 	
 	public static void logProperties(String status) {
 		
-		Main.log(String.format(status + " properties :\n downloadpath-%s\n format-%s\n quality-%s\n playlistoption-%s", Main.getProperties().getSaveto(), Main.getProperties().getFormat(), Main.getProperties().getQuality(), Main.getProperties().getPlaylistOption()));
+		Main.log(status + getProperties().toString());
 		
 	}
 

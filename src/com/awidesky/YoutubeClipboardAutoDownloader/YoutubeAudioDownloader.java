@@ -159,8 +159,8 @@ public class YoutubeAudioDownloader {
 		
 		/* download video */
 		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "youtube-dl" + options, "--newline",
-				"--extract-audio", Main.getProperties().getPlaylistOption(), "--audio-format",
-				Main.getProperties().getFormat(), "--output", "\"%(title)s.%(ext)s\"", "--audio-quality",
+				"--extract-audio", Main.getProperties().getPlaylistOption().toCommandArgm(), "--audio-format",
+				Main.getProperties().getFormat(), "--output", "\"" + Main.getProperties().getFileNameFormat() + "\"", "--audio-quality",
 				Main.getProperties().getQuality(), url);
 
 		// retrieve command line argument

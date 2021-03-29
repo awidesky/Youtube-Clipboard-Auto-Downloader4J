@@ -23,8 +23,8 @@ public class GUI {
 	
 	
 	private JFrame loadingFrame;
-	private JLabel tlb_loadingStatus;
-	private JProgressBar jpb_initProgress;
+	private JLabel loadingStatus;
+	private JProgressBar initProgress;
 	
 
 	private JFrame mainFrame;
@@ -61,14 +61,14 @@ public class GUI {
 		loadingFrame.setLayout(null);
 		loadingFrame.setResizable(false);
 		
-		tlb_loadingStatus = new JLabel("");
-		tlb_loadingStatus.setBounds(14, 8, 370, 18);
+		loadingStatus = new JLabel("");
+		loadingStatus.setBounds(14, 8, 370, 18);
 		
-		jpb_initProgress = new JProgressBar();
-		jpb_initProgress.setBounds(15, 27, 370, 18);
+		initProgress = new JProgressBar();
+		initProgress.setBounds(15, 27, 370, 18);
 		
-		loadingFrame.add(tlb_loadingStatus);
-		loadingFrame.add(jpb_initProgress);
+		loadingFrame.add(loadingStatus);
+		loadingFrame.add(initProgress);
 		loadingFrame.setVisible(true);
 		
 	}
@@ -124,30 +124,36 @@ public class GUI {
 		format = new JLabel("Format :");
 		quality = new JLabel("Audio Quality :");
 		path = new JLabel("Save to :");
+		nameFormat = new JLabel("Filename Format : ");
+		playList = new JLabel("Download Playlist?");
 		
 		format.setBounds(26, 23, format.getPreferredSize().width, format.getPreferredSize().height);
 		quality.setBounds(273, 23, quality.getPreferredSize().width, quality.getPreferredSize().height);
 		path.setBounds(14, 80, path.getPreferredSize().width, path.getPreferredSize().height);
-
+		nameFormat.setBounds(10, 126, nameFormat.getPreferredSize().width, nameFormat.getPreferredSize().height);
+		playList.setBounds(389, 126, playList.getPreferredSize().width, playList.getPreferredSize().height);
+		
 		mainFrame.add(format);
 		mainFrame.add(path);
 		mainFrame.add(quality);
+		mainFrame.add(nameFormat);
+		mainFrame.add(playList);
 		
 	}
 	
 	private void addTextFields() {
 		
 		pathField = new JTextField(Main.getProperties().getSaveto());
-
-		pathField.addActionListener((e) -> {
-
-			Main.getProperties().setSaveto(pathField.getText());
-
-		});
+		nameFormatField =  new JTextField(Main.getProperties().getSaveto());
 		
-		pathField.setBounds(65, 76, 456, 22);
+		pathField.addActionListener((e) -> { Main.getProperties().setSaveto(pathField.getText()); });
+		nameFormatField.addActionListener((e) -> { Main.getProperties().setSaveto(nameFormat.getText()); });
+		
+		pathField.setBounds(65, 76, 456, 22); 
+		nameFormatField.setBounds(115, 122, 172, 22);
 
 		mainFrame.add(pathField);
+		mainFrame.add(nameFormatField);
 
 	}
 	
@@ -192,26 +198,23 @@ public class GUI {
 		
 		cb_format = new JComboBox<>(new String[] { "mp3", "best", "aac", "flac", "m4a", "opus", "vorbis", "wav" });
 		cb_quality = new JComboBox<>(new String[] { "0(best)", "1", "2", "3", "4", "5", "6", "7", "8", "9(worst)" });
+		cb_playList = new JComboBox<>(new String[] { "yes", "no" });
 
 		cb_format.setSelectedItem(Main.getProperties().getFormat());
 		cb_quality.setSelectedIndex(Integer.parseInt(Main.getProperties().getQuality()));
+		cb_playList.setSelectedItem(Main.getProperties().getPlaylistOption().toComboBox());
 
-		cb_format.addActionListener((e) -> {
-
-			Main.getProperties().setFormat(cb_format.getSelectedItem().toString());
-
-		});
-		cb_quality.addActionListener((e) -> {
-
-			Main.getProperties().setQuality(String.valueOf(cb_quality.getSelectedIndex()));
-
-		});
-
+		cb_format.addActionListener((e) -> { Main.getProperties().setFormat(cb_format.getSelectedItem().toString()); });
+		cb_quality.addActionListener((e) -> { Main.getProperties().setQuality(String.valueOf(cb_quality.getSelectedIndex())); });
+		cb_playList.addActionListener((e) -> { Main.getProperties().setPlaylistOption(cb_playList.getSelectedItem().toString()); });
+		
 		cb_format.setBounds(83, 19, 96, 22);
 		cb_quality.setBounds(365, 19, 150, 22);
+		cb_playList.setBounds(499, 122, 109, 22);
 
 		mainFrame.add(cb_format);
 		mainFrame.add(cb_quality);
+		mainFrame.add(cb_playList);
 		
 	}
 	
@@ -239,8 +242,8 @@ public class GUI {
 		loadingFrame.dispose();
 		
 		loadingFrame = null;
-		tlb_loadingStatus = null;
-		jpb_initProgress = null;
+		loadingStatus = null;
+		initProgress = null;
 		
 	}
 	
@@ -252,8 +255,8 @@ public class GUI {
 
 	public void setLoadingStat(LoadingStatus stat) {
 		
-		tlb_loadingStatus.setText(stat.getStatus());
-		jpb_initProgress.setValue(stat.getProgress());
+		loadingStatus.setText(stat.getStatus());
+		initProgress.setValue(stat.getProgress());
 		
 	}
 	

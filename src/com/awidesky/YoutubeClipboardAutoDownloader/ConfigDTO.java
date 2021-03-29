@@ -1,21 +1,27 @@
 package com.awidesky.YoutubeClipboardAutoDownloader;
 
+import com.awidesky.YoutubeClipboardAutoDownloader.gui.PlayListOption;
+
 public class ConfigDTO { 
 	
 	private String saveto;
 	private String format;
 	private String quality;
-	private String playlistOption;
+	private PlayListOption playlistOption;
+	private String fileNameFormat;
 	
-	public ConfigDTO(String saveto, String extension, String quality, String playlistOption) {
+	public ConfigDTO(String saveto, String extension, String quality, String playlistOption, String nameFormat) {
 
 		this.saveto = saveto;
 		this.format = extension;
 		this.quality = quality;
-		this.playlistOption = playlistOption;
+		setPlaylistOption(playlistOption);
+		this.fileNameFormat = nameFormat;
 		
 	}
 
+
+	
 	
 	public String getSaveto() {
 		
@@ -54,11 +60,31 @@ public class ConfigDTO {
 	}
 
 
-	public String getPlaylistOption() {
+	public PlayListOption getPlaylistOption() {
 		
 		return playlistOption;
 		
 	}
+	
+	public void setPlaylistOption(String playlistOption2) {
 
+		this.playlistOption = PlayListOption.get(playlistOption2);
+		
+	}
+
+
+	public String getFileNameFormat() {
+		return fileNameFormat;
+	}
+
+
+	public void setFileNameFormat(String fileNameFormat) {
+		this.fileNameFormat = fileNameFormat;
+	}
+
+	@Override
+	public String toString() {
+		return String.format(" properties :\n downloadpath-%s\n format-%s\n quality-%s\n playlistoption-%s\n filenameformat-%s", saveto, format, quality, playlistOption, fileNameFormat);
+	}
 	
 }
