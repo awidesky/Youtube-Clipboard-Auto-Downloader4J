@@ -136,13 +136,14 @@ public class YoutubeAudioDownloader {
 
 	public static void download(String url, TaskData task) throws Exception {
 
+		long startTime = System.nanoTime();
 		Main.logProperties("[Task" + task.getTaskNum() + "] " + "Current");
 
 		StringBuilder sb = new StringBuilder(""); // to retrieve command line argument
 
 		/* get video name */
 		ProcessBuilder pbGetName = new ProcessBuilder(youtubedlpath + "youtube-dl", "--get-filename", "-output",
-				"\"%(title)s\"", url);
+				Main.getProperties().getFileNameFormat(), url);
 
 		// retrieve command line argument
 		pbGetName.command().stream().forEach((s) -> sb.append(s).append(' '));
@@ -230,10 +231,11 @@ public class YoutubeAudioDownloader {
 		});
 
 
-		int e;
-		if( (e = p.waitFor()) != 0) { 
+		int errorCode;
+		if( (errorCode = p.waitFor()) != 0) { 
 			task.setStatus("ERROR");
-			GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum() + "] " + " has executed with error code : " + e, null);
+			GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum() + "] " + " has executed with error code : " + errorCode, null);
+			Main.log("[Task" + task.getTaskNum() + "] " + "elapsed time in downloading(failed) : " + ((System.nanoTime() - startTime) / 1e6) + "ms" );
 			return;
 		}
 
@@ -242,26 +244,31 @@ public class YoutubeAudioDownloader {
 
 		Main.log("[Task" + task.getTaskNum() + "] " + "Done!\n");
 
+		Main.log("[Task" + task.getTaskNum() + "] " + "elapsed time in downloading : " + ((System.nanoTime() - startTime) / 1e6) + "ms" );
+		
 	}
 
 
 	public static boolean checkURL(String url, int taskNum) {
 
-
-		Main.log("[Task" + taskNum + "] " +"Check if youtube-dl path is in system path");
+		long startTime = System.nanoTime();
+		Main.log("[Task" + taskNum + "] " + "Check if youtube-dl path is in system path");
 		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "youtube-dl", url,"--skip-download");
 
-		Main.log("[Task" + taskNum + "] " +"Checking url validation by \"" + youtubedlpath + "youtube-dl " + url +" --skip-download" + "\"");
+		Main.log("[Task" + taskNum + "] " + "Checking url validation by \"" + youtubedlpath + "youtube-dl " + url +" --skip-download" + "\"");
 
-		// start process
 		try {
 			
 			return pb.directory(null).start().waitFor() == 0 ? true : false;
 			
 		} catch (Exception e) {
 					
-			GUI.error("[Task" + taskNum + "] " +"Error when checking url", "%e%", e);
+			GUI.error("[Task" + taskNum + "] " + "Error when checking url", "%e%", e);
 			return false;
+			
+		} finally {
+			
+			Main.log("[Task" + taskNum + "] " + "elapsed time in checking URL : " + ((System.nanoTime() - startTime) / 1e6) + "ms" );
 			
 		}
 		

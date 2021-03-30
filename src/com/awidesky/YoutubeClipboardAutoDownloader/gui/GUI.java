@@ -274,6 +274,7 @@ public class GUI {
 		} catch (URISyntaxException e) {
 			GUI.error("Invalid url!", "%e%", e);
 		}
+		
 	}
 
 

@@ -24,6 +24,7 @@ public class TaskData {
 	
 	public void setVideoName(String videoName) {
 		this.videoName = videoName;
+		SwingUtilities.invokeLater(() -> TaskStatusModel.getinstance().updated(this));
 	}
 	
 	public String getStatus() {
@@ -50,6 +51,7 @@ public class TaskData {
 	
 	public void setDest(String dest) {
 		this.dest = dest;
+		SwingUtilities.invokeLater(() -> TaskStatusModel.getinstance().updated(this));
 	}
 
 	public int getTaskNum() {

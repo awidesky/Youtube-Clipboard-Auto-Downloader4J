@@ -3,8 +3,6 @@ package com.awidesky.YoutubeClipboardAutoDownloader;
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.FlavorEvent;
-import java.awt.datatransfer.FlavorListener;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -87,81 +85,7 @@ public class Main {
 		clipChecker = new ClipBoardCheckerThread();
 		clipChecker.start(); //A daemon thread that will check clipboard
 
-		Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener(new FlavorListener() {
-
-			@Override
-			public void flavorsChanged(FlavorEvent e) { // This code is invoked in EDT!!
-
-				// System.err.println("CLIPBOARD CHANGED");
-
-				clipChecker.submit(() -> { //To avoid overhead in EDT, put task in clipCheckerThread.
-
-					try {
-
-						Thread.sleep(50);
-						final String data = (String) Toolkit.getDefaultToolkit().getSystemClipboard()
-								.getData(DataFlavor.stringFlavor);
-						// System.out.println("data : " + data + "\nex-clipboard : " + clipboardBefore);
-
-						if (data.equals(clipboardBefore)) {
-
-							if (!isSecondtime) {
-
-								Thread.sleep(50);
-								clearClipboardBefore();
-								return;
-
-							} else {
-
-								return;
-
-							}
-
-						}
-
-						clipboardBefore = data;
-
-						executorService.submit(() -> { //download worker thread
-
-							if (data.startsWith("https://www.youtu")) {
-
-								int num = taskNum++;
-								log("[Task" + num + "] " + "Received a link from your clipboard : " + data);
-
-								if (YoutubeAudioDownloader.checkURL(data, num)) {
-									
-									TaskData t = new TaskData(num, data);
-									TaskStatusModel.getinstance().addTask(t);
-									t.setStatus("Preparing...");
-
-									try {
-
-										YoutubeAudioDownloader.download(data, t);
-
-									} catch (Exception e1) {
-
-										GUI.error("[Task" + num + "] " +"Error when downloading!", "%e%", e1);
-										return;
-
-									}
-									
-								} else { GUI.error("[Task" + num + "] " +"Not a valid url!", data + "\nis not valid or unsupported url!", null); return; }
-
-							}
-
-						}); // submit to executor service end
-
-					} catch (InterruptedException | HeadlessException | UnsupportedFlavorException | IOException e1) {
-
-						GUI.error("Error! : ", "%e%", e1);
-
-					} // try end
-
-				}); // submit to clipChecker end
-
-			} // flavorsChanged end
-
-		}); // FlavorListener end
+		Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener((e) -> { checkClipBoard(); }); 
 
 		gui.setLoadingStat(LoadingStatus.LOADING_WINDOW);
 		SwingUtilities.invokeLater(() -> {
@@ -171,7 +95,93 @@ public class Main {
 		log("Listening clipboard...");
 
 	}
+	
+	private static void checkClipBoard() {
+		
+		clipChecker.submit(() -> { //To avoid overhead in EDT, put task in clipCheckerThread.
 
+			try {
+
+				Thread.sleep(50);
+				final String data = (String) Toolkit.getDefaultToolkit().getSystemClipboard()
+						.getData(DataFlavor.stringFlavor);
+				// System.out.println("data : " + data + "\nex-clipboard : " + clipboardBefore);
+
+				if(isRedundant(data)) return;
+
+				clipboardBefore = data;
+
+				submitDownload(data);
+
+			} catch (InterruptedException | HeadlessException | UnsupportedFlavorException | IOException e1) {
+
+				GUI.error("Error! : ", "%e%", e1);
+
+			} 
+
+		});
+		
+	}
+	
+	private static boolean isRedundant(String data) throws InterruptedException {
+		
+		if (data.equals(clipboardBefore)) {
+
+			if (isSecondtime) { //second time finding same data
+
+				Thread.sleep(50);
+				clearClipboardBefore();
+
+			} else {
+				
+				isSecondtime = true;
+				
+			}
+			
+			return true;
+
+		} else {
+			
+			return false;
+			
+		}
+		
+	}
+
+	private static void submitDownload(String data) {
+		
+		executorService.submit(() -> { //download worker thread
+
+			if (data.startsWith("https://www.youtu")) {
+
+				int num = taskNum++;
+				log("[Task" + num + "] " + "Received a link from your clipboard : " + data);
+
+				if (YoutubeAudioDownloader.checkURL(data, num)) {
+					
+					TaskData t = new TaskData(num, data);
+					TaskStatusModel.getinstance().addTask(t);
+					t.setStatus("Preparing...");
+
+					try {
+
+						YoutubeAudioDownloader.download(data, t);
+
+					} catch (Exception e1) {
+
+						GUI.error("[Task" + num + "] " +"Error when downloading!", "%e%", e1);
+						return;
+
+					}
+					
+				} else { GUI.error("[Task" + num + "] " +"Not a valid url!", data + "\nis not valid or unsupported url!", null); return; }
+
+			}
+
+		});
+	}
+	
+	
 	private static void prepareLogFile() {
 		
 		try {
@@ -282,7 +292,7 @@ public class Main {
 
 	private static void clearClipboardBefore() {
 
-		clipboardBefore = ""; // System.out.println("clearclipboard called");
+		clipboardBefore = ""; 
 
 	}
 
