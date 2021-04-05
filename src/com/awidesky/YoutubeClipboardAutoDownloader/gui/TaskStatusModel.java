@@ -7,6 +7,8 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
+import com.awidesky.YoutubeClipboardAutoDownloader.TaskData;
+
 public class TaskStatusModel extends AbstractTableModel {
 
 	/**

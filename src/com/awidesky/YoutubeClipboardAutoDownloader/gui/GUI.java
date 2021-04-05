@@ -21,6 +21,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
+import com.awidesky.YoutubeClipboardAutoDownloader.ConfigDTO;
+import com.awidesky.YoutubeClipboardAutoDownloader.LoadingStatus;
 import com.awidesky.YoutubeClipboardAutoDownloader.Main;
 import com.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
 
@@ -121,7 +123,7 @@ public class GUI {
 		
 		jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		jfc.setDialogTitle("Choose directory to save music!");
-		jfc.setCurrentDirectory(new File(Main.getProperties().getSaveto()));
+		jfc.setCurrentDirectory(new File(ConfigDTO.getSaveto()));
 	}
 	
 	private void addLabels() {
@@ -148,11 +150,11 @@ public class GUI {
 	
 	private void addTextFields() {
 		
-		pathField = new JTextField(Main.getProperties().getSaveto());
-		nameFormatField =  new JTextField(Main.getProperties().getSaveto());
+		pathField = new JTextField(ConfigDTO.getSaveto());
+		nameFormatField =  new JTextField(ConfigDTO.getSaveto());
 		
-		pathField.addActionListener((e) -> { Main.getProperties().setSaveto(pathField.getText()); });
-		nameFormatField.addActionListener((e) -> { Main.getProperties().setSaveto(nameFormat.getText()); });
+		pathField.addActionListener((e) -> { ConfigDTO.setSaveto(pathField.getText()); });
+		nameFormatField.addActionListener((e) -> { ConfigDTO.setSaveto(nameFormat.getText()); });
 		
 		pathField.setBounds(65, 76, 456, 22); 
 		nameFormatField.setBounds(115, 122, 172, 22);
@@ -178,7 +180,7 @@ public class GUI {
 			}
 
 			String path = jfc.getSelectedFile().getAbsolutePath();
-			Main.getProperties().setSaveto(path);
+			ConfigDTO.setSaveto(path);
 			pathField.setText(path);
 			jfc.setCurrentDirectory(new File(path));
 
@@ -205,13 +207,13 @@ public class GUI {
 		cb_quality = new JComboBox<>(new String[] { "0(best)", "1", "2", "3", "4", "5", "6", "7", "8", "9(worst)" });
 		cb_playList = new JComboBox<>(new String[] { "yes", "no" });
 
-		cb_format.setSelectedItem(Main.getProperties().getFormat());
-		cb_quality.setSelectedIndex(Integer.parseInt(Main.getProperties().getQuality()));
-		cb_playList.setSelectedItem(Main.getProperties().getPlaylistOption().toComboBox());
+		cb_format.setSelectedItem(ConfigDTO.getFormat());
+		cb_quality.setSelectedIndex(Integer.parseInt(ConfigDTO.getQuality()));
+		cb_playList.setSelectedItem(ConfigDTO.getPlaylistOption().toComboBox());
 
-		cb_format.addActionListener((e) -> { Main.getProperties().setFormat(cb_format.getSelectedItem().toString()); });
-		cb_quality.addActionListener((e) -> { Main.getProperties().setQuality(String.valueOf(cb_quality.getSelectedIndex())); });
-		cb_playList.addActionListener((e) -> { Main.getProperties().setPlaylistOption(cb_playList.getSelectedItem().toString()); });
+		cb_format.addActionListener((e) -> { ConfigDTO.setFormat(cb_format.getSelectedItem().toString()); });
+		cb_quality.addActionListener((e) -> { ConfigDTO.setQuality(String.valueOf(cb_quality.getSelectedIndex())); });
+		cb_playList.addActionListener((e) -> { ConfigDTO.setPlaylistOption(cb_playList.getSelectedItem().toString()); });
 		
 		cb_format.setBounds(83, 19, 96, 22);
 		cb_quality.setBounds(365, 19, 150, 22);
@@ -306,7 +308,7 @@ public class GUI {
 	public static void warning(String title, String content, Exception e) {
 
 		JOptionPane.showMessageDialog(null, content, title, JOptionPane.WARNING_MESSAGE);
-		Main.log("[GUI.warning] " + title + "\n\t" + content.replaceAll("%e%", (e == null) ? "" : e.getMessage()));
+		Main.log("[GUI.warning] " + title + "\n\t" + content.replaceAll("%e%", (e == null) ? "%e%" : e.getMessage()));
 		Main.log(e);
 		
 	}

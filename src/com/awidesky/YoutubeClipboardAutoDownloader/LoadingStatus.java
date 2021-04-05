@@ -1,4 +1,4 @@
-package com.awidesky.YoutubeClipboardAutoDownloader.gui;
+package com.awidesky.YoutubeClipboardAutoDownloader;
 
 public enum LoadingStatus {
 

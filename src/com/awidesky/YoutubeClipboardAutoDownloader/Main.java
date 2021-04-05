@@ -22,8 +22,6 @@ import javax.swing.SwingUtilities;
 
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.ClipBoardCheckerThread;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
-import com.awidesky.YoutubeClipboardAutoDownloader.gui.LoadingStatus;
-import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskData;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
 
 
@@ -32,7 +30,6 @@ public class Main {
 
 	private static ExecutorService executorService;
 	private static String clipboardBefore = "";
-	private static ConfigDTO properties = null;
 	private static boolean isSecondtime = false;
 	private static ClipBoardCheckerThread clipChecker;
 	private static PrintWriter logTo;
@@ -233,7 +230,12 @@ public class Main {
 
 		} finally {
 			
-			properties = new ConfigDTO(p, f, q, l, n);
+			ConfigDTO.setSaveto(p);
+			ConfigDTO.setFormat(f);
+			ConfigDTO.setQuality(q);
+			ConfigDTO.setPlaylistOption(l);
+			ConfigDTO.setFileNameFormat(n);
+			
 			Main.logProperties("Initial");
 			
 		}
@@ -247,8 +249,6 @@ public class Main {
 	 * */
 	public static void writeProperties() {
 
-		if(properties == null) return;
-		
 		/** Write <code>properties</code> */
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
 				YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\config.txt")))) {
@@ -258,11 +258,11 @@ public class Main {
 			if (!cfg.exists())
 				cfg.createNewFile();
 
-			bw.write("SavePath=" + properties.getSaveto() + "\n");
-			bw.write("Format=" + properties.getFormat() + "\n");
-			bw.write("Quality=" + properties.getQuality() + "\n");
-			bw.write("Playlist=" + properties.getPlaylistOption() + "\n");
-			bw.write("FileNameFormat=" + properties.getFileNameFormat() + "\n");
+			bw.write("SavePath=" + ConfigDTO.getSaveto() + "\n");
+			bw.write("Format=" + ConfigDTO.getFormat() + "\n");
+			bw.write("Quality=" + ConfigDTO.getQuality() + "\n");
+			bw.write("Playlist=" + ConfigDTO.getPlaylistOption() + "\n");
+			bw.write("FileNameFormat=" + ConfigDTO.getFileNameFormat() + "\n");
 			
 			Main.logProperties("Final");
 			
@@ -280,15 +280,10 @@ public class Main {
 	
 	public static void logProperties(String status) {
 		
-		Main.log(status + getProperties().toString());
+		Main.log(status + ConfigDTO.status());
 		
 	}
 
-	public static ConfigDTO getProperties() {
-
-		return properties;
-
-	}
 
 	private static void clearClipboardBefore() {
 

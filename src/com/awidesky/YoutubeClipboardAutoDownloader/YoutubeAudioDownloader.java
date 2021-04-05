@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.regex.Pattern;
 
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
-import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskData;
 
 public class YoutubeAudioDownloader {
 
@@ -143,7 +142,7 @@ public class YoutubeAudioDownloader {
 
 		/* get video name */
 		ProcessBuilder pbGetName = new ProcessBuilder(youtubedlpath + "youtube-dl", "--get-filename", "-output",
-				Main.getProperties().getFileNameFormat(), url);
+				ConfigDTO.getFileNameFormat(), url);
 
 		// retrieve command line argument
 		pbGetName.command().stream().forEach((s) -> sb.append(s).append(' '));
@@ -161,18 +160,18 @@ public class YoutubeAudioDownloader {
 		
 		/* download video */
 		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "youtube-dl" + options, "--newline",
-				"--extract-audio", Main.getProperties().getPlaylistOption().toCommandArgm(), "--audio-format",
-				Main.getProperties().getFormat(), "--output", "\"" + Main.getProperties().getFileNameFormat() + "\"", "--audio-quality",
-				Main.getProperties().getQuality(), url);
+				"--extract-audio", ConfigDTO.getPlaylistOption().toCommandArgm(), "--audio-format",
+				ConfigDTO.getFormat(), "--output", "\"" + ConfigDTO.getFileNameFormat() + "\"", "--audio-quality",
+				ConfigDTO.getQuality(), url);
 
 		// retrieve command line argument
 		pb.command().stream().forEach((s) -> sb.append(s).append(' '));
 		Main.log("[Task" + task.getTaskNum() + "] " + "Donwloading video name by \"" + sb.toString().trim() + "\"");
 
 		// start process
-		Process p = pb.directory(new File(Main.getProperties().getSaveto())).start();
+		Process p = pb.directory(new File(ConfigDTO.getSaveto())).start();
 
-		task.setDest(Main.getProperties().getSaveto());
+		task.setDest(ConfigDTO.getSaveto());
 		task.setStatus("Downloading");
 		task.setProgress(0);
 
@@ -237,14 +236,13 @@ public class YoutubeAudioDownloader {
 			GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum() + "] " + " has executed with error code : " + errorCode, null);
 			Main.log("[Task" + task.getTaskNum() + "] " + "elapsed time in downloading(failed) : " + ((System.nanoTime() - startTime) / 1e6) + "ms" );
 			return;
+		} else {
+			task.done();
 		}
 
-		task.done();
+		Main.log("[Task" + task.getTaskNum() + "] " + "Finished!\n");
 
-
-		Main.log("[Task" + task.getTaskNum() + "] " + "Done!\n");
-
-		Main.log("[Task" + task.getTaskNum() + "] " + "elapsed time in downloading : " + ((System.nanoTime() - startTime) / 1e6) + "ms" );
+		Main.log("[Task" + task.getTaskNum() + "] " + "elapsed time in working : " + ((System.nanoTime() - startTime) / 1e6) + "ms" );
 		
 	}
 

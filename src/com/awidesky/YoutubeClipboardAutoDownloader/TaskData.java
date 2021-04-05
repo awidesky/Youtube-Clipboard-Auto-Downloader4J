@@ -1,6 +1,8 @@
-package com.awidesky.YoutubeClipboardAutoDownloader.gui;
+package com.awidesky.YoutubeClipboardAutoDownloader;
 
 import javax.swing.SwingUtilities;
+
+import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
 
 public class TaskData {
 	

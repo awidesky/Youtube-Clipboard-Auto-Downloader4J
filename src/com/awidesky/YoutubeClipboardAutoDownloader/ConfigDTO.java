@@ -1,90 +1,75 @@
 package com.awidesky.YoutubeClipboardAutoDownloader;
 
-import com.awidesky.YoutubeClipboardAutoDownloader.gui.PlayListOption;
-
 public class ConfigDTO { 
 	
-	private String saveto;
-	private String format;
-	private String quality;
-	private PlayListOption playlistOption;
-	private String fileNameFormat;
-	
-	public ConfigDTO(String saveto, String extension, String quality, String playlistOption, String nameFormat) {
-
-		this.saveto = saveto;
-		this.format = extension;
-		this.quality = quality;
-		setPlaylistOption(playlistOption);
-		this.fileNameFormat = nameFormat;
-		
-	}
-
-
+	private static String saveto;
+	private static String format;
+	private static String quality;
+	private static PlayListOption playlistOption;
+	private static String fileNameFormat;
 	
 	
-	public String getSaveto() {
+	public static String getSaveto() {
 		
 		return saveto;
 		
 	}
 	
-	public void setSaveto(String saveto) {
+	public static synchronized void setSaveto(String saveto) {
 		
-		this.saveto = saveto;
+		ConfigDTO.saveto = saveto;
 		
 	}
 	
-	public String getFormat() {
+	public static String getFormat() {
 		
 		return format;
 		
 	}
 	
-	public void setFormat(String extension) {
+	public static synchronized void setFormat(String extension) {
 		
-		this.format = extension;
+		ConfigDTO.format = extension;
 		
 	}
 	
-	public String getQuality() {
+	public static String getQuality() {
 		
 		return quality;
 		
 	}
 	
-	public void setQuality(String quality) {
+	public static synchronized void setQuality(String quality) {
 		
-		this.quality = quality;
+		ConfigDTO.quality = quality;
 		
 	}
 
 
-	public PlayListOption getPlaylistOption() {
+	public static PlayListOption getPlaylistOption() {
 		
 		return playlistOption;
 		
 	}
 	
-	public void setPlaylistOption(String playlistOption2) {
+	public static synchronized void setPlaylistOption(String playlistOption2) {
 
-		this.playlistOption = PlayListOption.get(playlistOption2);
+		ConfigDTO.playlistOption = PlayListOption.get(playlistOption2);
 		
 	}
 
 
-	public String getFileNameFormat() {
+	public static String getFileNameFormat() {
 		return fileNameFormat;
 	}
 
 
-	public void setFileNameFormat(String fileNameFormat) {
-		this.fileNameFormat = fileNameFormat;
+	public static synchronized void setFileNameFormat(String fileNameFormat) {
+		ConfigDTO.fileNameFormat = fileNameFormat;
 	}
 
-	@Override
-	public String toString() {
-		return String.format(" properties :\n downloadpath-%s\n format-%s\n quality-%s\n playlistoption-%s\n filenameformat-%s", saveto, format, quality, playlistOption, fileNameFormat);
+	public static String status() {
+		return String.format(" properties :\n downloadpath-%s\n format-%s\n quality-%s\n playlistoption-%s\n filenameformat-%s", ConfigDTO.saveto, ConfigDTO.format, ConfigDTO.quality, ConfigDTO.playlistOption, ConfigDTO.fileNameFormat);
 	}
 	
 }
