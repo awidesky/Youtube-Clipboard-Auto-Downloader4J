@@ -39,7 +39,7 @@ public class Main {
 
 	private static volatile int taskNum = 0;
 	
-	public static final String version = "v1.5.0";
+	public static final String version = "v1.5.5";
 
 	public static void main(String[] args) {
 		
@@ -107,18 +107,34 @@ public class Main {
 	}
 	
 	private static void checkClipBoard() {
-		
-		clipChecker.submit(() -> { //To avoid overhead in EDT, put task in clipCheckerThread.
+
+		if (ConfigDTO.getClipboardListenOption().equals("Stop listening clipboard")) {
+			log("[debug] clipboard ignored due to ClipboardListenOption == \"Stop listening clipboard\"");
+			return;
+		}
+
+		clipChecker.submit(() -> { // To avoid overhead in EDT, put task in clipCheckerThread.
 
 			try {
 
 				Thread.sleep(50);
-				final String data = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
-				System.out.println("[debug] clipboard : " + data);
-				
-				if(isRedundant(data)) return;
 
+				final String data = (String) Toolkit.getDefaultToolkit().getSystemClipboard()
+						.getData(DataFlavor.stringFlavor);
+
+				log("[debug] clipboard : " + data);
+				
+				if (isRedundant(data)) return;
 				clipboardBefore = data;
+
+				if (!data.startsWith("https://www.youtu"))
+					return;
+
+				if (ConfigDTO.getClipboardListenOption().equals("Ask when a link is found")) {
+					if (!GUI.acceptLink(clipboardBefore))
+						return;
+				}
+
 
 				Arrays.stream(data.split("\n")).forEach(Main::submitDownload);
 
@@ -126,10 +142,10 @@ public class Main {
 
 				GUI.error("Error when checking clipboard!", "%e%", e1);
 
-			} 
+			}
 
 		});
-		
+
 	}
 	
 	private static boolean isRedundant(String data) throws InterruptedException {
@@ -137,66 +153,59 @@ public class Main {
 		if (clipboardBefore.equals(data)) {
 
 			if (isSecondtime) { //second time finding same data
-
 				Thread.sleep(50);
-				clipboardBefore = ""; System.out.println("1" + data);
-
+				clipboardBefore = ""; 
 			} else {
-				
-				isSecondtime = true; System.out.println("2" + data);
-				
+				isSecondtime = true; 
 			}
 			
 			return true;
 
 		} else {
-			System.out.println("3" + data);
 			return false; 
-			
 		}
 		
 	}
 
 	private static void submitDownload(String data) {
-		
-		executorService.submit(() -> { //download worker thread
 
-			if (data.startsWith("https://www.youtu")) {
+		executorService.submit(() -> { // download worker thread
 
-				int num = taskNum++;
-				log("\n");
-				log("[Task" + num + "] " + "Received a link from your clipboard : " + data);
+			int num = taskNum++;
+			log("\n");
+			log("[Task" + num + "] " + "Received a link from your clipboard : " + data);
 
-				TaskData t = new TaskData(num);
-				t.setVideoName(data); // temporarily set video name as url 
-				t.setDest(ConfigDTO.getSaveto());
-				t.setStatus("Validating...");
-				TaskStatusModel.getinstance().addTask(t);
-				
-				String url = "\"" + data + "\"";
-				
-				if (YoutubeAudioDownloader.validateAndSetName(url, t)) {
+			TaskData t = new TaskData(num);
+			t.setVideoName(data); // temporarily set video name as url
+			t.setDest(ConfigDTO.getSaveto());
+			t.setStatus("Validating...");
+			TaskStatusModel.getinstance().addTask(t);
 
-					t.setStatus("Preparing...");
+			String url = "\"" + data + "\"";
 
-					try {
+			if (YoutubeAudioDownloader.validateAndSetName(url, t)) {
 
-						YoutubeAudioDownloader.download(url, t);
+				t.setStatus("Preparing...");
 
-					} catch (Exception e1) {
+				try {
 
-						GUI.error("[Task" + num + "|downloading] " +"Error when downloading!", "%e%", e1);
-						return;
+					YoutubeAudioDownloader.download(url, t);
 
-					}
-					
-				} else { GUI.error("[Task" + num + "|validating] " +"Not a valid url!", data + "\nis not valid or unsupported url!", null); return; }
+				} catch (Exception e1) {
 
+					GUI.error("[Task" + num + "|downloading] " + "Error when downloading!", "%e%", e1);
+					return;
+
+				}
+
+			} else {
+				GUI.error("[Task" + num + "|validating] " + "Not a valid url!",
+						data + "\nis not valid or unsupported url!", null);
+				return;
 			}
 
 		});
 	}
-	
 	
 	private static void prepareLogFile() {
 		
@@ -225,6 +234,7 @@ public class Main {
 		String q = "0";
 		String l = "--no-playlist";
 		String n = "%(title)s.%(ext)s"; 
+		String c = "Download link automatically"; 
 		
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
 				YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\config.txt")))) {
@@ -234,7 +244,8 @@ public class Main {
 			q = br.readLine().split("=")[1];
 			l = br.readLine().split("=")[1];
 			n = br.readLine().split("=")[1];
-			
+			c = br.readLine().split("=")[1];
+
 		} catch (FileNotFoundException e1) {
 
 			GUI.warning("config.txt not exists!","%e%\nDon't worry! I'll make one later...", e1);
@@ -254,6 +265,7 @@ public class Main {
 			ConfigDTO.setQuality(q);
 			ConfigDTO.setPlaylistOption(l);
 			ConfigDTO.setFileNameFormat(n);
+			ConfigDTO.setClipboardListenOption(c);
 			
 			Main.logProperties("Initial");
 			
@@ -282,6 +294,7 @@ public class Main {
 			bw.write("Quality=" + ConfigDTO.getQuality() + "\n");
 			bw.write("Playlist=" + ConfigDTO.getPlaylistOption().toComboBox() + "\n");
 			bw.write("FileNameFormat=" + ConfigDTO.getFileNameFormat() + "\n");
+			bw.write("ClipboardListenOption=" + ConfigDTO.getClipboardListenOption() + "\n");
 			
 			Main.logProperties("Final");
 			
@@ -328,7 +341,7 @@ public class Main {
 	 * */
 	public static void kill(int exitcode) {
 		
-		Main.log("YoutubeAudioAutoDownloader closed with exit code : " + exitcode);
+		Main.log("YoutubeAudioAutoDownloader exit code : " + exitcode);
 		Main.writeProperties();
 		System.exit(exitcode);
 		

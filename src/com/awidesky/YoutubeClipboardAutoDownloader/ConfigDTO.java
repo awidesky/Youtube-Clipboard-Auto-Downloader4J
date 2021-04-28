@@ -7,6 +7,7 @@ public class ConfigDTO {
 	private static String quality;
 	private static PlayListOption playlistOption;
 	private static String fileNameFormat;
+	private static String clipboardListenOption;
 	
 	
 	public static String getSaveto() {
@@ -68,8 +69,16 @@ public class ConfigDTO {
 		ConfigDTO.fileNameFormat = fileNameFormat;
 	}
 
+	public static String getClipboardListenOption() {
+		return clipboardListenOption;
+	}
+
+	public static void setClipboardListenOption(String clipboardListenOption) {
+		ConfigDTO.clipboardListenOption = clipboardListenOption;
+	}
+
 	public static String status() {
-		return String.format(" properties :\n downloadpath-%s\n format-%s\n quality-%s\n playlistoption-%s\n filenameformat-%s", ConfigDTO.saveto, ConfigDTO.format, ConfigDTO.quality, ConfigDTO.playlistOption, ConfigDTO.fileNameFormat);
+		return String.format(" properties :\n downloadpath-%s\n format-%s\n quality-%s\n playlistoption-%s\n filenameformat-%s\n clipboardListenOption-%s", ConfigDTO.saveto, ConfigDTO.format, ConfigDTO.quality, ConfigDTO.playlistOption, ConfigDTO.fileNameFormat, ConfigDTO.clipboardListenOption);
 	}
 	
 }
