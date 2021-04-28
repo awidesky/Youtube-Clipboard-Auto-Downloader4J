@@ -15,14 +15,14 @@ public class ProgressRenderer extends JProgressBar implements TableCellRenderer 
 
 	public ProgressRenderer() {
 		super(0, 100);
-		setStringPainted(true);
+		this.setStringPainted(true);
 	}
 	
 	@Override
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
 			int row, int column) {
-		setValue((int)value);
-		setString((int)value + "%");
+		this.setValue((Integer)value); 
+		this.setString((Integer)value + "%");
 		return this;
 	}
 

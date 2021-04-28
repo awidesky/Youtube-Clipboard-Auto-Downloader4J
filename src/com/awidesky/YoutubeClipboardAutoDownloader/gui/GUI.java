@@ -1,6 +1,8 @@
 package com.awidesky.YoutubeClipboardAutoDownloader.gui;
 
 import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -20,6 +22,8 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import com.awidesky.YoutubeClipboardAutoDownloader.ConfigDTO;
 import com.awidesky.YoutubeClipboardAutoDownloader.LoadingStatus;
@@ -28,6 +32,7 @@ import com.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
 
 public class GUI {
 	
+	private Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 	
 	private JFrame loadingFrame;
 	private JLabel loadingStatus;
@@ -44,7 +49,16 @@ public class GUI {
 	private JScrollPane scrollPane;
 	
 	
-	public GUI() {}
+	public GUI() {
+		
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+				| UnsupportedLookAndFeelException e) {
+			error("Error while setting window look&feel", "%e%", e);
+		}
+		
+	}
 	
 	
 	/**
@@ -65,6 +79,7 @@ public class GUI {
 						.getImage());
 		loadingFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		loadingFrame.setSize(450, 100); //add more height than fxml because it does not think about title length
+		loadingFrame.setLocation(dim.width/2-loadingFrame.getSize().width/2, dim.height/2-loadingFrame.getSize().height/2);
 		loadingFrame.setLayout(null);
 		loadingFrame.setResizable(false);
 		
@@ -89,7 +104,8 @@ public class GUI {
 				YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\icon.jpg")
 						.getImage());
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		mainFrame.setSize(630, 455);
+		mainFrame.setSize(630, 495);
+		mainFrame.setLocation(dim.width/2-mainFrame.getSize().width/2, dim.height/2-mainFrame.getSize().height/2);
 		mainFrame.setLayout(null);
 		mainFrame.setResizable(false);
 		mainFrame.addWindowListener(new WindowAdapter() {
@@ -98,7 +114,7 @@ public class GUI {
 			public void windowClosing(WindowEvent e) {
 				
 				e.getWindow().dispose();
-				Main.kill();
+				Main.kill(0);
 
 			}
 
@@ -107,7 +123,6 @@ public class GUI {
 		addFileChooser();
 		addLabels();
 		addTextFields();
-		addButtons();
 		addButtons();
 		addComboBoxes();
 		addTable();
@@ -132,13 +147,13 @@ public class GUI {
 		quality = new JLabel("Audio Quality :");
 		path = new JLabel("Save to :");
 		nameFormat = new JLabel("Filename Format : ");
-		playList = new JLabel("Download Playlist?");
+		playList = new JLabel("Download Playlist? : ");
 		
 		format.setBounds(26, 23, format.getPreferredSize().width, format.getPreferredSize().height);
 		quality.setBounds(273, 23, quality.getPreferredSize().width, quality.getPreferredSize().height);
-		path.setBounds(14, 80, path.getPreferredSize().width, path.getPreferredSize().height);
+		path.setBounds(12, 80, path.getPreferredSize().width, path.getPreferredSize().height);
 		nameFormat.setBounds(10, 126, nameFormat.getPreferredSize().width, nameFormat.getPreferredSize().height);
-		playList.setBounds(389, 126, playList.getPreferredSize().width, playList.getPreferredSize().height);
+		playList.setBounds(395, 126, playList.getPreferredSize().width, playList.getPreferredSize().height);
 		
 		mainFrame.add(format);
 		mainFrame.add(path);
@@ -151,10 +166,10 @@ public class GUI {
 	private void addTextFields() {
 		
 		pathField = new JTextField(ConfigDTO.getSaveto());
-		nameFormatField =  new JTextField(ConfigDTO.getSaveto());
+		nameFormatField =  new JTextField(ConfigDTO.getFileNameFormat());
 		
 		pathField.addActionListener((e) -> { ConfigDTO.setSaveto(pathField.getText()); });
-		nameFormatField.addActionListener((e) -> { ConfigDTO.setSaveto(nameFormat.getText()); });
+		nameFormatField.addActionListener((e) -> { ConfigDTO.setFileNameFormat(nameFormatField.getText()); });
 		
 		pathField.setBounds(65, 76, 456, 22); 
 		nameFormatField.setBounds(115, 122, 172, 22);
@@ -169,7 +184,7 @@ public class GUI {
 		browse = new JButton("Browse...");
 		cleanCompleted = new JButton("clean completed");
 		cleanAll = new JButton("clean all");
-		nameFormatHelp = new JButton("<- help?");
+		nameFormatHelp = new JButton("<= help?");
 		
 		browse.addActionListener((e) -> {
 
@@ -189,10 +204,10 @@ public class GUI {
 		cleanAll.addActionListener((e) -> { TaskStatusModel.getinstance().clearAll(); });
 		nameFormatHelp.addActionListener((e) -> { showNameFormatPage(); });
 		
-		browse.setBounds(523, 76, browse.getPreferredSize().width, browse.getPreferredSize().height);
+		browse.setBounds(523, 75, browse.getPreferredSize().width, browse.getPreferredSize().height);
 		cleanCompleted.setBounds(14, 418, cleanCompleted.getPreferredSize().width, cleanCompleted.getPreferredSize().height);
-		cleanAll.setBounds(142, 418, cleanAll.getPreferredSize().width, cleanAll.getPreferredSize().height);
-		nameFormatHelp.setBounds(298, 122, nameFormatHelp.getPreferredSize().width, nameFormatHelp.getPreferredSize().height);
+		cleanAll.setBounds(170, 418, cleanAll.getPreferredSize().width, cleanAll.getPreferredSize().height);
+		nameFormatHelp.setBounds(298, 121, nameFormatHelp.getPreferredSize().width, nameFormatHelp.getPreferredSize().height);
 		
 		mainFrame.add(browse);
 		mainFrame.add(cleanCompleted);
@@ -217,7 +232,7 @@ public class GUI {
 		
 		cb_format.setBounds(83, 19, 96, 22);
 		cb_quality.setBounds(365, 19, 150, 22);
-		cb_playList.setBounds(499, 122, 109, 22);
+		cb_playList.setBounds(518, 122, 90, 22);
 
 		mainFrame.add(cb_format);
 		mainFrame.add(cb_quality);
@@ -235,12 +250,19 @@ public class GUI {
 			private static final long serialVersionUID = 6021131657635813356L;
 
 			@Override
-			public String getToolTipText(MouseEvent e) {
-				return TaskStatusModel.getinstance().getUrlOf(rowAtPoint(e.getPoint()));
+			public String getToolTipText(MouseEvent e) { 
+				int row = rowAtPoint(e.getPoint());
+				int column = columnAtPoint(e.getPoint());
+				if (row == -1) return "";
+				if (column == 2) return TaskStatusModel.getinstance().getProgressToolTip(row);
+				return String.valueOf(TaskStatusModel.getinstance().getValueAt(row, column));
 			}
 			
 		};
+		
 		table.setModel(TaskStatusModel.getinstance());
+		table.setAutoCreateColumnsFromModel(false);
+		//table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.getColumn("Progress").setCellRenderer(new ProgressRenderer());
 		table.setFillsViewportHeight(true);
 		table.getColumnModel().getColumn(0).setPreferredWidth(120);
@@ -248,8 +270,8 @@ public class GUI {
 		table.getColumnModel().getColumn(2).setPreferredWidth(73);
 		table.getColumnModel().getColumn(3).setPreferredWidth(82);
 		
-		scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPane.setBounds(8, 122, 600, 280);
+		scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setBounds(8, 168, 600, 240);
 
 		mainFrame.add(scrollPane);
 
@@ -294,9 +316,11 @@ public class GUI {
 	 * */
 	public static void error(String title, String content, Exception e) {
 
+		Main.log("\n");
+		content = content.replace("%e%", (e == null) ? "null" : e.getMessage());
 		JOptionPane.showMessageDialog(null, content, title, JOptionPane.ERROR_MESSAGE);
-		Main.log("[GUI.error] " + title + "\n\t" + content.replaceAll("%e%", (e == null) ? "" : e.getMessage()));
-		Main.log(e);
+		Main.log("[GUI.error] " + title + "\n\t" + content);
+		if(e != null) Main.log(e);
 		
 	}
 
@@ -307,9 +331,11 @@ public class GUI {
 	 * */
 	public static void warning(String title, String content, Exception e) {
 
+		Main.log("\n");
+		content = content.replace("%e%", (e == null) ? "null" : e.getMessage());
 		JOptionPane.showMessageDialog(null, content, title, JOptionPane.WARNING_MESSAGE);
-		Main.log("[GUI.warning] " + title + "\n\t" + content.replaceAll("%e%", (e == null) ? "%e%" : e.getMessage()));
-		Main.log(e);
+		Main.log("[GUI.warning] " + title + "\n\t" + content);
+		if(e != null) Main.log(e);
 		
 	}
 

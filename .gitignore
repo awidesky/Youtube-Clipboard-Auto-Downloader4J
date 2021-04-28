@@ -5,8 +5,12 @@
 !YoutubeAudioAutoDownloader-resources
 YoutubeAudioAutoDownloader-resources/*
 !YoutubeAudioAutoDownloader-resources/icon.jpg
+!YoutubeAudioAutoDownloader-resources/icon.ico
+
 
 logs/
+build/
+jre*/
 
 *.exe
 # Test audio files

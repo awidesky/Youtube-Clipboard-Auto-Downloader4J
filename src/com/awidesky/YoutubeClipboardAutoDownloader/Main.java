@@ -8,12 +8,14 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,11 +39,22 @@ public class Main {
 
 	private static volatile int taskNum = 0;
 	
-	private static int exitcode;
-	public static final String version = "v1.2.5-beta";
+	public static final String version = "v1.5.0";
 
 	public static void main(String[] args) {
+		
+		try {
+			setup(args);
+		} catch (Exception e) {
+			GUI.error("Error when initializing application!", e.getClass() + " : %e%", e);
+			kill(1);
+		}
 
+	}
+	
+	
+	private static void setup(String[] args) throws Exception {
+		
 		prepareLogFile();
 
 		try {
@@ -100,19 +113,18 @@ public class Main {
 			try {
 
 				Thread.sleep(50);
-				final String data = (String) Toolkit.getDefaultToolkit().getSystemClipboard()
-						.getData(DataFlavor.stringFlavor);
-				// System.out.println("data : " + data + "\nex-clipboard : " + clipboardBefore);
-
+				final String data = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+				System.out.println("[debug] clipboard : " + data);
+				
 				if(isRedundant(data)) return;
 
 				clipboardBefore = data;
 
-				submitDownload(data);
+				Arrays.stream(data.split("\n")).forEach(Main::submitDownload);
 
 			} catch (InterruptedException | HeadlessException | UnsupportedFlavorException | IOException e1) {
 
-				GUI.error("Error! : ", "%e%", e1);
+				GUI.error("Error when checking clipboard!", "%e%", e1);
 
 			} 
 
@@ -122,24 +134,24 @@ public class Main {
 	
 	private static boolean isRedundant(String data) throws InterruptedException {
 		
-		if (data.equals(clipboardBefore)) {
+		if (clipboardBefore.equals(data)) {
 
 			if (isSecondtime) { //second time finding same data
 
 				Thread.sleep(50);
-				clearClipboardBefore();
+				clipboardBefore = ""; System.out.println("1" + data);
 
 			} else {
 				
-				isSecondtime = true;
+				isSecondtime = true; System.out.println("2" + data);
 				
 			}
 			
 			return true;
 
 		} else {
-			
-			return false;
+			System.out.println("3" + data);
+			return false; 
 			
 		}
 		
@@ -152,26 +164,33 @@ public class Main {
 			if (data.startsWith("https://www.youtu")) {
 
 				int num = taskNum++;
+				log("\n");
 				log("[Task" + num + "] " + "Received a link from your clipboard : " + data);
 
-				if (YoutubeAudioDownloader.checkURL(data, num)) {
-					
-					TaskData t = new TaskData(num, data);
-					TaskStatusModel.getinstance().addTask(t);
+				TaskData t = new TaskData(num);
+				t.setVideoName(data); // temporarily set video name as url 
+				t.setDest(ConfigDTO.getSaveto());
+				t.setStatus("Validating...");
+				TaskStatusModel.getinstance().addTask(t);
+				
+				String url = "\"" + data + "\"";
+				
+				if (YoutubeAudioDownloader.validateAndSetName(url, t)) {
+
 					t.setStatus("Preparing...");
 
 					try {
 
-						YoutubeAudioDownloader.download(data, t);
+						YoutubeAudioDownloader.download(url, t);
 
 					} catch (Exception e1) {
 
-						GUI.error("[Task" + num + "] " +"Error when downloading!", "%e%", e1);
+						GUI.error("[Task" + num + "|downloading] " +"Error when downloading!", "%e%", e1);
 						return;
 
 					}
 					
-				} else { GUI.error("[Task" + num + "] " +"Not a valid url!", data + "\nis not valid or unsupported url!", null); return; }
+				} else { GUI.error("[Task" + num + "|validating] " +"Not a valid url!", data + "\nis not valid or unsupported url!", null); return; }
 
 			}
 
@@ -183,15 +202,16 @@ public class Main {
 		
 		try {
 			
-			File logFile = new File(YoutubeAudioDownloader.getProjectpath() + "\\logs\\log-"
-					+ new SimpleDateFormat("yyyyMMddkkmmss").format(new Date()) + ".txt");
-			logFile.getParentFile().mkdirs();
+			File logFolder = new File(YoutubeAudioDownloader.getProjectpath() + File.separator + "logs");
+			File logFile = new File(logFolder.getAbsolutePath() + File.separator + "log-" + new SimpleDateFormat("yyyy-MM-dd-kk-mm-ss").format(new Date()) + ".txt");
+			logFolder.mkdirs();
 			logFile.createNewFile();
-			logTo = new PrintWriter(logFile);
+			
+			logTo = new PrintWriter(new FileOutputStream(logFile), true);
 			
 		} catch (IOException e) {
 
-			logTo = new PrintWriter(System.out);
+			logTo = new PrintWriter(System.out, true);
 			GUI.error("Error when creating log flie", "%e%", e);
 			
 		}
@@ -204,7 +224,7 @@ public class Main {
 		String f = "mp3";
 		String q = "0";
 		String l = "--no-playlist";
-		String n = "%(title)s.%(ext)s";
+		String n = "%(title)s.%(ext)s"; 
 		
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
 				YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\config.txt")))) {
@@ -225,8 +245,7 @@ public class Main {
 
 		} catch (NullPointerException e2) {
 			
-			GUI.warning("config.txt has no or invalid data!", "%e%\nI'll initiate config.txt with default...", e2);
-
+			GUI.warning("config.txt has no or invalid data!", "NullPointerException\nI'll initiate config.txt with default...", null);
 
 		} finally {
 			
@@ -255,13 +274,13 @@ public class Main {
 
 			File cfg = new File(
 					YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\config.txt");
-			if (!cfg.exists())
-				cfg.createNewFile();
+			
+			if (!cfg.exists()) cfg.createNewFile();
 
 			bw.write("SavePath=" + ConfigDTO.getSaveto() + "\n");
 			bw.write("Format=" + ConfigDTO.getFormat() + "\n");
 			bw.write("Quality=" + ConfigDTO.getQuality() + "\n");
-			bw.write("Playlist=" + ConfigDTO.getPlaylistOption() + "\n");
+			bw.write("Playlist=" + ConfigDTO.getPlaylistOption().toComboBox() + "\n");
 			bw.write("FileNameFormat=" + ConfigDTO.getFileNameFormat() + "\n");
 			
 			Main.logProperties("Final");
@@ -285,11 +304,6 @@ public class Main {
 	}
 
 
-	private static void clearClipboardBefore() {
-
-		clipboardBefore = ""; 
-
-	}
 
 	public static void log(String data) {
 
@@ -303,14 +317,6 @@ public class Main {
 		
 	}
 
-	public static int getExitcode() {
-		return exitcode;
-	}
-
-	public static void setExitcode(int exitcode) {
-		Main.exitcode = exitcode;
-	}
-	
 	
 	public static ExecutorService getExecutorservice() {
 		return executorService;
@@ -320,10 +326,11 @@ public class Main {
 	 * Close the window and kills the application.
 	 * 
 	 * */
-	public static void kill() {
+	public static void kill(int exitcode) {
 		
+		Main.log("YoutubeAudioAutoDownloader closed with exit code : " + exitcode);
 		Main.writeProperties();
-		System.exit(Main.getExitcode());
+		System.exit(exitcode);
 		
 	}
 

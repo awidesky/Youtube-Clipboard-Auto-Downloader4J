@@ -6,17 +6,17 @@ import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
 
 public class TaskData {
 	
-	private String videoName = ""; 
+	private String videoName = "null"; 
 	private String status = "";
 	private int progress = 0;
 	private String dest = "";
 	private int taskNum;
-	private String url; /** Show as tooltip */ 
+	private int totalNumOfVideo = 1;
+	private int videoNum = 0;
 	
 	
-	public TaskData(int num, String url) {
+	public TaskData(int num) {
 		this.taskNum = num;
-		this.url = url;
 	}
 	
 
@@ -42,7 +42,7 @@ public class TaskData {
 		return progress;
 	}
 	
-	public void setProgress(int progress) {
+	public void setProgress(int progress) { 
 		this.progress = progress;
 		SwingUtilities.invokeLater(() -> TaskStatusModel.getinstance().updated(this));
 	}
@@ -60,13 +60,32 @@ public class TaskData {
 		return taskNum;
 	}
 
-	public String getUrl() {
-		return url;
-	}
 
 
 	public void done() {
 		setStatus("Done!");
 	}
 
+
+	public void setTotalNumVideo(int vdnum) {
+		totalNumOfVideo = vdnum;
+	}
+
+	public int getTotalNumVideo() {
+		return totalNumOfVideo;
+	}
+	
+	public void increaseVideoNum() {
+		videoNum++;
+	}
+	
+	public int getVideoNum() {
+		return videoNum;
+	}
+
+
+	public String getProgressToolTip() {
+		return progress + "%" + ( (totalNumOfVideo > 1) ? " (" + videoNum + "/" + totalNumOfVideo + ")" : "" );
+	}
+	
 }

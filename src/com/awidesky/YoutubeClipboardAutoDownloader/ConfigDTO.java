@@ -52,9 +52,9 @@ public class ConfigDTO {
 		
 	}
 	
-	public static synchronized void setPlaylistOption(String playlistOption2) {
+	public static synchronized void setPlaylistOption(String playlist) {
 
-		ConfigDTO.playlistOption = PlayListOption.get(playlistOption2);
+		ConfigDTO.playlistOption = PlayListOption.get(playlist);
 		
 	}
 

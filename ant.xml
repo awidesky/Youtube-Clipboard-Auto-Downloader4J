@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="deploy" name="Create Runnable Jar for Project YoutubeAudioAutoDownloader">
+	<!--ANT 1.7 is required-->
+	<property name="dir.buildfile" value="."/>
+
+	<property name="version" value="v1.5"/>
+	<property name="target" value="1.8"/>
+	<property name="source" value="1.8"/>
+	<property name="debuglevel" value="source,lines,vars"/>
+	<property name="launch4j.dir" location="C:\Program Files (x86)\Launch4j" />
+
+	<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask" classpath="${launch4j.dir}/launch4j.jar:${launch4j.dir}/lib/xstream.jar"/>
+
+	<target depends="clean" name="init">
+		<mkdir dir="${dir.buildfile}/build"/>
+		<mkdir dir="${dir.buildfile}/build/win_standalone"/>
+	</target>
+
+	<target depends="init" name="compile">
+		<echo message="${ant.project.name}: ${ant.file}"/>
+		<javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+			<src path="src"/>
+			<classpath refid="YoutubeAudioAutoDownloader.classpath"/>
+		</javac>
+	</target>
+
+	<target depends="compile" name="create_run_jar">
+		<jar destfile="${dir.buildfile}/build/YoutubeAudioAutoDownloader ${version}.jar" filesetmanifest="mergewithoutmain">
+			<manifest>
+				<attribute name="Main-Class" value="com.awidesky.YoutubeClipboardAutoDownloader.Main"/>
+				<attribute name="Class-Path" value="."/>
+			</manifest>
+			<fileset dir="${dir.buildfile}/bin"/>
+		</jar>
+	</target>
+
+	<target depends="create_run_jar" name="deploy">
+
+		<copy file="${dir.buildfile}/YoutubeAudioAutoDownloader-resources/icon.jpg" tofile="${dir.buildfile}/build/icon.jpg"/>
+
+		<copy todir="${dir.buildfile}/build/win_standalone">
+			<fileset dir="${dir.buildfile}">
+				<include name="jre/**"/>
+			</fileset>
+		</copy>
+
+		<copy todir="${dir.buildfile}/build/win_standalone">
+			<fileset dir="${dir.buildfile}">
+				<include name="YoutubeAudioAutoDownloader-resources/**"/>
+				<exclude name="YoutubeAudioAutoDownloader-resources/icon.ico"/>
+			</fileset>
+		</copy>
+
+
+		<launch4j configFile="${dir.buildfile}/Launch4J.xml" jar="${dir.buildfile}\build\YoutubeAudioAutoDownloader ${version}.jar" outfile="${dir.buildfile}\build\win_standalone\YoutubeAudioAutoDownloader ${version}.exe"/>
+		
+	</target>
+
+	<target name="clean">
+		<delete dir="${dir.buildfile}/build"/>
+	</target>
+
+</project>
