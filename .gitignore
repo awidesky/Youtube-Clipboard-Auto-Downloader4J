@@ -2,9 +2,24 @@
 # Created by https://www.toptal.com/developers/gitignore/api/java,eclipse
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,eclipse
 
+<<<<<<< HEAD
 YoutubeAudioAutoDownloader-resources/
 *.exe
 #test audio files
+=======
+!YoutubeAudioAutoDownloader-resources
+YoutubeAudioAutoDownloader-resources/*
+!YoutubeAudioAutoDownloader-resources/icon.jpg
+!YoutubeAudioAutoDownloader-resources/icon.ico
+
+
+logs/
+build/
+jre*/
+
+*.exe
+# Test audio files
+>>>>>>> dev
 *.mp3
 *.flac
 *.aac

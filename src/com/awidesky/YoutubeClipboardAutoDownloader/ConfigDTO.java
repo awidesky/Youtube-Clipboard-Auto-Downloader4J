@@ -1,73 +1,75 @@
 package com.awidesky.YoutubeClipboardAutoDownloader;
 
-import java.io.Serializable;
-
-public class ConfigDTO implements Serializable{
-
-	private static final long serialVersionUID = 1184293966501697035L;
+public class ConfigDTO { 
 	
-	private String saveto;
-	private String format;
-	private String quality;
-	private String playlistOption;
+	private static String saveto;
+	private static String format;
+	private static String quality;
+	private static PlayListOption playlistOption;
+	private static String fileNameFormat;
 	
-	public ConfigDTO(String saveto, String extension, String quality, String playlistOption) {
-
-		this.saveto = saveto;
-		this.format = extension;
-		this.quality = quality;
-		this.setPlaylistOption(playlistOption);
-	}
-
 	
-	public String getSaveto() {
+	public static String getSaveto() {
 		
 		return saveto;
 		
 	}
 	
-	public void setSaveto(String saveto) {
+	public static synchronized void setSaveto(String saveto) {
 		
-		this.saveto = saveto;
+		ConfigDTO.saveto = saveto;
 		
 	}
 	
-	public String getFormat() {
+	public static String getFormat() {
 		
 		return format;
 		
 	}
 	
-	public void setFormat(String extension) {
+	public static synchronized void setFormat(String extension) {
 		
-		this.format = extension;
+		ConfigDTO.format = extension;
 		
 	}
 	
-	public String getQuality() {
+	public static String getQuality() {
 		
 		return quality;
 		
 	}
 	
-	public void setQuality(String quality) {
+	public static synchronized void setQuality(String quality) {
 		
-		this.quality = quality;
-		
-	}
-
-
-	public String getPlaylistOption() {
-		
-		return (Boolean.parseBoolean(playlistOption)) ? "--yes-playlist" : "--no-playlist";
+		ConfigDTO.quality = quality;
 		
 	}
 
 
-	public void setPlaylistOption(String playlistOption) {
+	public static PlayListOption getPlaylistOption() {
 		
-		this.playlistOption = playlistOption;
+		return playlistOption;
 		
+	}
+	
+	public static synchronized void setPlaylistOption(String playlist) {
+
+		ConfigDTO.playlistOption = PlayListOption.get(playlist);
+		
+	}
+
+
+	public static String getFileNameFormat() {
+		return fileNameFormat;
+	}
+
+
+	public static synchronized void setFileNameFormat(String fileNameFormat) {
+		ConfigDTO.fileNameFormat = fileNameFormat;
+	}
+
+	public static String status() {
+		return String.format(" properties :\n downloadpath-%s\n format-%s\n quality-%s\n playlistoption-%s\n filenameformat-%s", ConfigDTO.saveto, ConfigDTO.format, ConfigDTO.quality, ConfigDTO.playlistOption, ConfigDTO.fileNameFormat);
 	}
 	
 }

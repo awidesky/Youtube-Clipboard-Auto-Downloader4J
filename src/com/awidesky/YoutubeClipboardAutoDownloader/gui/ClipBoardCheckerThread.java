@@ -1,6 +1,8 @@
-package com.awidesky.YoutubeClipboardAutoDownloader;
+package com.awidesky.YoutubeClipboardAutoDownloader.gui;
 
 import java.util.concurrent.LinkedBlockingQueue;
+
+import com.awidesky.YoutubeClipboardAutoDownloader.Main;
 
 public class ClipBoardCheckerThread extends Thread {
 
@@ -10,17 +12,21 @@ public class ClipBoardCheckerThread extends Thread {
 
 		super(() -> {
 
-			try {
+			while(true) {
+				 try {
 
-				queue.take().run();
+				 	 queue.take().run();
 
-			} catch (InterruptedException e) {
-				Main.log("ClipBoardCheckerThread Interrupted! : " + e.getMessage());
+				} catch (InterruptedException e) {
+					 Main.log("ClipBoardCheckerThread Interrupted! : " + e.getMessage());
+					 //break;
+				}
 			}
 
 		});
 		
 		this.setDaemon(true);
+
 	}
 	
 	public void submit(Runnable r) {
