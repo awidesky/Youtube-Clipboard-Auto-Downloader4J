@@ -17,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -39,7 +40,7 @@ public class Main {
 
 	private static volatile int taskNum = 0;
 	
-	public static final String version = "v1.5.5";
+	public static final String version = "v1.5.7";
 
 	public static void main(String[] args) {
 		
@@ -125,16 +126,31 @@ public class Main {
 				log("[debug] clipboard : " + data);
 				
 				if (isRedundant(data)) return;
+				
 				clipboardBefore = data;
 
 				if (!data.startsWith("https://www.youtu"))
 					return;
 
 				if (ConfigDTO.getClipboardListenOption().equals("Ask when a link is found")) {
-					if (!GUI.acceptLink(clipboardBefore))
-						return;
+				
+					SwingUtilities.invokeLater(() -> {
+						
+						if (!GUI.confirm("Download link in clipboard?", "Download link : " + data)) {
+							
+							Main.log("\n[GUI.linkAcceptChoose] Download link " + data + "? : " + false + "\n");
+							
+						} else {
+							
+							Main.log("\n[GUI.linkAcceptChoose] Download link " + data + "? : " + true + "\n");	
+							Arrays.stream(data.split("\n")).forEach(Main::submitDownload);
+							
+						}
+						
+					});
+					
+					return;
 				}
-
 
 				Arrays.stream(data.split("\n")).forEach(Main::submitDownload);
 
@@ -169,13 +185,14 @@ public class Main {
 
 	private static void submitDownload(String data) {
 
-		executorService.submit(() -> { // download worker thread
+		int num = taskNum++;
+		log("\n");
+		log("[Task" + num + "] " + "Received a link from your clipboard : " + data);
 
-			int num = taskNum++;
-			log("\n");
-			log("[Task" + num + "] " + "Received a link from your clipboard : " + data);
+		TaskData t = new TaskData(num);
+		
+		t.setFuture( executorService.submit(() -> { // download worker thread
 
-			TaskData t = new TaskData(num);
 			t.setVideoName(data); // temporarily set video name as url
 			t.setDest(ConfigDTO.getSaveto());
 			t.setStatus("Validating...");
@@ -204,7 +221,7 @@ public class Main {
 				return;
 			}
 
-		});
+		}));
 	}
 	
 	private static void prepareLogFile() {
@@ -239,12 +256,12 @@ public class Main {
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
 				YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\config.txt")))) {
 
-			p = br.readLine().split("=")[1];
-			f = br.readLine().split("=")[1];
-			q = br.readLine().split("=")[1];
-			l = br.readLine().split("=")[1];
-			n = br.readLine().split("=")[1];
-			c = br.readLine().split("=")[1];
+			p = Optional.of(br.readLine()).get().split("=")[1];
+			f = Optional.of(br.readLine()).get().split("=")[1];
+			q = Optional.of(br.readLine()).get().split("=")[1];
+			l = Optional.of(br.readLine()).get().split("=")[1];
+			n = Optional.of(br.readLine()).get().split("=")[1];
+			c = Optional.of(br.readLine()).get().split("=")[1];
 
 		} catch (FileNotFoundException e1) {
 
@@ -267,7 +284,7 @@ public class Main {
 			ConfigDTO.setFileNameFormat(n);
 			ConfigDTO.setClipboardListenOption(c);
 			
-			Main.logProperties("Initial");
+			Main.logProperties("\n\nInitial");
 			
 		}
 
@@ -296,7 +313,7 @@ public class Main {
 			bw.write("FileNameFormat=" + ConfigDTO.getFileNameFormat() + "\n");
 			bw.write("ClipboardListenOption=" + ConfigDTO.getClipboardListenOption() + "\n");
 			
-			Main.logProperties("Final");
+			Main.logProperties("\n\nFinal");
 			
 		} catch (IOException e) {
 

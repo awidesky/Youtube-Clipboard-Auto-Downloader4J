@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 
@@ -61,10 +62,7 @@ public class YoutubeAudioDownloader {
 		ProcessBuilder pb_ffmpeg = new ProcessBuilder(youtubedlpath + "ffmpeg", "-version");
 
 		// retrieve command line argument
-		StringBuilder sb = new StringBuilder("");
-		pb_ffmpeg.command().stream().forEach((s) -> sb.append(s).append(' '));
-		Main.log("\n");
-		Main.log("Checking ffmpeg installation by \"" + sb.toString().trim() + "\"");
+		Main.log("\nChecking ffmpeg installation by \"" + pb_ffmpeg.command().stream().collect(Collectors.joining(" ")).trim() + "\"");
 
 		// start process
 		try {
@@ -148,7 +146,6 @@ public class YoutubeAudioDownloader {
 
 		/* download video */
 		Main.log("\n");
-		StringBuilder sb2 = new StringBuilder("");
 		long startTime = System.nanoTime();
 		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "youtube-dl" + options, "--newline",
 				"--extract-audio", ConfigDTO.getPlaylistOption().toCommandArgm(), "--audio-format",
@@ -156,12 +153,11 @@ public class YoutubeAudioDownloader {
 				ConfigDTO.getQuality(), url);
 
 		// retrieve command line argument
-		pb.command().stream().forEach((s) -> sb2.append(s).append(' '));
-		Main.log("[Task" + task.getTaskNum() + "|downloading] " + "Donwloading video name by \"" + sb2.toString().trim() + "\"");
+		Main.log("[Task" + task.getTaskNum() + "|downloading] " + "Donwloading video name by \"" + pb.command().stream().collect(Collectors.joining(" ")) + "\"");
 
 		// start process
 		Process p = pb.directory(new File(ConfigDTO.getSaveto())).start();
-
+		task.setProcess(p);
 		task.setStatus("Downloading");
 		task.setProgress(0);
 
@@ -172,7 +168,7 @@ public class YoutubeAudioDownloader {
 			while ((line = br.readLine()) != null) {
 
 				if (line.startsWith("[download]")) {
-					if(line.contains("0.0%")) task.increaseVideoNum();
+					if(line.contains(" 0.0%")) task.increaseVideoNum();
 					
 					Matcher m = percentPtn.matcher(line);
 					if (m.find()) task.setProgress((int)Math.round(Double.parseDouble(m.group().replace("%", ""))));
@@ -239,18 +235,16 @@ public class YoutubeAudioDownloader {
 		
 		try {
 			Main.log("\n");
-			StringBuilder sb = new StringBuilder(""); // to retrieve command line argument
 			long startTime = System.nanoTime();
 			ProcessBuilder pbGetName = new ProcessBuilder(youtubedlpath + "youtube-dl", "--get-filename",
 					ConfigDTO.getPlaylistOption().toCommandArgm(), "-o", ConfigDTO.getFileNameFormat().replace("%(ext)s", ConfigDTO.getFormat()), url);
 
 			// retrieve command line argument
-			pbGetName.command().stream().forEach((s) -> sb.append(s).append(' '));
-			Main.log("[Task" + task.getTaskNum() + "|validating] " + "Getting video name by \"" + sb.toString().trim()
-					+ "\"");
+			Main.log("[Task" + task.getTaskNum() + "|validating] " + "Getting video name by \"" + pbGetName.command().stream().collect(Collectors.joining(" "))	+ "\"");
 
 			// start process
 			Process p1 = pbGetName.directory(null).start();
+			task.setProcess(p1);
 			BufferedReader br1 = new BufferedReader(new InputStreamReader(p1.getInputStream()));
 			String name = br1.readLine();
 			
@@ -285,9 +279,6 @@ public class YoutubeAudioDownloader {
 		}
 		return false;
 	}
-	
-
-		
 	
 
 }

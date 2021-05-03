@@ -80,6 +80,11 @@ public class TaskStatusModel extends AbstractTableModel {
 
 	public void clearAll() {
 
+		if (rows.stream().anyMatch(TaskData::isNotDone)) 
+			if (!GUI.confirm("Before clearing!", "Some task(s) are not done!\nCancel all task(s) and clear list?"))
+				return;
+		
+		rows.stream().filter(TaskData::isNotDone).forEach(TaskData::kill);
 		rows.clear();
 		fireTableDataChanged();
 
@@ -101,7 +106,6 @@ public class TaskStatusModel extends AbstractTableModel {
 	}
 
 	public String getProgressToolTip(int row) {
-		
 		return rows.get(row).getProgressToolTip();
 	}
 

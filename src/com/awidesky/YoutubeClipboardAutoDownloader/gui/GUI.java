@@ -22,6 +22,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -77,11 +78,23 @@ public class GUI {
 		loadingFrame.setIconImage(new ImageIcon(
 				YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\icon.jpg")
 						.getImage());
-		loadingFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		loadingFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		loadingFrame.setSize(450, 100); //add more height than fxml because it does not think about title length
 		loadingFrame.setLocation(dim.width/2-loadingFrame.getSize().width/2, dim.height/2-loadingFrame.getSize().height/2);
 		loadingFrame.setLayout(null);
 		loadingFrame.setResizable(false);
+		loadingFrame.addWindowListener(new WindowAdapter() {
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				
+				e.getWindow().dispose();
+				Main.log("LoadingFrame was closed");
+				Main.kill(0);
+
+			}
+
+		});
 		
 		loadingStatus = new JLabel("");
 		loadingStatus.setBounds(14, 8, 370, 18);
@@ -95,7 +108,7 @@ public class GUI {
 		
 	}
 	
-	public void initMainFrame() {
+	public void initMainFrame() { System.out.println("df");
 		
 		/** make <code>mainFrame</code> */
 		mainFrame = new JFrame();
@@ -126,9 +139,9 @@ public class GUI {
 		addButtons();
 		addComboBoxes();
 		addTable();
-		
+		System.out.println("dddf");
 		disposeLoadingFrame();
-		
+		System.out.println("dsssf");
 		mainFrame.setVisible(true);
 		
 	}
@@ -206,7 +219,7 @@ public class GUI {
 		
 		browse.setBounds(523, 75, browse.getPreferredSize().width, browse.getPreferredSize().height);
 		cleanCompleted.setBounds(14, 418, cleanCompleted.getPreferredSize().width, cleanCompleted.getPreferredSize().height);
-		cleanAll.setBounds(170, 418, cleanAll.getPreferredSize().width, cleanAll.getPreferredSize().height);
+		cleanAll.setBounds(160, 418, cleanAll.getPreferredSize().width, cleanAll.getPreferredSize().height);
 		nameFormatHelp.setBounds(298, 121, nameFormatHelp.getPreferredSize().width, nameFormatHelp.getPreferredSize().height);
 		
 		mainFrame.add(browse);
@@ -269,7 +282,6 @@ public class GUI {
 		
 		table.setModel(TaskStatusModel.getinstance());
 		table.setAutoCreateColumnsFromModel(false);
-		//table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.getColumn("Progress").setCellRenderer(new ProgressRenderer());
 		table.setFillsViewportHeight(true);
 		table.getColumnModel().getColumn(0).setPreferredWidth(120);
@@ -324,9 +336,9 @@ public class GUI {
 	public static void error(String title, String content, Exception e) {
 
 		Main.log("\n");
-		content = content.replace("%e%", (e == null) ? "null" : e.getMessage());
-		JOptionPane.showMessageDialog(null, content, title, JOptionPane.ERROR_MESSAGE);
-		Main.log("[GUI.error] " + title + "\n\t" + content);
+		String co = content.replace("%e%", (e == null) ? "null" : e.getMessage());
+		SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null, co, title, JOptionPane.ERROR_MESSAGE));
+		Main.log("[GUI.error] " + title + "\n\t" + co);
 		if(e != null) Main.log(e);
 		
 	}
@@ -339,20 +351,16 @@ public class GUI {
 	public static void warning(String title, String content, Exception e) {
 
 		Main.log("\n");
-		content = content.replace("%e%", (e == null) ? "null" : e.getMessage());
-		JOptionPane.showMessageDialog(null, content, title, JOptionPane.WARNING_MESSAGE);
-		Main.log("[GUI.warning] " + title + "\n\t" + content);
+		String co = content.replace("%e%", (e == null) ? "null" : e.getMessage());
+		SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null, co, title, JOptionPane.WARNING_MESSAGE));
+		Main.log("[GUI.warning] " + title + "\n\t" + co);
 		if(e != null) Main.log(e);
 		
 	}
 
-	public static boolean acceptLink(String link) {
+	public static boolean confirm(String title, String message) {
 
-		Main.log("\n"); ;
-		boolean result = (JOptionPane.showConfirmDialog(null, "Download link : " + link, "Download link in clipboard?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) ? true : false;
-		Main.log("[GUI.linkAcceptChoose] Download link " + link + "? : " + result + "\n");
-		
-		return result;
+		return JOptionPane.showConfirmDialog(null, message, title, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
 		
 	}
 

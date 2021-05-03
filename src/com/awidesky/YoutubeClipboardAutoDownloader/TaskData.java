@@ -1,5 +1,7 @@
 package com.awidesky.YoutubeClipboardAutoDownloader;
 
+import java.util.concurrent.Future;
+
 import javax.swing.SwingUtilities;
 
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
@@ -14,6 +16,8 @@ public class TaskData {
 	private int totalNumOfVideo = 1;
 	private int videoNum = 0;
 	
+	private Future<?> fu;
+	private Process p;
 	
 	public TaskData(int num) {
 		this.taskNum = num;
@@ -60,12 +64,13 @@ public class TaskData {
 		return taskNum;
 	}
 
-
-
 	public void done() {
 		setStatus("Done!");
 	}
 
+	public boolean isNotDone() {
+		return !status.equals("Done!");
+	}
 
 	public void setTotalNumVideo(int vdnum) {
 		totalNumOfVideo = vdnum;
@@ -83,9 +88,26 @@ public class TaskData {
 		return videoNum;
 	}
 
+	public void kill() {
+		if(isNotDone()) {
+			if (p != null) p.destroy();
+			if (fu != null) fu.cancel(true);
+			Main.log("[Task" + taskNum + "|Canceled] Task number " + taskNum + " has killed!");
+		}
+	}
 
 	public String getProgressToolTip() {
 		return progress + "%" + ( (totalNumOfVideo > 1) ? " (" + videoNum + "/" + totalNumOfVideo + ")" : "" );
+	}
+
+
+	public void setFuture(Future<?> submit) {
+		fu = submit;
+	}
+
+
+	public void setProcess(Process p) {
+		this.p = p;
 	}
 	
 }
