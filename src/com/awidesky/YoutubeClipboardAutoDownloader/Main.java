@@ -273,7 +273,7 @@ public class Main {
 
 		} catch (NullPointerException e2) {
 			
-			GUI.warning("config.txt has no or invalid data!", "NullPointerException\nI'll initiate config.txt with default...", null);
+			GUI.warning("config.txt has no or invalid data!", "NullPointerException : %e%\nI'll initiate config.txt with default...", e2);
 
 		} finally {
 			
@@ -359,6 +359,7 @@ public class Main {
 	public static void kill(int exitcode) {
 		
 		Main.log("YoutubeAudioAutoDownloader exit code : " + exitcode);
+		if (executorService != null) executorService.shutdownNow();
 		Main.writeProperties();
 		System.exit(exitcode);
 		
