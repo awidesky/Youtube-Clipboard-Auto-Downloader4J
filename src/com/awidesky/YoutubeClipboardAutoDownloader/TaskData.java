@@ -65,6 +65,8 @@ public class TaskData {
 	}
 
 	public void done() {
+		fu = null;
+		p = null;
 		setStatus("Done!");
 	}
 
