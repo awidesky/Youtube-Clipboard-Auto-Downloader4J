@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -338,7 +339,14 @@ public class GUI {
 
 		Main.log("\n");
 		String co = content.replace("%e%", (e == null) ? "null" : e.getMessage());
-		SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null, co, title, JOptionPane.ERROR_MESSAGE));
+		SwingUtilities.invokeLater(() -> {
+			
+			final JDialog dialog = new JDialog();
+			dialog.setAlwaysOnTop(true);  
+			JOptionPane.showMessageDialog(dialog, co, title, JOptionPane.ERROR_MESSAGE);
+			
+		});
+		
 		Main.log("[GUI.error] " + title + "\n\t" + co);
 		if(e != null) Main.log(e);
 		
@@ -353,7 +361,14 @@ public class GUI {
 
 		Main.log("\n");
 		String co = content.replace("%e%", (e == null) ? "null" : e.getMessage());
-		SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null, co, title, JOptionPane.WARNING_MESSAGE));
+		SwingUtilities.invokeLater(() -> {
+
+			final JDialog dialog = new JDialog();
+			dialog.setAlwaysOnTop(true);  
+			JOptionPane.showMessageDialog(dialog, co, title, JOptionPane.WARNING_MESSAGE);
+			
+		});
+		
 		Main.log("[GUI.warning] " + title + "\n\t" + co);
 		if(e != null) Main.log(e);
 		
@@ -364,13 +379,16 @@ public class GUI {
 		SwingWorker<Boolean, Boolean> worker = new SwingWorker<Boolean, Boolean>() {
 
 			private volatile boolean result;
-
+			private volatile Object key = new Object(); 
+			
 			@Override
 			protected Boolean doInBackground() throws Exception {
 				publish(); // Will cause process() to be called on Event Dispatch thread.
 
-				synchronized (this) {
-					wait();
+				System.out.println("dobackgnd : " + Thread.currentThread());
+
+				synchronized (key) {
+					key.wait();
 				}
 
 				return result;
@@ -379,10 +397,13 @@ public class GUI {
 			@Override 
 			protected void process(List<Boolean> chunks) {
 
-				result = JOptionPane.showConfirmDialog(null, message, title, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+				System.out.println("dobackgnd : " + Thread.currentThread());
+				final JDialog dialog = new JDialog();
+				dialog.setAlwaysOnTop(true);  
+				result = JOptionPane.showConfirmDialog(dialog, message, title, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
 
-				synchronized (this) {
-					notifyAll();
+				synchronized (key) {
+					key.notifyAll();
 				}
 			}
 		};
