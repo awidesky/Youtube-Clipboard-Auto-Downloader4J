@@ -3,8 +3,8 @@ package com.awidesky.YoutubeClipboardAutoDownloader;
 public enum PlayListOption {
 
 	YES("yes", "--yes-playlist"),
-	NO("no", "--no-playlist");
-	
+	NO("no", "--no-playlist"),
+	ASK("ask", null);
 	
 	private String toComboBox;
 	private String toCommandArgm;
@@ -33,6 +33,9 @@ public enum PlayListOption {
 		case "no":
 		case "--no-playlist":
 			return NO;
+			
+		case "ask":
+			return ASK;
 		
 		default:
 			throw new RuntimeException("Invalid parameter : PlayListOption.get(" + s + ")");

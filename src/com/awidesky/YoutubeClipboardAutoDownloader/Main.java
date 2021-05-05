@@ -136,7 +136,7 @@ public class Main {
 				
 					SwingUtilities.invokeLater(() -> {
 						
-						if (!GUI.confirm("Download link in clipboard?", "Download link : " + data)) {
+						if (!GUI.confirm("Download link in clipboard?", "Link : " + data)) {
 							
 							Main.log("\n[GUI.linkAcceptChoose] Download link " + data + "? : " + false + "\n");
 							
@@ -199,14 +199,20 @@ public class Main {
 			TaskStatusModel.getinstance().addTask(t);
 
 			String url = "\"" + data + "\"";
-
-			if (YoutubeAudioDownloader.validateAndSetName(url, t)) {
+			
+			PlayListOption p = Config.getPlaylistOption();
+			
+			if (p == PlayListOption.ASK) {
+				p = (GUI.confirm("Download entire Playlist?", "Link : " + url)) ? PlayListOption.YES : PlayListOption.NO;
+			}
+					
+			if (YoutubeAudioDownloader.validateAndSetName(url, t, p)) {
 
 				t.setStatus("Preparing...");
 
 				try {
 
-					YoutubeAudioDownloader.download(url, t);
+					YoutubeAudioDownloader.download(url, t, p);
 
 				} catch (Exception e1) {
 

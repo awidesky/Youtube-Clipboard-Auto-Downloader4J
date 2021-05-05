@@ -46,11 +46,8 @@ public class Config {
 		
 	}
 
-
 	public static PlayListOption getPlaylistOption() {
-		
 		return playlistOption;
-		
 	}
 	
 	public static synchronized void setPlaylistOption(String playlist) {

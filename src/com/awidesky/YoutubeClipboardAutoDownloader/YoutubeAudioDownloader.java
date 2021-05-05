@@ -138,7 +138,7 @@ public class YoutubeAudioDownloader {
 	}
 
 
-	public static void download(String url, TaskData task) throws Exception {
+	public static void download(String url, TaskData task, PlayListOption playListOption) throws Exception {
 
 		Main.log("\n"); Main.log("\n");
 		Main.logProperties("[Task" + task.getTaskNum() + "|preparing] " + "Current");
@@ -148,7 +148,7 @@ public class YoutubeAudioDownloader {
 		Main.log("\n");
 		long startTime = System.nanoTime();
 		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "youtube-dl" + options, "--newline",
-				"--extract-audio", Config.getPlaylistOption().toCommandArgm(), "--audio-format",
+				"--extract-audio", playListOption.toCommandArgm(), "--audio-format",
 				Config.getFormat(), "--output", "\"" + Config.getFileNameFormat() + "\"", "--audio-quality",
 				Config.getQuality(), url);
 
@@ -230,14 +230,15 @@ public class YoutubeAudioDownloader {
 	}
 
 	/** get video name 
+	 * @param p 
 	 * @throws Exception */
-	public static boolean validateAndSetName(String url, TaskData task) {
+	public static boolean validateAndSetName(String url, TaskData task, PlayListOption p) {
 		
 		try {
 			Main.log("\n");
 			long startTime = System.nanoTime();
 			ProcessBuilder pbGetName = new ProcessBuilder(youtubedlpath + "youtube-dl", "--get-filename",
-					Config.getPlaylistOption().toCommandArgm(), "-o", Config.getFileNameFormat().replace("%(ext)s", Config.getFormat()), url);
+					p.toCommandArgm(), "-o", Config.getFileNameFormat().replace("%(ext)s", Config.getFormat()), url);
 
 			// retrieve command line argument
 			Main.log("[Task" + task.getTaskNum() + "|validating] " + "Getting video name by \"" + pbGetName.command().stream().collect(Collectors.joining(" "))	+ "\"");
@@ -250,7 +251,7 @@ public class YoutubeAudioDownloader {
 			
 			if ((name.contains("WARNING")) || (name.contains("ERROR")) || (p1.waitFor() != 0)) return false;
 			
-			if (Config.getPlaylistOption() == PlayListOption.YES) {
+			if (p == PlayListOption.YES) {
 				
 				name += " 및 플레이리스트 전체";
 				task.setVideoName(name);
@@ -265,7 +266,7 @@ public class YoutubeAudioDownloader {
 			Main.log("[Task" + task.getTaskNum() + "|validating] " + "Ended with exit code : " + p1.waitFor());
 			
 			try {
-				br1.close();
+				if (br1 != null) br1.close();
 			} catch (IOException i) {
 				GUI.error("[Task" + task.getTaskNum() + "|validating] " + "Error when closing process stream", "%e%", i);
 			}
