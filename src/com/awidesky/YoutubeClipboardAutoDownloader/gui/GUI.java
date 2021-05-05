@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -23,10 +25,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import com.awidesky.YoutubeClipboardAutoDownloader.ConfigDTO;
+import com.awidesky.YoutubeClipboardAutoDownloader.Config;
 import com.awidesky.YoutubeClipboardAutoDownloader.LoadingStatus;
 import com.awidesky.YoutubeClipboardAutoDownloader.Main;
 import com.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
@@ -108,7 +111,7 @@ public class GUI {
 		
 	}
 	
-	public void initMainFrame() { System.out.println("df");
+	public void initMainFrame() { 
 		
 		/** make <code>mainFrame</code> */
 		mainFrame = new JFrame();
@@ -139,9 +142,7 @@ public class GUI {
 		addButtons();
 		addComboBoxes();
 		addTable();
-		System.out.println("dddf");
 		disposeLoadingFrame();
-		System.out.println("dsssf");
 		mainFrame.setVisible(true);
 		
 	}
@@ -151,7 +152,7 @@ public class GUI {
 		
 		jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		jfc.setDialogTitle("Choose directory to save music!");
-		jfc.setCurrentDirectory(new File(ConfigDTO.getSaveto()));
+		jfc.setCurrentDirectory(new File(Config.getSaveto()));
 	}
 	
 	private void addLabels() {
@@ -178,11 +179,11 @@ public class GUI {
 	
 	private void addTextFields() {
 		
-		pathField = new JTextField(ConfigDTO.getSaveto());
-		nameFormatField =  new JTextField(ConfigDTO.getFileNameFormat());
+		pathField = new JTextField(Config.getSaveto());
+		nameFormatField =  new JTextField(Config.getFileNameFormat());
 		
-		pathField.addActionListener((e) -> { ConfigDTO.setSaveto(pathField.getText()); });
-		nameFormatField.addActionListener((e) -> { ConfigDTO.setFileNameFormat(nameFormatField.getText()); });
+		pathField.addActionListener((e) -> { Config.setSaveto(pathField.getText()); });
+		nameFormatField.addActionListener((e) -> { Config.setFileNameFormat(nameFormatField.getText()); });
 		
 		pathField.setBounds(65, 76, 456, 22); 
 		nameFormatField.setBounds(115, 122, 172, 22);
@@ -208,7 +209,7 @@ public class GUI {
 			}
 
 			String path = jfc.getSelectedFile().getAbsolutePath();
-			ConfigDTO.setSaveto(path);
+			Config.setSaveto(path);
 			pathField.setText(path);
 			jfc.setCurrentDirectory(new File(path));
 
@@ -238,15 +239,15 @@ public class GUI {
 															"Ask when a link is found",
 															"Stop listening clipboard" });
 		
-		cb_format.setSelectedItem(ConfigDTO.getFormat());
-		cb_quality.setSelectedIndex(Integer.parseInt(ConfigDTO.getQuality()));
-		cb_playList.setSelectedItem(ConfigDTO.getPlaylistOption().toComboBox());
-		cb_clipboardOption.setSelectedItem(ConfigDTO.getClipboardListenOption());
+		cb_format.setSelectedItem(Config.getFormat());
+		cb_quality.setSelectedIndex(Integer.parseInt(Config.getQuality()));
+		cb_playList.setSelectedItem(Config.getPlaylistOption().toComboBox());
+		cb_clipboardOption.setSelectedItem(Config.getClipboardListenOption());
 
-		cb_format.addActionListener((e) -> { ConfigDTO.setFormat(cb_format.getSelectedItem().toString()); });
-		cb_quality.addActionListener((e) -> { ConfigDTO.setQuality(String.valueOf(cb_quality.getSelectedIndex())); });
-		cb_playList.addActionListener((e) -> { ConfigDTO.setPlaylistOption(cb_playList.getSelectedItem().toString()); });
-		cb_clipboardOption.addActionListener((e) -> {ConfigDTO.setClipboardListenOption(cb_clipboardOption.getSelectedItem().toString());});
+		cb_format.addActionListener((e) -> { Config.setFormat(cb_format.getSelectedItem().toString()); });
+		cb_quality.addActionListener((e) -> { Config.setQuality(String.valueOf(cb_quality.getSelectedIndex())); });
+		cb_playList.addActionListener((e) -> { Config.setPlaylistOption(cb_playList.getSelectedItem().toString()); });
+		cb_clipboardOption.addActionListener((e) -> {Config.setClipboardListenOption(cb_clipboardOption.getSelectedItem().toString());});
 		
 		cb_format.setBounds(83, 19, 96, 22);
 		cb_quality.setBounds(365, 19, 150, 22);
@@ -360,8 +361,41 @@ public class GUI {
 
 	public static boolean confirm(String title, String message) {
 
-		return JOptionPane.showConfirmDialog(null, message, title, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+		SwingWorker<Boolean, Boolean> worker = new SwingWorker<Boolean, Boolean>() {
+
+			private volatile boolean result;
+
+			@Override
+			protected Boolean doInBackground() throws Exception {
+				publish(); // Will cause process() to be called on Event Dispatch thread.
+
+				synchronized (this) {
+					wait();
+				}
+
+				return result;
+			}
+
+			@Override 
+			protected void process(List<Boolean> chunks) {
+
+				result = JOptionPane.showConfirmDialog(null, message, title, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+
+				synchronized (this) {
+					notifyAll();
+				}
+			}
+		};
+		worker.execute();
 		
+		try {
+			return worker.get();
+		} catch (InterruptedException | ExecutionException e) {
+			GUI.error("Exception in Thread working(SwingWorker)", e.getClass().getName() + "-%e%\nI'll consider you chose \"no\"", e);
+		}
+		
+		return false;
+
 	}
 
 }
