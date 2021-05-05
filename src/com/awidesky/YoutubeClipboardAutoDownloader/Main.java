@@ -109,7 +109,7 @@ public class Main {
 	
 	private static void checkClipBoard() {
 
-		if (ConfigDTO.getClipboardListenOption().equals("Stop listening clipboard")) {
+		if (Config.getClipboardListenOption().equals("Stop listening clipboard")) {
 			log("[debug] clipboard ignored due to ClipboardListenOption == \"Stop listening clipboard\"");
 			return;
 		}
@@ -132,7 +132,7 @@ public class Main {
 				if (!data.startsWith("https://www.youtu"))
 					return;
 
-				if (ConfigDTO.getClipboardListenOption().equals("Ask when a link is found")) {
+				if (Config.getClipboardListenOption().equals("Ask when a link is found")) {
 				
 					SwingUtilities.invokeLater(() -> {
 						
@@ -194,7 +194,7 @@ public class Main {
 		t.setFuture( executorService.submit(() -> { // download worker thread
 
 			t.setVideoName(data); // temporarily set video name as url
-			t.setDest(ConfigDTO.getSaveto());
+			t.setDest(Config.getSaveto());
 			t.setStatus("Validating...");
 			TaskStatusModel.getinstance().addTask(t);
 
@@ -277,12 +277,12 @@ public class Main {
 
 		} finally {
 			
-			ConfigDTO.setSaveto(p);
-			ConfigDTO.setFormat(f);
-			ConfigDTO.setQuality(q);
-			ConfigDTO.setPlaylistOption(l);
-			ConfigDTO.setFileNameFormat(n);
-			ConfigDTO.setClipboardListenOption(c);
+			Config.setSaveto(p);
+			Config.setFormat(f);
+			Config.setQuality(q);
+			Config.setPlaylistOption(l);
+			Config.setFileNameFormat(n);
+			Config.setClipboardListenOption(c);
 			
 			Main.logProperties("\n\nInitial");
 			
@@ -306,12 +306,12 @@ public class Main {
 			
 			if (!cfg.exists()) cfg.createNewFile();
 
-			bw.write("SavePath=" + ConfigDTO.getSaveto() + "\n");
-			bw.write("Format=" + ConfigDTO.getFormat() + "\n");
-			bw.write("Quality=" + ConfigDTO.getQuality() + "\n");
-			bw.write("Playlist=" + ConfigDTO.getPlaylistOption().toComboBox() + "\n");
-			bw.write("FileNameFormat=" + ConfigDTO.getFileNameFormat() + "\n");
-			bw.write("ClipboardListenOption=" + ConfigDTO.getClipboardListenOption() + "\n");
+			bw.write("SavePath=" + Config.getSaveto() + "\n");
+			bw.write("Format=" + Config.getFormat() + "\n");
+			bw.write("Quality=" + Config.getQuality() + "\n");
+			bw.write("Playlist=" + Config.getPlaylistOption().toComboBox() + "\n");
+			bw.write("FileNameFormat=" + Config.getFileNameFormat() + "\n");
+			bw.write("ClipboardListenOption=" + Config.getClipboardListenOption() + "\n");
 			
 			Main.logProperties("\n\nFinal");
 			
@@ -329,7 +329,7 @@ public class Main {
 	
 	public static void logProperties(String status) {
 		
-		Main.log(status + ConfigDTO.status());
+		Main.log(status + Config.status());
 		
 	}
 

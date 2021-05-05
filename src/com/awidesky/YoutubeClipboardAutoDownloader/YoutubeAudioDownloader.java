@@ -148,15 +148,15 @@ public class YoutubeAudioDownloader {
 		Main.log("\n");
 		long startTime = System.nanoTime();
 		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "youtube-dl" + options, "--newline",
-				"--extract-audio", ConfigDTO.getPlaylistOption().toCommandArgm(), "--audio-format",
-				ConfigDTO.getFormat(), "--output", "\"" + ConfigDTO.getFileNameFormat() + "\"", "--audio-quality",
-				ConfigDTO.getQuality(), url);
+				"--extract-audio", Config.getPlaylistOption().toCommandArgm(), "--audio-format",
+				Config.getFormat(), "--output", "\"" + Config.getFileNameFormat() + "\"", "--audio-quality",
+				Config.getQuality(), url);
 
 		// retrieve command line argument
 		Main.log("[Task" + task.getTaskNum() + "|downloading] " + "Donwloading video name by \"" + pb.command().stream().collect(Collectors.joining(" ")) + "\"");
 
 		// start process
-		Process p = pb.directory(new File(ConfigDTO.getSaveto())).start();
+		Process p = pb.directory(new File(Config.getSaveto())).start();
 		task.setProcess(p);
 		task.setStatus("Downloading");
 		task.setProgress(0);
@@ -237,7 +237,7 @@ public class YoutubeAudioDownloader {
 			Main.log("\n");
 			long startTime = System.nanoTime();
 			ProcessBuilder pbGetName = new ProcessBuilder(youtubedlpath + "youtube-dl", "--get-filename",
-					ConfigDTO.getPlaylistOption().toCommandArgm(), "-o", ConfigDTO.getFileNameFormat().replace("%(ext)s", ConfigDTO.getFormat()), url);
+					Config.getPlaylistOption().toCommandArgm(), "-o", Config.getFileNameFormat().replace("%(ext)s", Config.getFormat()), url);
 
 			// retrieve command line argument
 			Main.log("[Task" + task.getTaskNum() + "|validating] " + "Getting video name by \"" + pbGetName.command().stream().collect(Collectors.joining(" "))	+ "\"");
@@ -250,7 +250,7 @@ public class YoutubeAudioDownloader {
 			
 			if ((name.contains("WARNING")) || (name.contains("ERROR")) || (p1.waitFor() != 0)) return false;
 			
-			if (ConfigDTO.getPlaylistOption() == PlayListOption.YES) {
+			if (Config.getPlaylistOption() == PlayListOption.YES) {
 				
 				name += " 및 플레이리스트 전체";
 				task.setVideoName(name);

@@ -1,6 +1,6 @@
 package com.awidesky.YoutubeClipboardAutoDownloader;
 
-public class ConfigDTO { 
+public class Config { 
 	
 	private static String saveto;
 	private static String format;
@@ -18,7 +18,7 @@ public class ConfigDTO {
 	
 	public static synchronized void setSaveto(String saveto) {
 		
-		ConfigDTO.saveto = saveto;
+		Config.saveto = saveto;
 		
 	}
 	
@@ -30,7 +30,7 @@ public class ConfigDTO {
 	
 	public static synchronized void setFormat(String extension) {
 		
-		ConfigDTO.format = extension;
+		Config.format = extension;
 		
 	}
 	
@@ -42,7 +42,7 @@ public class ConfigDTO {
 	
 	public static synchronized void setQuality(String quality) {
 		
-		ConfigDTO.quality = quality;
+		Config.quality = quality;
 		
 	}
 
@@ -55,7 +55,7 @@ public class ConfigDTO {
 	
 	public static synchronized void setPlaylistOption(String playlist) {
 
-		ConfigDTO.playlistOption = PlayListOption.get(playlist);
+		Config.playlistOption = PlayListOption.get(playlist);
 		
 	}
 
@@ -66,7 +66,7 @@ public class ConfigDTO {
 
 
 	public static synchronized void setFileNameFormat(String fileNameFormat) {
-		ConfigDTO.fileNameFormat = fileNameFormat;
+		Config.fileNameFormat = fileNameFormat;
 	}
 
 	public static String getClipboardListenOption() {
@@ -74,11 +74,11 @@ public class ConfigDTO {
 	}
 
 	public static void setClipboardListenOption(String clipboardListenOption) {
-		ConfigDTO.clipboardListenOption = clipboardListenOption;
+		Config.clipboardListenOption = clipboardListenOption;
 	}
 
 	public static String status() {
-		return String.format(" properties :\n downloadpath-%s\n format-%s\n quality-%s\n playlistoption-%s\n filenameformat-%s\n clipboardListenOption-%s", ConfigDTO.saveto, ConfigDTO.format, ConfigDTO.quality, ConfigDTO.playlistOption, ConfigDTO.fileNameFormat, ConfigDTO.clipboardListenOption);
+		return String.format(" properties :\n downloadpath-%s\n format-%s\n quality-%s\n playlistoption-%s\n filenameformat-%s\n clipboardListenOption-%s", Config.saveto, Config.format, Config.quality, Config.playlistOption, Config.fileNameFormat, Config.clipboardListenOption);
 	}
 	
 }
