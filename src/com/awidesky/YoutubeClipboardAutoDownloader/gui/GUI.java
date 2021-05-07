@@ -373,7 +373,7 @@ public class GUI {
 		} else {
 			
 			final AtomicReference<Boolean> result = new AtomicReference<>();
-	        final CountDownLatch latch = new CountDownLatch(1);
+	        	final CountDownLatch latch = new CountDownLatch(1);
 
 			try {
 
