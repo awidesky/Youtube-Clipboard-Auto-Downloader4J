@@ -43,6 +43,7 @@ public class YoutubeAudioDownloader {
 			if (!checkYoutubedlPath(youtubedlpath + "youtube-dl")) {
 
 				GUI.error("Error!", "youtube-dl does not exist in\n\t" + youtubedlpath + "\tor system %path%!", null);
+	 			Main.webBrowse("http://ytdl-org.github.io/youtube-dl/download.html");
 				Main.kill(1);
 				
 			}
@@ -81,6 +82,7 @@ public class YoutubeAudioDownloader {
 		} catch (Exception e) {
 			
 			GUI.error("Error!", "ffmpeg does not exist in\n\t" + youtubedlpath + "\tor system %path%!", null);
+	 		Main.webBrowse("https://ffmpeg.org/download.html");
 			Main.kill(1);
 			
 		}
@@ -253,7 +255,7 @@ public class YoutubeAudioDownloader {
 			
 			if (p == PlayListOption.YES) {
 				
-				name += " �� �÷��̸���Ʈ ��ü";
+				name += " ¹× ÇÃ·¹ÀÌ¸®½ºÆ® ÀüÃ¼";
 				task.setVideoName(name);
 				
 				int vdnum = 1;
