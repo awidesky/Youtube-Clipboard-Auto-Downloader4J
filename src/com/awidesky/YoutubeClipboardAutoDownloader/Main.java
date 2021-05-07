@@ -133,22 +133,18 @@ public class Main {
 					return;
 
 				if (Config.getClipboardListenOption().equals("Ask when a link is found")) {
-				
-					SwingUtilities.invokeLater(() -> {
-						
-						if (!GUI.confirm("Download link in clipboard?", "Link : " + data)) {
-							
-							Main.log("\n[GUI.linkAcceptChoose] Download link " + data + "? : " + false + "\n");
-							
-						} else {
-							
-							Main.log("\n[GUI.linkAcceptChoose] Download link " + data + "? : " + true + "\n");	
-							Arrays.stream(data.split("\n")).forEach(Main::submitDownload);
-							
-						}
-						
-					});
-					
+
+					if (!GUI.confirm("Download link in clipboard?", "Link : " + data)) {
+
+						Main.log("\n[GUI.linkAcceptChoose] Download link " + data + "? : " + false + "\n");
+
+					} else {
+
+						Main.log("\n[GUI.linkAcceptChoose] Download link " + data + "? : " + true + "\n");
+						Arrays.stream(data.split("\n")).forEach(Main::submitDownload);
+
+					}
+
 					return;
 				}
 
@@ -202,7 +198,7 @@ public class Main {
 			
 			PlayListOption p = Config.getPlaylistOption();
 			
-			if (p == PlayListOption.ASK) {
+			if (data.contains("list=") && p == PlayListOption.ASK) {
 				p = (GUI.confirm("Download entire Playlist?", "Link : " + url)) ? PlayListOption.YES : PlayListOption.NO;
 			}
 					
@@ -222,8 +218,7 @@ public class Main {
 				}
 
 			} else {
-				GUI.error("[Task" + num + "|validating] " + "Not a valid url!",
-						data + "\nis not valid or unsupported url!", null);
+				GUI.error("[Task" + num + "|validating] " + "Not a valid url!",	data + "\nis not valid or unsupported url!", null);
 				return;
 			}
 
