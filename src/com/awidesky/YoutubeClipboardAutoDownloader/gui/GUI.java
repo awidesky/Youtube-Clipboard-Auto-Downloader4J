@@ -313,7 +313,7 @@ public class GUI {
 	private void showNameFormatPage() { 
 
 		try {
-			if(!Desktop.isDesktopSupported()) {  }
+			if(!Desktop.isDesktopSupported()) { throw new IOException("Desktop.isDesktopSupported() is false"); }
 			Desktop.getDesktop().browse(new URI("https://github.com/ytdl-org/youtube-dl#output-template"));
 		} catch (IOException e) {
 			GUI.warning("Cannot open default web browser!", "Please visit https://github.com/ytdl-org/youtube-dl#output-template\n%e%", e);
