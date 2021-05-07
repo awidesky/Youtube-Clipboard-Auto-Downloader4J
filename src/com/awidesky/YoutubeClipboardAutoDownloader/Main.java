@@ -198,7 +198,7 @@ public class Main {
 			
 			PlayListOption p = Config.getPlaylistOption();
 			
-			if (data.contains("list=") && p == PlayListOption.ASK) {
+			if (p == PlayListOption.ASK && data.contains("list=")) {
 				p = (GUI.confirm("Download entire Playlist?", "Link : " + url)) ? PlayListOption.YES : PlayListOption.NO;
 			}
 					
