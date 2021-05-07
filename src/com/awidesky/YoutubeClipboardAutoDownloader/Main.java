@@ -366,4 +366,26 @@ public class Main {
 		
 	}
 
+
+	public static void webBrowse(String link) {
+
+		try {
+			if(Desktop.isDesktopSupported()) {
+				Desktop.getDesktop().browse(new URI(link));
+			} else {
+          			try {
+                		 	Runtime.getRuntime().exec("xdg-open " + link);
+            			} catch (IOException e) {
+               				throw new IOException("Desktop.isDesktopSupported() is false and xdg-open doesn't work");
+            			}
+			}
+
+		} catch (IOException e) {
+			GUI.warning("Cannot open default web browser!", "Please visit" + link + "\n%e%", e);
+		} catch (URISyntaxException e) {
+			GUI.error("Invalid url!", link + "\n%e%", e);
+		}
+
+	}
+
 }
