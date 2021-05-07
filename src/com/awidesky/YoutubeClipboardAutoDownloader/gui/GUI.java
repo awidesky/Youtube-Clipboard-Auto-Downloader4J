@@ -2,16 +2,18 @@ package com.awidesky.YoutubeClipboardAutoDownloader.gui;
 
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -26,7 +28,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -376,47 +377,40 @@ public class GUI {
 
 	public static boolean confirm(String title, String message) {
 
-		SwingWorker<Boolean, Boolean> worker = new SwingWorker<Boolean, Boolean>() {
+		final JDialog dialog = new JDialog();
+		dialog.setAlwaysOnTop(true);
+		
+		if (EventQueue.isDispatchThread()) {
 
-			private volatile boolean result;
-			private volatile Object key = new Object(); 
+			return showConfirmDialog(title, message, dialog);
 			
-			@Override
-			protected Boolean doInBackground() throws Exception {
-				publish(); // Will cause process() to be called on Event Dispatch thread.
+		} else {
+			
+			final AtomicReference<Boolean> result = new AtomicReference<>();
+	        final CountDownLatch latch = new CountDownLatch(1);
 
-				System.out.println("dobackgnd : " + Thread.currentThread());
+			try {
 
-				synchronized (key) {
-					key.wait();
-				}
+				SwingUtilities.invokeAndWait(() -> {
+					result.set(showConfirmDialog(title, message, dialog));
+				});
 
-				return result;
+				latch.await();
+				return result.get();
+
+			} catch (InterruptedException | InvocationTargetException e) {
+				GUI.error("Exception in Thread working(SwingWorker)",
+						e.getClass().getName() + "-%e%\nI'll consider you chose \"no\"", e);
 			}
 
-			@Override 
-			protected void process(List<Boolean> chunks) {
+			return false;
 
-				System.out.println("dobackgnd : " + Thread.currentThread());
-				final JDialog dialog = new JDialog();
-				dialog.setAlwaysOnTop(true);  
-				result = JOptionPane.showConfirmDialog(dialog, message, title, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
-
-				synchronized (key) {
-					key.notifyAll();
-				}
-			}
-		};
-		worker.execute();
-		
-		try {
-			return worker.get();
-		} catch (InterruptedException | ExecutionException e) {
-			GUI.error("Exception in Thread working(SwingWorker)", e.getClass().getName() + "-%e%\nI'll consider you chose \"no\"", e);
 		}
-		
-		return false;
 
 	}
+	
+	private static boolean showConfirmDialog(String title, String message, JDialog dialog) {
+		return JOptionPane.showConfirmDialog(dialog, message, title,JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+	} 
 
 }
