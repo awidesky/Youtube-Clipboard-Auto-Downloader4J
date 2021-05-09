@@ -1,5 +1,7 @@
 package com.awidesky.YoutubeClipboardAutoDownloader;
 
+import java.awt.Desktop;
+import java.awt.EventQueue;
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -14,6 +16,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -320,11 +324,7 @@ public class Main {
 
 			GUI.error("Error when writing config.txt file", "%e%", e);
 
-		} finally {
-			
-			logTo.close();
-			
-		}
+		} 
 
 	}
 	
@@ -359,9 +359,17 @@ public class Main {
 	 * */
 	public static void kill(int exitcode) {
 		
-		Main.log("YoutubeAudioAutoDownloader exit code : " + exitcode);
+		log("YoutubeAudioAutoDownloader exit code : " + exitcode);
 		if (executorService != null) executorService.shutdownNow();
+		if(!EventQueue.isDispatchThread()) {
+			try {
+				SwingUtilities.invokeAndWait(() -> { log("Every task queued in EDT has done."); });
+			} catch (InvocationTargetException | InterruptedException e) {
+				log("Failed when waiting for EDT to be done! : " + e.getClass() + "-" + e.getMessage());
+			}
+		}
 		Main.writeProperties();
+		logTo.close();
 		System.exit(exitcode);
 		
 	}

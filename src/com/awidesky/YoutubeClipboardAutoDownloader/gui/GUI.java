@@ -1,6 +1,5 @@
 package com.awidesky.YoutubeClipboardAutoDownloader.gui;
 
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
@@ -8,10 +7,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -39,6 +35,7 @@ import com.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
 public class GUI {
 	
 	private Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+	private static final JDialog confirmDialogParent = new JDialog();
 	
 	private JFrame loadingFrame;
 	private JLabel loadingStatus;
@@ -94,6 +91,7 @@ public class GUI {
 			public void windowClosing(WindowEvent e) {
 				
 				e.getWindow().dispose();
+				confirmDialogParent.dispose();
 				Main.log("LoadingFrame was closed");
 				Main.kill(0);
 
@@ -363,12 +361,11 @@ public class GUI {
 
 	public static boolean confirm(String title, String message) {
 
-		final JDialog dialog = new JDialog();
-		dialog.setAlwaysOnTop(true);
+		confirmDialogParent.setAlwaysOnTop(true);
 		
 		if (EventQueue.isDispatchThread()) {
 
-			return showConfirmDialog(title, message, dialog);
+			return showConfirmDialog(title, message, confirmDialogParent);
 			
 		} else {
 			
@@ -378,7 +375,7 @@ public class GUI {
 			try {
 
 				SwingUtilities.invokeAndWait(() -> {
-					result.set(showConfirmDialog(title, message, dialog));
+					result.set(showConfirmDialog(title, message, confirmDialogParent));
 				});
 
 				latch.await();
