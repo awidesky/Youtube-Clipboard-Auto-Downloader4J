@@ -112,11 +112,17 @@ public class YoutubeAudioDownloader {
 					
 					Main.log("Found valid command to execute youtube-dl : " + ydlfile);
 					Main.log("youtube-dl version : " + line);
-					if ( (Integer.parseInt(new SimpleDateFormat("yyyyMM").format(new Date())) - Integer.parseInt(line.substring(0, 7).replace(".", ""))) > 1 ) //update if yputube-dl version is older than a month 
-						try { new ProcessBuilder(ydlfile, "--update").start().waitFor(); } catch (Exception e) { GUI.error("Error when updating youtube-dl", "%e%\nI couldn't update youtube-dl!", e); }
-					else Main.log("youtube-dl version is not older than a month");
 					
-					Main.log("Executing youtube-dl ended with exit code : " + p.waitFor());
+					if ( (Integer.parseInt(new SimpleDateFormat("yyyyMM").format(new Date())) - Integer.parseInt(line.substring(0, 7).replace(".", ""))) > 1 ) { //update if yputube-dl version is older than a month 
+						try {
+							int e;
+							if ((e = new ProcessBuilder(ydlfile, "--update").start().waitFor()) != 0) throw new Exception("Error code : " + e);
+						} catch (Exception e) { 
+							GUI.error("Error when updating youtube-dl", "%e%\nI couldn't update youtube-dl!", e);
+						}
+					} else {Main.log("youtube-dl version is not older than a month");}
+					
+					Main.log("Executing youtube-dl --version ended with exit code : " + p.waitFor());
 					
 					return true;
 					
@@ -255,7 +261,7 @@ public class YoutubeAudioDownloader {
 			
 			if (p == PlayListOption.YES) {
 				
-				name += " 쨔횞 횉횄쨌쨔�횑쨍짰쩍쨘횈짰 �체횄쩌";
+				name += " 夷뷀슎 �쉲�쉪夷뚯쮷占쏀쉻夷띿㎞姨띿쮼�쉱吏� 占쎌껜�쉪姨�";
 				task.setVideoName(name);
 				
 				int vdnum = 1;
