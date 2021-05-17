@@ -77,7 +77,7 @@ public class YoutubeAudioDownloader {
 				else Main.log(output);
 			} catch (IOException e1) { throw e1; }
 			
-			Main.log("Executing ffmpeg ended with exit code : " + p.waitFor());
+			Main.log("Executing ffmpeg -version ended with exit code : " + p.waitFor());
 			
 		} catch (Exception e) {
 			
@@ -149,7 +149,7 @@ public class YoutubeAudioDownloader {
 	public static void download(String url, TaskData task, PlayListOption playListOption) throws Exception {
 
 		Main.log("\n"); Main.log("\n");
-		Main.logProperties("[Task" + task.getTaskNum() + "|preparing] " + "Current");
+		Main.logProperties("[Task" + task.getTaskNum() + "|preparing] Current");
 
 
 		/* download video */
@@ -161,7 +161,7 @@ public class YoutubeAudioDownloader {
 				Config.getQuality(), url);
 
 		// retrieve command line argument
-		Main.log("[Task" + task.getTaskNum() + "|downloading] " + "Donwloading video name by \"" + pb.command().stream().collect(Collectors.joining(" ")) + "\"");
+		Main.log("[Task" + task.getTaskNum() + "|downloading] Donwloading video by \"" + pb.command().stream().collect(Collectors.joining(" ")) + "\"");
 
 		// start process
 		Process p = pb.directory(new File(Config.getSaveto())).start();
@@ -182,13 +182,13 @@ public class YoutubeAudioDownloader {
 					if (m.find()) task.setProgress((int)Math.round(Double.parseDouble(m.group().replace("%", ""))));
 				}
 
-				Main.log("[Task" + task.getTaskNum() + "|downloading] " + "youtube-dl stdout : " + line);
+				Main.log("[Task" + task.getTaskNum() + "|downloading] youtube-dl stdout : " + line);
 
 			}
 
 		} catch (IOException e) {
 
-			GUI.error("[Task" + task.getTaskNum() + "|downloading] " + "Error when redirecting output of youtube-dl", "%e%", e);
+			GUI.error("[Task" + task.getTaskNum() + "|downloading] Error when redirecting output of youtube-dl", "%e%", e);
 
 		}
 
@@ -202,44 +202,40 @@ public class YoutubeAudioDownloader {
 
 				task.setStatus("ERROR");
 				sb1.append(line);
-				Main.log("[Task" + task.getTaskNum() + "|downloading] " + "youtube-dl stderr : " + line);
+				Main.log("[Task" + task.getTaskNum() + "|downloading] youtube-dl stderr : " + line);
 
 			}
 
 			if (!sb1.toString().equals("")) {
 
-				GUI.error("Error in youtube-dl",
-						"[Task" + task.getTaskNum() + "|downloading] " + "There's Error(s) in youtube-dl proccess!",
-						null);
+				GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum()
+					+ "|downloading] There's Error(s) in youtube-dl proccess!", null);
 
 			}
 
 		} catch (IOException e) {
 
-			GUI.error("[Task" + task.getTaskNum() + "|downloading] "
-					+ "Error when redirecting error output of youtube-dl", "%e%", e);
+			GUI.error("[Task" + task.getTaskNum() + "|downloading] Error when redirecting error output of youtube-dl", "%e%", e);
 
 		}
 
 		int errorCode;
 		if( (errorCode = p.waitFor()) != 0) { 
 			task.setStatus("ERROR");
-			GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum() + "|downloading] " + " has ended with error code : " + errorCode, null);
-			Main.log("[Task" + task.getTaskNum() + "|downloading] " + "elapsed time in downloading(failed) : " + ((System.nanoTime() - startTime) / 1e6) + "ms" );
+			GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum() + "|downloading] youtube-dl has ended with error code : " + errorCode, null);
+			Main.log("[Task" + task.getTaskNum() + "|downloading] elapsed time in downloading(failed) : " + ((System.nanoTime() - startTime) / 1e6) + "ms" );
 			return;
 		} else {
 			task.done();
 		}
 
-		Main.log("[Task" + task.getTaskNum() + "|downloading] " + "Finished!\n");
+		Main.log("[Task" + task.getTaskNum() + "|downloaded] Finished!\n");
 
-		Main.log("[Task" + task.getTaskNum() + "|downloading] " + "elapsed time in working : " + ((System.nanoTime() - startTime) / 1e6) + "ms" );
+		Main.log("[Task" + task.getTaskNum() + "|downloaded] elapsed time in working(sucessed) : " + ((System.nanoTime() - startTime) / 1e6) + "ms" );
 		
 	}
 
-	/** get video name 
-	 * @param p 
-	 * @throws Exception */
+	/** get video name */
 	public static boolean validateAndSetName(String url, TaskData task, PlayListOption p) {
 		
 		try {
@@ -249,7 +245,7 @@ public class YoutubeAudioDownloader {
 					p.toCommandArgm(), "-o", Config.getFileNameFormat().replace("%(ext)s", Config.getFormat()), url);
 
 			// retrieve command line argument
-			Main.log("[Task" + task.getTaskNum() + "|validating] " + "Getting video name by \"" + pbGetName.command().stream().collect(Collectors.joining(" "))	+ "\"");
+			Main.log("[Task" + task.getTaskNum() + "|validating] Getting video name by \"" + pbGetName.command().stream().collect(Collectors.joining(" "))	+ "\"");
 
 			// start process
 			Process p1 = pbGetName.directory(null).start();
@@ -261,7 +257,7 @@ public class YoutubeAudioDownloader {
 			
 			if (p == PlayListOption.YES) {
 				
-				name += " 夷뷀슎 �쉲�쉪夷뚯쮷占쏀쉻夷띿㎞姨띿쮼�쉱吏� 占쎌껜�쉪姨�";
+				name += " 및 플레이리스트 전체";
 				task.setVideoName(name);
 				
 				int vdnum = 1;
@@ -270,21 +266,21 @@ public class YoutubeAudioDownloader {
 				
 			} else { task.setVideoName(name); }
 			
-			Main.log("[Task" + task.getTaskNum() + "|validating] " + "Video name : " + name);
-			Main.log("[Task" + task.getTaskNum() + "|validating] " + "Ended with exit code : " + p1.waitFor());
+			Main.log("[Task" + task.getTaskNum() + "|validating] Video name : " + name);
+			Main.log("[Task" + task.getTaskNum() + "|validating] Ended with exit code : " + p1.waitFor());
 			
 			try {
 				if (br1 != null) br1.close();
 			} catch (IOException i) {
-				GUI.error("[Task" + task.getTaskNum() + "|validating] " + "Error when closing process stream", "%e%", i);
+				GUI.error("[Task" + task.getTaskNum() + "|validating] Error when closing process stream", "%e%", i);
 			}
 			
-			Main.log("[Task" + task.getTaskNum() + "|validating] " + "elapsed time in validating link and downloading video name : "
+			Main.log("[Task" + task.getTaskNum() + "|validating] elapsed time in validating link and downloading video name : "
 					+ ((System.nanoTime() - startTime) / 1e6) + "ms");
 			
 			return true;
 		} catch (Exception e) {
-			GUI.error("Error in getting video name", "[Task" + task.getTaskNum() + "|validating] " + "%e%", e);
+			GUI.error("Error in getting video name", "[Task" + task.getTaskNum() + "|validating] %e%", e);
 		}
 		return false;
 	}
