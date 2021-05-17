@@ -1,7 +1,6 @@
 package com.awidesky.YoutubeClipboardAutoDownloader;
 
 import java.awt.Desktop;
-import java.awt.EventQueue;
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -216,13 +215,13 @@ public class Main {
 
 				} catch (Exception e1) {
 
-					GUI.error("[Task" + num + "|downloading] " + "Error when downloading!", "%e%", e1);
+					GUI.error("[Task" + num + "|downloading] Error when downloading!", "%e%", e1);
 					return;
 
 				}
 
 			} else {
-				GUI.error("[Task" + num + "|validating] " + "Not a valid url!",	data + "\nis not valid or unsupported url!", null);
+				GUI.error("[Task" + num + "|validating] Not a valid url!",	data + "\nis not valid or unsupported url!", null);
 				return;
 			}
 
@@ -259,7 +258,7 @@ public class Main {
 		String c = "Download link automatically"; 
 		
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
-				YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\config.txt")))) {
+				YoutubeAudioDownloader.getProjectpath() + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "config.txt")))) {
 
 			p = Optional.of(br.readLine()).get().split("=")[1];
 			f = Optional.of(br.readLine()).get().split("=")[1];
@@ -304,10 +303,10 @@ public class Main {
 
 		/** Write <code>properties</code> */
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
-				YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\config.txt")))) {
+				YoutubeAudioDownloader.getProjectpath() + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "config.txt")))) {
 
 			File cfg = new File(
-					YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\config.txt");
+					YoutubeAudioDownloader.getProjectpath() + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "config.txt");
 			
 			if (!cfg.exists()) cfg.createNewFile();
 
@@ -353,21 +352,17 @@ public class Main {
 		return executorService;
 	}
 
+	
 	/*
-	 * Close the window and kills the application.
+	 * Kills the application NOW.
 	 * 
 	 * */
 	public static void kill(int exitcode) {
 		
 		log("YoutubeAudioAutoDownloader exit code : " + exitcode);
-		if (executorService != null) executorService.shutdownNow();
-		if(!EventQueue.isDispatchThread()) {
-			try {
-				SwingUtilities.invokeAndWait(() -> { log("Every task queued in EDT has done."); });
-			} catch (InvocationTargetException | InterruptedException e) {
-				log("Failed when waiting for EDT to be done! : " + e.getClass() + "-" + e.getMessage());
-			}
-		}
+		
+		if (executorService != null && !executorService.isShutdown()) executorService.shutdownNow();
+
 		Main.writeProperties();
 		logTo.close();
 		System.exit(exitcode);
@@ -381,11 +376,11 @@ public class Main {
 			if(Desktop.isDesktopSupported()) {
 				Desktop.getDesktop().browse(new URI(link));
 			} else {
-          			try {
-                		 	Runtime.getRuntime().exec("xdg-open " + link);
-            			} catch (IOException e) {
-               				throw new IOException("Desktop.isDesktopSupported() is false and xdg-open doesn't work");
-            			}
+          		try {
+              		Runtime.getRuntime().exec("xdg-open " + link);
+           		} catch (IOException e) {
+               		throw new IOException("Desktop.isDesktopSupported() is false and xdg-open doesn't work");
+            	}
 			}
 
 		} catch (IOException e) {
