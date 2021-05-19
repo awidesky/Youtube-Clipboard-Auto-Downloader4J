@@ -260,12 +260,12 @@ public class Main {
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
 				YoutubeAudioDownloader.getProjectpath() + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "config.txt")))) {
 
-			p = Optional.of(br.readLine()).get().split("=")[1];
-			f = Optional.of(br.readLine()).get().split("=")[1];
-			q = Optional.of(br.readLine()).get().split("=")[1];
-			l = Optional.of(br.readLine()).get().split("=")[1];
-			n = Optional.of(br.readLine()).get().split("=")[1];
-			c = Optional.of(br.readLine()).get().split("=")[1];
+			p = Optional.of(br.readLine()).orElse("SavePath=" + p)				.split("=")[1];
+			f = Optional.of(br.readLine()).orElse("Format=" + f)				.split("=")[1];
+			q = Optional.of(br.readLine()).orElse("Quality=" + q)				.split("=")[1];
+			l = Optional.of(br.readLine()).orElse("Playlist=" + l)				.split("=")[1];
+			n = Optional.of(br.readLine()).orElse("FileNameFormat=" + n)		.split("=")[1];
+			c = Optional.of(br.readLine()).orElse("ClipboardListenOption=" + c)	.split("=")[1];
 
 		} catch (FileNotFoundException e1) {
 
