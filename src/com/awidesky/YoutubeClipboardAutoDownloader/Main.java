@@ -106,7 +106,7 @@ public class Main {
 			gui.initMainFrame();
 		});
 		
-		log("Listening clipboard...");
+		log("\nistening clipboard...\n");
 
 	}
 	

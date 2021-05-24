@@ -8,7 +8,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.ImageIcon;
@@ -370,15 +369,13 @@ public class GUI {
 		} else {
 			
 			final AtomicReference<Boolean> result = new AtomicReference<>();
-	        	final CountDownLatch latch = new CountDownLatch(1);
 
 			try {
 
 				SwingUtilities.invokeAndWait(() -> {
 					result.set(showConfirmDialog(title, message, confirmDialogParent));
 				});
-
-				latch.await();
+				
 				return result.get();
 
 			} catch (InterruptedException | InvocationTargetException e) {
