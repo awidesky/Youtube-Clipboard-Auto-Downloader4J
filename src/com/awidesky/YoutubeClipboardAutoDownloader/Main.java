@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.swing.SwingUtilities;
 
@@ -39,8 +40,12 @@ public class Main {
 	private static boolean isSecondtime = false;
 	private static ClipBoardCheckerThread clipChecker;
 	private static PrintWriter logTo;
+	
 	private static GUI gui = new GUI();
-
+	private static LoggerThread logger = new LoggerThread();
+	
+	private static LinkedBlockingQueue<Runnable> loggerQueue = new LinkedBlockingQueue<>();
+	
 	private static volatile int taskNum = 0;
 	
 	public static final String version = "v1.5.7";
@@ -244,6 +249,8 @@ public class Main {
 			logTo = new PrintWriter(System.out, true);
 			GUI.error("Error when creating log flie", "%e%", e);
 			
+		} finally {
+			logger.start();
 		}
 		
 	}
@@ -260,13 +267,20 @@ public class Main {
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
 				YoutubeAudioDownloader.getProjectpath() + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "config.txt")))) {
 
-			p = Optional.of(br.readLine()).orElse("SavePath=" + p)				.split("=")[1];
-			f = Optional.of(br.readLine()).orElse("Format=" + f)				.split("=")[1];
-			q = Optional.of(br.readLine()).orElse("Quality=" + q)				.split("=")[1];
-			l = Optional.of(br.readLine()).orElse("Playlist=" + l)				.split("=")[1];
-			n = Optional.of(br.readLine()).orElse("FileNameFormat=" + n)		.split("=")[1];
-			c = Optional.of(br.readLine()).orElse("ClipboardListenOption=" + c)	.split("=")[1];
+			String p1 = Optional.of(br.readLine()).orElse("SavePath=" + p)				.split("=")[1];
+			String f1 = Optional.of(br.readLine()).orElse("Format=" + f)				.split("=")[1];
+			String q1 = Optional.of(br.readLine()).orElse("Quality=" + q)				.split("=")[1];
+			String l1 = Optional.of(br.readLine()).orElse("Playlist=" + l)				.split("=")[1];
+			String n1 = Optional.of(br.readLine()).orElse("FileNameFormat=" + n)		.split("=")[1];
+			String c1 = Optional.of(br.readLine()).orElse("ClipboardListenOption=" + c)	.split("=")[1];
 
+			p = p1.equals("null") ?  p : p1;
+			f = f1.equals("null") ?  f : f1;
+			q = q1.equals("null") ?  q : q1;
+			l = l1.equals("null") ?  l : l1;
+			n = n1.equals("null") ?  n : n1;
+			c = c1.equals("null") ?  c : c1;
+			
 		} catch (FileNotFoundException e1) {
 
 			GUI.warning("config.txt not exists!","%e%\nDon't worry! I'll make one later...", e1);
@@ -337,13 +351,17 @@ public class Main {
 
 	public static void log(String data) {
 
-		logTo.println(data);
-
+		loggerQueue.offer(() -> {
+			logTo.println(data);
+		});
+		
 	}
 	
 	public static void log(Exception e) {
 		
-		e.printStackTrace(logTo);
+		loggerQueue.offer(() -> {
+			e.printStackTrace(logTo);
+		});
 		
 	}
 
@@ -364,6 +382,15 @@ public class Main {
 		if (executorService != null && !executorService.isShutdown()) executorService.shutdownNow();
 
 		Main.writeProperties();
+		
+		LoggerThread.isStop = true;
+		
+		try {
+			logger.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace(logTo);
+		}
+		
 		logTo.close();
 		System.exit(exitcode);
 		
@@ -390,5 +417,34 @@ public class Main {
 		}
 
 	}
+	
+	private static class LoggerThread extends Thread {
+
+		public static volatile boolean isStop = false;
+		
+		public LoggerThread() {
+
+			super(() -> {
+
+				while(true) {
+					
+					if(loggerQueue.isEmpty() && isStop) {
+						return;
+					}
+					
+					 try {
+					 	 loggerQueue.take().run();
+					} catch (InterruptedException e) {
+						 logTo.println("LoggerThread Interrupted! : " + e.getMessage());
+					}
+				}
+
+			});
+			
+		}
+		
+	}
 
 }
+
+
