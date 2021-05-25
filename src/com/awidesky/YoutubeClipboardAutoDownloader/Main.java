@@ -386,7 +386,7 @@ public class Main {
 		LoggerThread.isStop = true;
 		
 		try {
-			logger.join();
+			logger.join(5000);
 		} catch (InterruptedException e) {
 			e.printStackTrace(logTo);
 		}
