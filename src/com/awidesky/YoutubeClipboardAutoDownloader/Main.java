@@ -265,7 +265,7 @@ public class Main {
 		String c = "Download link automatically"; 
 		
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
-				YoutubeAudioDownloader.getProjectpath() + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "config.txt")))) {
+				YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt")))) {
 
 			String p1 = Optional.of(br.readLine()).orElse("SavePath=" + p)				.split("=")[1];
 			String f1 = Optional.of(br.readLine()).orElse("Format=" + f)				.split("=")[1];
@@ -317,10 +317,10 @@ public class Main {
 
 		/** Write <code>properties</code> */
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
-				YoutubeAudioDownloader.getProjectpath() + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "config.txt")))) {
+				YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt")))) {
 
 			File cfg = new File(
-					YoutubeAudioDownloader.getProjectpath() + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "config.txt");
+					YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt");
 			
 			if (!cfg.exists()) cfg.createNewFile();
 

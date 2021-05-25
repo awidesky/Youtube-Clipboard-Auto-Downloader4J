@@ -32,11 +32,13 @@
 			</manifest>
 			<fileset dir="${dir.buildfile}/bin"/>
 		</jar>
+		
+		<copy file="${dir.buildfile}/config.txt" tofile="${dir.buildfile}/build/config.txt"/>
+		<copy file="${dir.buildfile}/YoutubeAudioAutoDownloader-resources/icon.jpg" tofile="${dir.buildfile}/build/icon.jpg"/>
+		
 	</target>
 
 	<target depends="create_run_jar" name="deploy">
-
-		<copy file="${dir.buildfile}/YoutubeAudioAutoDownloader-resources/icon.jpg" tofile="${dir.buildfile}/build/icon.jpg"/>
 
 		<copy todir="${dir.buildfile}/build/win_standalone">
 			<fileset dir="${dir.buildfile}">
@@ -51,6 +53,7 @@
 			</fileset>
 		</copy>
 
+		<copy file="${dir.buildfile}/config.txt" tofile="${dir.buildfile}/build/win_standalone/config.txt"/>
 
 		<launch4j configFile="${dir.buildfile}/Launch4J.xml" jar="${dir.buildfile}\build\YoutubeAudioAutoDownloader ${version}.jar" outfile="${dir.buildfile}\build\win_standalone\YoutubeAudioAutoDownloader ${version}.exe"/>
 		
