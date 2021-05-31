@@ -281,6 +281,8 @@ public class Main {
 			n = n1.equals("null") ?  n : n1;
 			c = c1.equals("null") ?  c : c1;
 			
+			
+			
 		} catch (FileNotFoundException e1) {
 
 			GUI.warning("config.txt not exists!","%e%\nDon't worry! I'll make one later...", e1);
@@ -317,7 +319,7 @@ public class Main {
 
 		/** Write <code>properties</code> */
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
-				YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt")))) {
+				YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt"), false))) {
 
 			File cfg = new File(
 					YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt");
