@@ -15,7 +15,7 @@ import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 public class YoutubeAudioDownloader {
 
 
-	private static String projectpath = new File(new File(".").getAbsolutePath()).getParent();;
+	private static String projectpath = new File(new File(".").getAbsolutePath()).getParent();
 	private static String youtubedlpath;
 	private static String options = "";
 	private static Pattern percentPtn = Pattern.compile("[0-9]+\\.*[0-9]+%");
