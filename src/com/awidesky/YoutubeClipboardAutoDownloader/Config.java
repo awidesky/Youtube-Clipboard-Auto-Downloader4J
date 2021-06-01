@@ -1,5 +1,9 @@
 package com.awidesky.YoutubeClipboardAutoDownloader;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class Config { 
 	
 	private static String saveto;
@@ -8,6 +12,7 @@ public class Config {
 	private static PlayListOption playlistOption;
 	private static String fileNameFormat;
 	private static String clipboardListenOption;
+	private static List<String> acceptableLinks = new ArrayList<>();
 	
 	
 	public static String getSaveto() {
@@ -74,8 +79,21 @@ public class Config {
 		Config.clipboardListenOption = clipboardListenOption;
 	}
 
+	public static void addAcceptableList(String s) {
+		acceptableLinks.add(s);
+	}
+	
+	public static boolean isLinkAcceptable(String s) {
+		return acceptableLinks.stream().anyMatch(valid -> s.startsWith(valid));
+	}
+	
+	public static String getAcceptedLinkStr() {
+		return acceptableLinks.stream().collect(Collectors.joining("\n"));
+	}
+	
+	
 	public static String status() {
-		return String.format(" properties :\n downloadpath-%s\n format-%s\n quality-%s\n playlistoption-%s\n filenameformat-%s\n clipboardListenOption-%s", Config.saveto, Config.format, Config.quality, Config.playlistOption, Config.fileNameFormat, Config.clipboardListenOption);
+		return String.format(" properties :\n downloadpath-%s\n format-%s\n quality-%s\n playlistoption-%s\n filenameformat-%s\n clipboardListenOption-%s\n Accepted links starts by :\n%s", Config.saveto, Config.format, Config.quality, Config.playlistOption, Config.fileNameFormat, Config.clipboardListenOption, Config.getAcceptedLinkStr());
 	}
 	
 }

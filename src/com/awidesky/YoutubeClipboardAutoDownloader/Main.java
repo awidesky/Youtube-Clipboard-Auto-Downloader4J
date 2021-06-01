@@ -137,7 +137,7 @@ public class Main {
 				
 				clipboardBefore = data;
 
-				if (!data.startsWith("https://www.youtu"))
+				if (!Config.isLinkAcceptable(data))
 					return;
 
 				if (Config.getClipboardListenOption().equals("Ask when a link is found")) {
@@ -264,6 +264,8 @@ public class Main {
 		String n = "%(title)s.%(ext)s"; 
 		String c = "Download link automatically"; 
 		
+		Config.addAcceptableList("https://www.youtu");
+		
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
 				YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt")))) {
 
@@ -282,6 +284,11 @@ public class Main {
 			c = c1.equals("null") ?  c : c1;
 			
 			
+			String s;
+			while((s = br.readLine()) != null) {
+				if(s.startsWith("#") || s.equals("https://www.youtu")) continue;
+				Config.addAcceptableList(s);
+			}
 			
 		} catch (FileNotFoundException e1) {
 
@@ -332,6 +339,14 @@ public class Main {
 			bw.write("Playlist=" + Config.getPlaylistOption().toComboBox() + "\n");
 			bw.write("FileNameFormat=" + Config.getFileNameFormat() + "\n");
 			bw.write("ClipboardListenOption=" + Config.getClipboardListenOption() + "\n");
+			
+			bw.write("#If you know a type of link that youtube-dl accepts (listed in https://github.com/ytdl-org/youtube-dl/blob/master/docs/supportedsites.md),\n");
+			bw.write("#and wish YoutubeAudioDownloader detact & download it, you can write how does the link starts(e.g. in youtube, \"https://www.youtu\")\n");
+			bw.write("#Every line starting with # will be ignored, but DO NOT CHANGE lines before these comments.\n");
+			bw.write("#If you want to modify those, please do it in YoutubeAudioDownloader GUI,\n");
+			bw.write("#and let my spaghetti handle that hardcoded shit. :)\n");
+			
+			bw.write(Config.getAcceptedLinkStr());
 			
 			Main.logProperties("\n\nFinal");
 			
