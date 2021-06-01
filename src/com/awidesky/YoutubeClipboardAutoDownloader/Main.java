@@ -286,7 +286,7 @@ public class Main {
 			
 			String s;
 			while((s = br.readLine()) != null) {
-				if(s.startsWith("#") || s.equals("https://www.youtu")) continue;
+				if(s.equals("") || s.startsWith("#") || s.equals("https://www.youtu")) continue;
 				Config.addAcceptableList(s);
 			}
 			
@@ -340,11 +340,13 @@ public class Main {
 			bw.write("FileNameFormat=" + Config.getFileNameFormat() + "\n");
 			bw.write("ClipboardListenOption=" + Config.getClipboardListenOption() + "\n");
 			
+			bw.newLine();
 			bw.write("#If you know a type of link that youtube-dl accepts (listed in https://github.com/ytdl-org/youtube-dl/blob/master/docs/supportedsites.md),\n");
 			bw.write("#and wish YoutubeAudioDownloader detact & download it, you can write how does the link starts(e.g. in youtube, \"https://www.youtu\")\n");
 			bw.write("#Every line starting with # will be ignored, but DO NOT CHANGE lines before these comments.\n");
 			bw.write("#If you want to modify those, please do it in YoutubeAudioDownloader GUI,\n");
 			bw.write("#and let my spaghetti handle that hardcoded shit. :)\n");
+			bw.newLine();
 			
 			bw.write(Config.getAcceptedLinkStr());
 			
@@ -458,6 +460,17 @@ public class Main {
 
 			});
 			
+		}
+		
+	}
+
+	public static void openConfig() {
+
+		File f = new File(YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt");
+		try {
+			Desktop.getDesktop().open(f);
+		} catch (IOException e) {
+			GUI.warning("Cannot open default text file editor!", "Please open" + f.getAbsolutePath() + "\n%e%", e);
 		}
 		
 	}

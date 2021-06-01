@@ -42,7 +42,7 @@ public class GUI {
 	
 
 	private JFrame mainFrame;
-	private JButton browse, cleanCompleted, cleanAll, nameFormatHelp;
+	private JButton browse, cleanCompleted, cleanAll, nameFormatHelp, openConfig;
 	private JLabel format, quality, path, nameFormat, playList;
 	private JTextField pathField, nameFormatField;
 	private JComboBox<String> cb_format, cb_quality, cb_playList, cb_clipboardOption;
@@ -198,6 +198,7 @@ public class GUI {
 		cleanCompleted = new JButton("clean completed");
 		cleanAll = new JButton("clean all");
 		nameFormatHelp = new JButton("<= help?");
+		openConfig = new JButton("open config.txt");
 		
 		browse.addActionListener((e) -> {
 
@@ -216,16 +217,19 @@ public class GUI {
 		cleanCompleted.addActionListener((e) -> { TaskStatusModel.getinstance().clearDone(); });
 		cleanAll.addActionListener((e) -> { TaskStatusModel.getinstance().clearAll(); });
 		nameFormatHelp.addActionListener((e) -> { Main.webBrowse("https://github.com/ytdl-org/youtube-dl#output-template"); });
+		openConfig.addActionListener((e) -> {Main.openConfig();});
 		
 		browse.setBounds(523, 75, browse.getPreferredSize().width, browse.getPreferredSize().height);
 		cleanCompleted.setBounds(14, 418, cleanCompleted.getPreferredSize().width, cleanCompleted.getPreferredSize().height);
 		cleanAll.setBounds(160, 418, cleanAll.getPreferredSize().width, cleanAll.getPreferredSize().height);
 		nameFormatHelp.setBounds(298, 121, nameFormatHelp.getPreferredSize().width, nameFormatHelp.getPreferredSize().height);
+		openConfig.setBounds(490, 418, openConfig.getPreferredSize().width, openConfig.getPreferredSize().height);
 		
 		mainFrame.add(browse);
 		mainFrame.add(cleanCompleted);
 		mainFrame.add(cleanAll);
 		mainFrame.add(nameFormatHelp);
+		mainFrame.add(openConfig);
 		
 	}
 	
