@@ -330,6 +330,8 @@ public class Main {
 			bw.write("Playlist=" + Config.getPlaylistOption().toComboBox() + "\n");
 			bw.write("FileNameFormat=" + Config.getFileNameFormat() + "\n");
 			bw.write("ClipboardListenOption=" + Config.getClipboardListenOption() + "\n");
+			bw.newLine();
+			bw.flush();
 			
 			Main.logProperties("\n\nFinal");
 			
