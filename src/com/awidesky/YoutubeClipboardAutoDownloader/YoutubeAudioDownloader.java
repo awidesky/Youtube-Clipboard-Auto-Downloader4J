@@ -209,8 +209,8 @@ public class YoutubeAudioDownloader {
 			if (!sb1.toString().equals("")) {
 
 				GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum()
-					+ "|downloading] There's Error(s) in youtube-dl proccess!", null);
-
+					+ "|downloading] There's Error(s) in youtube-dl proccess!\n" + sb1.toString(), null);
+				
 			}
 
 		} catch (IOException e) {
