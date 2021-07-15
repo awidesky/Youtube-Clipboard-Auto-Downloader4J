@@ -294,13 +294,13 @@ public class Main {
 
 			GUI.warning("config.txt not exists!","%e%\nDon't worry! I'll make one later...", e1);
 
-		} catch (IOException e) {
-
-			GUI.warning("Exception occurred when reading config.txt", "%e%\nI'll initiate config.txt with default...", e);
-
 		} catch (NullPointerException e2) {
 			
 			GUI.warning("config.txt has no or invalid data!", "NullPointerException : %e%\nI'll initiate config.txt with default...", e2);
+
+		} catch (Exception e) {
+
+			GUI.warning("Exception occurred when reading config.txt", "%e%\nI'll initiate config.txt with default...", e);
 
 		} finally {
 			
@@ -349,6 +349,7 @@ public class Main {
 			bw.newLine();
 			
 			bw.write(Config.getAcceptedLinkStr());
+			bw.flush();
 			
 			Main.logProperties("\n\nFinal");
 			
