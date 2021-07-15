@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -21,7 +23,42 @@ public class YoutubeAudioDownloader {
 	private static Pattern percentPtn = Pattern.compile("[0-9]+\\.*[0-9]+%");
 	private static Pattern versionPtn = Pattern.compile("^\\d{4}\\.\\d{2}\\.\\d{2}$");
 
+	private static Map<String, Runnable> fallBackFix = new HashMap<>();
+	
+	static {
+		fallBackFix.put("ERROR: unable to download video data: HTTP Error 403: Forbidden", () -> {
+			runFixCommand("ERROR: unable to download video data: HTTP Error 403: Forbidden", "youtube-dl --rm-cache-dir");
+		});
+	}
 
+	private static void runFixCommand(String error, String command) {
+		
+		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + command);
+
+		Main.log("\nFound known error : \"" + error + "\"");
+		Main.log("\nTrying to fix error automatically by executing \"" + command + "\"");
+
+		// start process
+		try {
+			
+			Process p = pb.directory(null).start();
+			
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+				Main.log(br.readLine());
+			} catch (IOException e1) { throw e1; }
+			
+			Main.log("Executing ended with exit code : " + p.waitFor());
+			
+		} catch (Exception e) {
+			
+			GUI.error("Error!", "Error when fixing youtube-dl problem!\n%e%", e);
+			
+		}
+		
+		Main.log("\n");
+	}
+	
+	
 	public static void setArgsOptions(String options) {
 		YoutubeAudioDownloader.options = options;
 	}
@@ -197,13 +234,15 @@ public class YoutubeAudioDownloader {
 
 			String line = null;
 			StringBuilder sb1 = new StringBuilder("");
+			Runnable fix = null;
 
 			while ((line = br.readLine()) != null) {
 
 				task.setStatus("ERROR");
 				sb1.append(line);
 				Main.log("[Task" + task.getTaskNum() + "|downloading] youtube-dl stderr : " + line);
-
+				fix = fallBackFix.get(line);
+				
 			}
 
 			if (!sb1.toString().equals("")) {
@@ -211,6 +250,7 @@ public class YoutubeAudioDownloader {
 				GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum()
 					+ "|downloading] There's Error(s) in youtube-dl proccess!", null);
 
+				if(fix != null) fix.run();
 			}
 
 		} catch (IOException e) {
