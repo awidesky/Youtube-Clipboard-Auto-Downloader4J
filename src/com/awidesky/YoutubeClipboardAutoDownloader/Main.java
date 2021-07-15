@@ -55,7 +55,7 @@ public class Main {
 		try {
 			setup(args);
 		} catch (Exception e) {
-			GUI.error("Error when initializing application!", e.getClass() + " : %e%", e);
+			GUI.error("Error when initializing application!", (e == null) ? "" : e.getClass() + " : %e%", e);
 			kill(1);
 		}
 
