@@ -207,7 +207,7 @@ public class Main {
 			PlayListOption p = Config.getPlaylistOption();
 			
 			if (p == PlayListOption.ASK && data.contains("list=")) {
-				p = (GUI.confirm("Download entire Playlist?", "Link : " + url)) ? PlayListOption.YES : PlayListOption.NO;
+				p = (GUI.confirm("Download entire Playlist?", "PlayList Link : " + url)) ? PlayListOption.YES : PlayListOption.NO;
 			}
 					
 			if (YoutubeAudioDownloader.validateAndSetName(url, t, p)) {
@@ -412,6 +412,9 @@ public class Main {
 		}
 		
 		logTo.close();
+		
+		gui.disposeAll();
+		
 		System.exit(exitcode);
 		
 	}

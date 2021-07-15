@@ -300,10 +300,22 @@ public class GUI {
 
 	}
 
+	public void disposeAll() {
+		
+		disposeLoadingFrame();
+		if (mainFrame != null) mainFrame.dispose();
+		confirmDialogParent.dispose();
+		
+		mainFrame = null;
+		
+	}
+	
 	private void disposeLoadingFrame() {
 
-		loadingFrame.setVisible(false);
-		loadingFrame.dispose();
+		if (loadingFrame != null) {
+			loadingFrame.setVisible(false);
+			loadingFrame.dispose();
+		}
 		
 		loadingFrame = null;
 		loadingStatus = null;
