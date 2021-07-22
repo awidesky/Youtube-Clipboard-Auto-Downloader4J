@@ -3,7 +3,7 @@
 	<!--ANT 1.7 is required-->
 	<property name="dir.buildfile" value="."/>
 
-	<property name="version" value="v1.5.7"/>
+	<property name="version" value="v1.6.0"/>
 	<property name="target" value="1.8"/>
 	<property name="source" value="1.8"/>
 	<property name="debuglevel" value="source,lines,vars"/>
