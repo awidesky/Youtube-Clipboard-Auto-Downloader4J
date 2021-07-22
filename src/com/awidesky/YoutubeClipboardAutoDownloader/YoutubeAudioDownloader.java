@@ -224,7 +224,14 @@ public class YoutubeAudioDownloader {
 
 			String line = null;
 			while ((line = br.readLine()) != null) {
-
+			  
+				if(line.matches("\\[download\\] Downloading video [\\d]+ of [\\d]+"))) {
+					Scanner sc = new Scanner(line);
+					sc.useDelimiter("[^\\d]+");
+					task.setNowVideoNum(sc.nextInt());
+					task.setTotalNumVideo(sc.nextInt());
+				}
+				
 				if (line.startsWith("[download]")) {
 					if(line.contains(" 0.0%")) task.increaseVideoNum();
 					
