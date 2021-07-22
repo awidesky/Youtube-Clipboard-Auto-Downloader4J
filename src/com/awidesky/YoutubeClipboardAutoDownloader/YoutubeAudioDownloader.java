@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -64,7 +65,10 @@ public class YoutubeAudioDownloader {
 	}
 	
 
-	public static void checkYoutubedl() {
+	/**
+	 * @return Whether the procedure went fine
+	 * */
+	public static boolean checkYoutubedl() {
 
 		Main.log("\n");
 		/* check youtube-dl */
@@ -79,9 +83,9 @@ public class YoutubeAudioDownloader {
 			
 			if (!checkYoutubedlPath(youtubedlpath + "youtube-dl")) {
 
-				GUI.error("Error!", "youtube-dl does not exist in\n\t" + youtubedlpath + "\tor system %path%!", null);
+				GUI.error("Error!", "youtube-dl does not exist in\n\t" + youtubedlpath + "\nor system %path%!", null);
 	 			if (GUI.confirm("Open link in browser?", "Move to download page of youtube-dl?")) Main.webBrowse("http://ytdl-org.github.io/youtube-dl/download.html");
-				Main.kill(1);
+				return false;
 				
 			}
 
@@ -91,9 +95,14 @@ public class YoutubeAudioDownloader {
 		Main.log("[init] youtubedlpath = " + (youtubedlpath.equals("") ? "system %path%" : youtubedlpath));
 		Main.log("\n");
 
+		return true;
+		
 	}
 	
-	public static void checkFfmpeg() {
+	/**
+	 * @return Whether the procedure went fine
+	 * */
+	public static boolean checkFfmpeg() {
 		
 		/* check ffmpeg */
 		//ffmpeg -version
@@ -118,13 +127,14 @@ public class YoutubeAudioDownloader {
 			
 		} catch (Exception e) {
 			
-			GUI.error("Error!", "ffmpeg does not exist in\n\t" + youtubedlpath + "\tor system %path%!", null);
+			GUI.error("Error!", "ffmpeg does not exist in\n\t" + youtubedlpath + "\nor system %path%!", null);
 	 		if (GUI.confirm("Open link in browser?", "Move to download page of ffmpeg?")) Main.webBrowse("https://ffmpeg.org/download.html");
-			Main.kill(1);
+			return false;
 			
 		}
 		
 		Main.log("\n");
+		return true;
 		
 	}
 	
@@ -225,19 +235,18 @@ public class YoutubeAudioDownloader {
 			String line = null;
 			while ((line = br.readLine()) != null) {
 			  
-				if(line.matches("\\[download\\] Downloading video [\\d]+ of [\\d]+"))) {
+				if(line.matches("\\[download\\] Downloading video [\\d]+ of [\\d]+")) {
 					Scanner sc = new Scanner(line);
 					sc.useDelimiter("[^\\d]+");
 					task.setNowVideoNum(sc.nextInt());
 					task.setTotalNumVideo(sc.nextInt());
+					sc.close();
 				}
 				
-				if (line.startsWith("[download]")) {
-					if(line.contains(" 0.0%")) task.increaseVideoNum();
-					
-					Matcher m = percentPtn.matcher(line);
-					if (m.find()) task.setProgress((int)Math.round(Double.parseDouble(m.group().replace("%", ""))));
-				}
+				
+				Matcher m = percentPtn.matcher(line);
+				if (m.find()) task.setProgress((int)Math.round(Double.parseDouble(m.group().replace("%", ""))));
+				
 
 				Main.log("[Task" + task.getTaskNum() + "|downloading] youtube-dl stdout : " + line);
 

@@ -52,17 +52,14 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		try {
-			setup(args);
-		} catch (Exception e) {
-			GUI.error("Error when initializing application!", (e == null) ? "" : e.getClass() + " : %e%", e);
-			kill(1);
-		}
+		if(!setup(args)) kill(1);
 
 	}
 	
-	
-	private static void setup(String[] args) throws Exception {
+	/**
+	 * @return Whether the procedure went fine
+	 * */
+	private static boolean setup(String[] args) {
 		
 		prepareLogFile();
 
@@ -74,13 +71,13 @@ public class Main {
 
 			log("[init] failed wating EDT!");
 			log(e2);
-
+			return false;
 		}
 
 		gui.setLoadingStat(LoadingStatus.CHECKING_YDL);
-		YoutubeAudioDownloader.checkYoutubedl();
+		if (!YoutubeAudioDownloader.checkYoutubedl()) return false;
 		gui.setLoadingStat(LoadingStatus.CHECKING_FFMPEG);
-		YoutubeAudioDownloader.checkFfmpeg();
+		if (!YoutubeAudioDownloader.checkFfmpeg()) return false;
 		
 		gui.setLoadingStat(LoadingStatus.READING_PROPERTIES);
 		readProperties();
@@ -112,7 +109,8 @@ public class Main {
 		});
 		
 		log("\nistening clipboard...\n");
-
+		return true;
+		
 	}
 	
 	private static void checkClipBoard() {
@@ -245,6 +243,10 @@ public class Main {
 		
 	}
 
+	
+	/**
+	 * note - this method should be Exception-proof.
+	 * */
 	private static void readProperties() {
 
 		String p = YoutubeAudioDownloader.getProjectpath(); //Default path for save is project root path
