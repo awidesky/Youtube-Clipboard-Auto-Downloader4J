@@ -183,7 +183,7 @@ public class YoutubeAudioDownloader {
 	}
 
 
-	public static void download(String url, TaskData task, PlayListOption playListOption) throws Exception {
+	public static void download(String url, TaskData task, PlayListOption playListOption)  {
 
 		Main.log("\n"); Main.log("\n");
 		Main.logProperties("[Task" + task.getTaskNum() + "|preparing] Current");
@@ -201,7 +201,20 @@ public class YoutubeAudioDownloader {
 		Main.log("[Task" + task.getTaskNum() + "|downloading] Donwloading video by \"" + pb.command().stream().collect(Collectors.joining(" ")) + "\"");
 
 		// start process
-		Process p = pb.directory(new File(Config.getSaveto())).start();
+		Process p = null;
+		try {
+			
+			p = pb.directory(new File(Config.getSaveto())).start();
+			
+		} catch (IOException e1) {
+			
+			task.setStatus("ERROR");
+			GUI.error("Error when executing youtube-dl", "[Task" + task.getTaskNum() + "|downloading] Couldn't start youtube-dl : %e%" , e1);
+			return;
+			
+		}
+		
+		
 		task.setProcess(p);
 		task.setStatus("Downloading");
 		task.setProgress(0);
@@ -225,8 +238,9 @@ public class YoutubeAudioDownloader {
 
 		} catch (IOException e) {
 
+			task.setStatus("ERROR");
 			GUI.error("[Task" + task.getTaskNum() + "|downloading] Error when redirecting output of youtube-dl", "%e%", e);
-
+			
 		}
 
 
@@ -255,18 +269,28 @@ public class YoutubeAudioDownloader {
 
 		} catch (IOException e) {
 
+			task.setStatus("ERROR");
 			GUI.error("[Task" + task.getTaskNum() + "|downloading] Error when redirecting error output of youtube-dl", "%e%", e);
 
 		}
 
 		int errorCode;
-		if( (errorCode = p.waitFor()) != 0) { 
+		try {
+			
+			if( (errorCode = p.waitFor()) != 0) { 
+				task.setStatus("ERROR");
+				GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum() + "|downloading] youtube-dl has ended with error code : " + errorCode, null);
+				Main.log("[Task" + task.getTaskNum() + "|downloading] elapsed time in downloading(failed) : " + ((System.nanoTime() - startTime) / 1e6) + "ms" );
+				return;
+			} else {
+				task.done();
+			}
+			
+		} catch (InterruptedException e) {
+			
 			task.setStatus("ERROR");
-			GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum() + "|downloading] youtube-dl has ended with error code : " + errorCode, null);
-			Main.log("[Task" + task.getTaskNum() + "|downloading] elapsed time in downloading(failed) : " + ((System.nanoTime() - startTime) / 1e6) + "ms" );
-			return;
-		} else {
-			task.done();
+			GUI.error("Error when waiting youtube-dl process", "[Task" + task.getTaskNum() + "|downloading] Failed to wait youtube-dl process : %e%", e);
+			
 		}
 
 		Main.log("[Task" + task.getTaskNum() + "|downloaded] Finished!\n");

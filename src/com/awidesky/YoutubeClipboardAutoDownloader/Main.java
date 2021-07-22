@@ -213,17 +213,7 @@ public class Main {
 			if (YoutubeAudioDownloader.validateAndSetName(url, t, p)) {
 
 				t.setStatus("Preparing...");
-
-				try {
-
-					YoutubeAudioDownloader.download(url, t, p);
-
-				} catch (Exception e1) {
-
-					GUI.error("[Task" + num + "|downloading] Error when downloading!", "%e%", e1);
-					return;
-
-				}
+				YoutubeAudioDownloader.download(url, t, p);
 
 			} else {
 				GUI.error("[Task" + num + "|validating] Not a valid url!",	data + "\nis not valid or unsupported url!", null);
