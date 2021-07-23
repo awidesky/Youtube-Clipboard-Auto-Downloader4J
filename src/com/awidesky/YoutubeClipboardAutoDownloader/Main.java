@@ -393,7 +393,13 @@ public class Main {
 		
 		if (executorService != null && !executorService.isShutdown()) executorService.shutdownNow();
 
-		Main.writeProperties();
+		try {
+			Main.writeProperties();
+		} catch (Exception e) {
+			log(e);
+		}
+			
+		
 		
 		LoggerThread.isStop = true;
 		
