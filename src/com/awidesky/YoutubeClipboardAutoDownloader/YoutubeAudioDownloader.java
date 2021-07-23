@@ -83,7 +83,7 @@ public class YoutubeAudioDownloader {
 			
 			if (!checkYoutubedlPath(youtubedlpath + "youtube-dl")) {
 
-				GUI.error("Error!", "youtube-dl does not exist in\n" + youtubedlpath + "\nor system %PATH%!", null);
+				GUI.error("Error!", "youtube-dl does not exist in\n" + youtubedlpath + "\nor system %PATH%", null);
 	 			if (GUI.confirm("youtube-dl does not exist!", "Move to download page of youtube-dl?")) Main.webBrowse("http://ytdl-org.github.io/youtube-dl/download.html");
 				return false;
 				
@@ -92,7 +92,7 @@ public class YoutubeAudioDownloader {
 		}
 		
 		Main.log("[init] projectpath = " + projectpath);
-		Main.log("[init] youtubedlpath = " + (youtubedlpath.equals("") ? "system %path%" : youtubedlpath));
+		Main.log("[init] youtubedlpath = " + (youtubedlpath.equals("") ? "system %PATH%" : youtubedlpath));
 		Main.log("\n");
 
 		return true;
@@ -127,7 +127,7 @@ public class YoutubeAudioDownloader {
 			
 		} catch (Exception e) {
 			
-			GUI.error("Error!", "ffmpeg does not exist in\n" + youtubedlpath + "\nor system %PATH%!", null);
+			GUI.error("Error!", "ffmpeg does not exist in\n" + youtubedlpath + "\nor system %PATH%", null);
 	 		if (GUI.confirm("ffmpeg does not exist!", "Move to download page of ffmpeg?")) Main.webBrowse("https://ffmpeg.org/download.html");
 			return false;
 			
