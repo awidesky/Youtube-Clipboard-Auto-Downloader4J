@@ -325,12 +325,12 @@ public class Main {
 			
 			if (!cfg.exists()) cfg.createNewFile();
 
-			bw.write("SavePath=" + Config.getSaveto() + "\n");
-			bw.write("Format=" + Config.getFormat() + "\n");
-			bw.write("Quality=" + Config.getQuality() + "\n");
-			bw.write("Playlist=" + Config.getPlaylistOption().toComboBox() + "\n");
-			bw.write("FileNameFormat=" + Config.getFileNameFormat() + "\n");
-			bw.write("ClipboardListenOption=" + Config.getClipboardListenOption() + "\n");
+			bw.write("SavePath=" + 				Optional.of(Config.getSaveto())						.orElse(YoutubeAudioDownloader.getProjectpath()) + "\n");
+			bw.write("Format=" + 				Optional.of(Config.getFormat())						.orElse("mp3") + "\n");
+			bw.write("Quality=" +				Optional.of(Config.getQuality())					.orElse("0") + "\n");
+			bw.write("Playlist=" + 				Optional.of(Config.getPlaylistOption().toComboBox()).orElse("--no-playlist") + "\n");
+			bw.write("FileNameFormat=" + 		Optional.of(Config.getFileNameFormat())				.orElse("%(title)s.%(ext)s") + "\n");
+			bw.write("ClipboardListenOption=" + Optional.of(Config.getClipboardListenOption())		.orElse("Download link automatically") + "\n");
 			
 			bw.newLine();
 			bw.write("#If you know a type of link that youtube-dl accepts (listed in https://github.com/ytdl-org/youtube-dl/blob/master/docs/supportedsites.md),\n");
