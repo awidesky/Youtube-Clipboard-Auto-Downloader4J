@@ -83,15 +83,9 @@ public class YoutubeAudioDownloader {
 			
 			if (!checkYoutubedlPath(youtubedlpath + "youtube-dl")) {
 
-<<<<<<< HEAD
 				GUI.error("Error!", "youtube-dl does not exist in\n\t" + youtubedlpath + "\nor system %path%!", null);
 	 			if (GUI.confirm("Open link in browser?", "Move to download page of youtube-dl?")) Main.webBrowse("http://ytdl-org.github.io/youtube-dl/download.html");
 				return false;
-=======
-				GUI.error("Error!", "youtube-dl does not exist in\n\t" + youtubedlpath + "\tor system %path%!", null);
-	 			if (GUI.confirm("youtube-dl does not exist!", "Move to download page of youtube-dl?")) Main.webBrowse("http://ytdl-org.github.io/youtube-dl/download.html");
-				Main.kill(1);
->>>>>>> 43f8e26edf60e24d08e06e9286e62e195063b3eb
 				
 			}
 
@@ -133,15 +127,9 @@ public class YoutubeAudioDownloader {
 			
 		} catch (Exception e) {
 			
-<<<<<<< HEAD
 			GUI.error("Error!", "ffmpeg does not exist in\n\t" + youtubedlpath + "\nor system %path%!", null);
 	 		if (GUI.confirm("Open link in browser?", "Move to download page of ffmpeg?")) Main.webBrowse("https://ffmpeg.org/download.html");
 			return false;
-=======
-			GUI.error("Error!", "ffmpeg does not exist in\n\t" + youtubedlpath + "\tor system %path%!", null);
-	 		if (GUI.confirm("ffmpeg does not exist!", "Move to download page of ffmpeg?")) Main.webBrowse("https://ffmpeg.org/download.html");
-			Main.kill(1);
->>>>>>> 43f8e26edf60e24d08e06e9286e62e195063b3eb
 			
 		}
 		
@@ -349,7 +337,7 @@ public class YoutubeAudioDownloader {
 			
 			if (p == PlayListOption.YES) {
 				
-				name += " 및 플레이리스트 전체";
+				name += " 諛� �뵆�젅�씠由ъ뒪�듃 �쟾泥�";
 				task.setVideoName(name);
 				
 				int vdnum = 1;
