@@ -337,7 +337,7 @@ public class YoutubeAudioDownloader {
 			
 			if (p == PlayListOption.YES) {
 				
-				name += " 諛� �뵆�젅�씠由ъ뒪�듃 �쟾泥�";
+				name += " and whole playlist";
 				task.setVideoName(name);
 				
 				int vdnum = 1;
