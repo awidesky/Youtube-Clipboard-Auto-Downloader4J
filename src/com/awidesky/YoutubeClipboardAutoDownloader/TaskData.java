@@ -82,9 +82,10 @@ public class TaskData {
 		return totalNumOfVideo;
 	}
 	
-	public void increaseVideoNum() {
-		videoNum++;
+	public void setNowVideoNum(int now) {
+	  videoNum = now;
 	}
+	
 	
 	public int getVideoNum() {
 		return videoNum;

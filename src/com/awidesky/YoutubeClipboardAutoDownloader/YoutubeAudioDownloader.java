@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -15,19 +18,57 @@ import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 public class YoutubeAudioDownloader {
 
 
-	private static String projectpath = new File(new File(".").getAbsolutePath()).getParent();;
+	private static String projectpath = new File(new File(".").getAbsolutePath()).getParent();
 	private static String youtubedlpath;
 	private static String options = "";
 	private static Pattern percentPtn = Pattern.compile("[0-9]+\\.*[0-9]+%");
 	private static Pattern versionPtn = Pattern.compile("^\\d{4}\\.\\d{2}\\.\\d{2}$");
 
+	private static Map<String, Runnable> fallBackFix = new HashMap<>();
+	
+	static {
+		fallBackFix.put("ERROR: unable to download video data: HTTP Error 403: Forbidden", () -> {
+			runFixCommand("ERROR: unable to download video data: HTTP Error 403: Forbidden", "youtube-dl --rm-cache-dir");
+		});
+	}
 
+	private static void runFixCommand(String error, String command) {
+		
+		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + command);
+
+		Main.log("\nFound known error : \"" + error + "\"");
+		Main.log("\nTrying to fix error automatically by executing \"" + command + "\"");
+
+		// start process
+		try {
+			
+			Process p = pb.directory(null).start();
+			
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+				Main.log(br.readLine());
+			} catch (IOException e1) { throw e1; }
+			
+			Main.log("Executing ended with exit code : " + p.waitFor());
+			
+		} catch (Exception e) {
+			
+			GUI.error("Error!", "Error when fixing youtube-dl problem!\n%e%", e);
+			
+		}
+		
+		Main.log("\n");
+	}
+	
+	
 	public static void setArgsOptions(String options) {
 		YoutubeAudioDownloader.options = options;
 	}
 	
 
-	public static void checkYoutubedl() {
+	/**
+	 * @return Whether the procedure went fine
+	 * */
+	public static boolean checkYoutubedl() {
 
 		Main.log("\n");
 		/* check youtube-dl */
@@ -42,21 +83,26 @@ public class YoutubeAudioDownloader {
 			
 			if (!checkYoutubedlPath(youtubedlpath + "youtube-dl")) {
 
-				GUI.error("Error!", "youtube-dl does not exist in\n\t" + youtubedlpath + "\tor system %path%!", null);
-	 			if (GUI.confirm("Open link in browser?", "Move to download page of youtube-dl?")) Main.webBrowse("http://ytdl-org.github.io/youtube-dl/download.html");
-				Main.kill(1);
+				GUI.error("Error!", "youtube-dl does not exist in\n" + youtubedlpath + "\nor system %PATH%", null);
+	 			if (GUI.confirm("youtube-dl does not exist!", "Move to download page of youtube-dl?")) Main.webBrowse("http://ytdl-org.github.io/youtube-dl/download.html");
+				return false;
 				
 			}
 
 		}
 		
 		Main.log("[init] projectpath = " + projectpath);
-		Main.log("[init] youtubedlpath = " + (youtubedlpath.equals("") ? "system %path%" : youtubedlpath));
+		Main.log("[init] youtubedlpath = " + (youtubedlpath.equals("") ? "system %PATH%" : youtubedlpath));
 		Main.log("\n");
 
+		return true;
+		
 	}
 	
-	public static void checkFfmpeg() {
+	/**
+	 * @return Whether the procedure went fine
+	 * */
+	public static boolean checkFfmpeg() {
 		
 		/* check ffmpeg */
 		//ffmpeg -version
@@ -73,7 +119,7 @@ public class YoutubeAudioDownloader {
 			try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
 				String output;
 				if (!(output = br.readLine()).startsWith("ffmpeg version"))
-					throw new Exception("ffmpeg does not exist in\n" + (youtubedlpath.equals("") ? "system %path%" : youtubedlpath));
+					throw new Exception("ffmpeg does not exist in\n" + (youtubedlpath.equals("") ? "system %PATH%" : youtubedlpath));
 				else Main.log(output);
 			} catch (IOException e1) { throw e1; }
 			
@@ -81,13 +127,14 @@ public class YoutubeAudioDownloader {
 			
 		} catch (Exception e) {
 			
-			GUI.error("Error!", "ffmpeg does not exist in\n\t" + youtubedlpath + "\tor system %path%!", null);
-	 		if (GUI.confirm("Open link in browser?", "Move to download page of ffmpeg?")) Main.webBrowse("https://ffmpeg.org/download.html");
-			Main.kill(1);
+			GUI.error("Error!", "ffmpeg does not exist in\n" + youtubedlpath + "\nor system %PATH%", null);
+	 		if (GUI.confirm("ffmpeg does not exist!", "Move to download page of ffmpeg?")) Main.webBrowse("https://ffmpeg.org/download.html");
+			return false;
 			
 		}
 		
 		Main.log("\n");
+		return true;
 		
 	}
 	
@@ -146,7 +193,7 @@ public class YoutubeAudioDownloader {
 	}
 
 
-	public static void download(String url, TaskData task, PlayListOption playListOption) throws Exception {
+	public static void download(String url, TaskData task, PlayListOption playListOption)  {
 
 		Main.log("\n"); Main.log("\n");
 		Main.logProperties("[Task" + task.getTaskNum() + "|preparing] Current");
@@ -164,7 +211,20 @@ public class YoutubeAudioDownloader {
 		Main.log("[Task" + task.getTaskNum() + "|downloading] Donwloading video by \"" + pb.command().stream().collect(Collectors.joining(" ")) + "\"");
 
 		// start process
-		Process p = pb.directory(new File(Config.getSaveto())).start();
+		Process p = null;
+		try {
+			
+			p = pb.directory(new File(Config.getSaveto())).start();
+			
+		} catch (IOException e1) {
+			
+			task.setStatus("ERROR");
+			GUI.error("Error when executing youtube-dl", "[Task" + task.getTaskNum() + "|downloading] Couldn't start youtube-dl : %e%" , e1);
+			return;
+			
+		}
+		
+		
 		task.setProcess(p);
 		task.setStatus("Downloading");
 		task.setProgress(0);
@@ -174,13 +234,19 @@ public class YoutubeAudioDownloader {
 
 			String line = null;
 			while ((line = br.readLine()) != null) {
-
-				if (line.startsWith("[download]")) {
-					if(line.contains(" 0.0%")) task.increaseVideoNum();
-					
-					Matcher m = percentPtn.matcher(line);
-					if (m.find()) task.setProgress((int)Math.round(Double.parseDouble(m.group().replace("%", ""))));
+			  
+				if(line.matches("\\[download\\] Downloading video [\\d]+ of [\\d]+")) {
+					Scanner sc = new Scanner(line);
+					sc.useDelimiter("[^\\d]+");
+					task.setNowVideoNum(sc.nextInt());
+					task.setTotalNumVideo(sc.nextInt());
+					sc.close();
 				}
+				
+				
+				Matcher m = percentPtn.matcher(line);
+				if (m.find()) task.setProgress((int)Math.round(Double.parseDouble(m.group().replace("%", ""))));
+				
 
 				Main.log("[Task" + task.getTaskNum() + "|downloading] youtube-dl stdout : " + line);
 
@@ -188,8 +254,9 @@ public class YoutubeAudioDownloader {
 
 		} catch (IOException e) {
 
+			task.setStatus("ERROR");
 			GUI.error("[Task" + task.getTaskNum() + "|downloading] Error when redirecting output of youtube-dl", "%e%", e);
-
+			
 		}
 
 
@@ -197,36 +264,49 @@ public class YoutubeAudioDownloader {
 
 			String line = null;
 			StringBuilder sb1 = new StringBuilder("");
+			Runnable fix = null;
 
 			while ((line = br.readLine()) != null) {
 
 				task.setStatus("ERROR");
 				sb1.append(line);
 				Main.log("[Task" + task.getTaskNum() + "|downloading] youtube-dl stderr : " + line);
-
+				fix = fallBackFix.get(line);
+				
 			}
 
 			if (!sb1.toString().equals("")) {
 
 				GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum()
-					+ "|downloading] There's Error(s) in youtube-dl proccess!\n" + sb1.toString(), null);
-				
+					+ "|downloading] There's Error(s) in youtube-dl proccess!", null);
+
+				if(fix != null) fix.run();
 			}
 
 		} catch (IOException e) {
 
+			task.setStatus("ERROR");
 			GUI.error("[Task" + task.getTaskNum() + "|downloading] Error when redirecting error output of youtube-dl", "%e%", e);
 
 		}
 
 		int errorCode;
-		if( (errorCode = p.waitFor()) != 0) { 
+		try {
+			
+			if( (errorCode = p.waitFor()) != 0) { 
+				task.setStatus("ERROR");
+				GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum() + "|downloading] youtube-dl has ended with error code : " + errorCode, null);
+				Main.log("[Task" + task.getTaskNum() + "|downloading] elapsed time in downloading(failed) : " + ((System.nanoTime() - startTime) / 1e6) + "ms" );
+				return;
+			} else {
+				task.done();
+			}
+			
+		} catch (InterruptedException e) {
+			
 			task.setStatus("ERROR");
-			GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum() + "|downloading] youtube-dl has ended with error code : " + errorCode, null);
-			Main.log("[Task" + task.getTaskNum() + "|downloading] elapsed time in downloading(failed) : " + ((System.nanoTime() - startTime) / 1e6) + "ms" );
-			return;
-		} else {
-			task.done();
+			GUI.error("Error when waiting youtube-dl process", "[Task" + task.getTaskNum() + "|downloading] Failed to wait youtube-dl process : %e%", e);
+			
 		}
 
 		Main.log("[Task" + task.getTaskNum() + "|downloaded] Finished!\n");
@@ -257,7 +337,7 @@ public class YoutubeAudioDownloader {
 			
 			if (p == PlayListOption.YES) {
 				
-				name += " 및 플레이리스트 전체";
+				name += " and whole playlist";
 				task.setVideoName(name);
 				
 				int vdnum = 1;

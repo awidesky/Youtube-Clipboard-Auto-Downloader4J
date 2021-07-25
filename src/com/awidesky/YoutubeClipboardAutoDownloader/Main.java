@@ -48,21 +48,18 @@ public class Main {
 	
 	private static volatile int taskNum = 0;
 	
-	public static final String version = "v1.5.7";
+	public static final String version = "v1.6.0";
 
 	public static void main(String[] args) {
 		
-		try {
-			setup(args);
-		} catch (Exception e) {
-			GUI.error("Error when initializing application!", e.getClass() + " : %e%", e);
-			kill(1);
-		}
+		if(!setup(args)) kill(1);
 
 	}
 	
-	
-	private static void setup(String[] args) throws Exception {
+	/**
+	 * @return Whether the procedure went fine
+	 * */
+	private static boolean setup(String[] args) {
 		
 		prepareLogFile();
 
@@ -74,13 +71,13 @@ public class Main {
 
 			log("[init] failed wating EDT!");
 			log(e2);
-
+			return false;
 		}
 
 		gui.setLoadingStat(LoadingStatus.CHECKING_YDL);
-		YoutubeAudioDownloader.checkYoutubedl();
+		if (!YoutubeAudioDownloader.checkYoutubedl()) return false;
 		gui.setLoadingStat(LoadingStatus.CHECKING_FFMPEG);
-		YoutubeAudioDownloader.checkFfmpeg();
+		if (!YoutubeAudioDownloader.checkFfmpeg()) return false;
 		
 		gui.setLoadingStat(LoadingStatus.READING_PROPERTIES);
 		readProperties();
@@ -112,7 +109,8 @@ public class Main {
 		});
 		
 		log("\nistening clipboard...\n");
-
+		return true;
+		
 	}
 	
 	private static void checkClipBoard() {
@@ -137,7 +135,7 @@ public class Main {
 				
 				clipboardBefore = data;
 
-				if (!data.startsWith("https://www.youtu"))
+				if (!Config.isLinkAcceptable(data))
 					return;
 
 				if (Config.getClipboardListenOption().equals("Ask when a link is found")) {
@@ -207,23 +205,13 @@ public class Main {
 			PlayListOption p = Config.getPlaylistOption();
 			
 			if (p == PlayListOption.ASK && data.contains("list=")) {
-				p = (GUI.confirm("Download entire Playlist?", "Link : " + url)) ? PlayListOption.YES : PlayListOption.NO;
+				p = (GUI.confirm("Download entire Playlist?", "PlayList Link : " + url)) ? PlayListOption.YES : PlayListOption.NO;
 			}
 					
 			if (YoutubeAudioDownloader.validateAndSetName(url, t, p)) {
 
 				t.setStatus("Preparing...");
-
-				try {
-
-					YoutubeAudioDownloader.download(url, t, p);
-
-				} catch (Exception e1) {
-
-					GUI.error("[Task" + num + "|downloading] Error when downloading!", "%e%", e1);
-					return;
-
-				}
+				YoutubeAudioDownloader.download(url, t, p);
 
 			} else {
 				GUI.error("[Task" + num + "|validating] Not a valid url!",	data + "\nis not valid or unsupported url!", null);
@@ -255,6 +243,10 @@ public class Main {
 		
 	}
 
+	
+	/**
+	 * note - this method should be Exception-proof.
+	 * */
 	private static void readProperties() {
 
 		String p = YoutubeAudioDownloader.getProjectpath(); //Default path for save is project root path
@@ -263,6 +255,8 @@ public class Main {
 		String l = "--no-playlist";
 		String n = "%(title)s.%(ext)s"; 
 		String c = "Download link automatically"; 
+		
+		Config.addAcceptableList("https://www.youtu");
 		
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
 				YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt")))) {
@@ -281,17 +275,24 @@ public class Main {
 			n = n1.equals("null") ?  n : n1;
 			c = c1.equals("null") ?  c : c1;
 			
+			
+			String s;
+			while((s = br.readLine()) != null) {
+				if(s.equals("") || s.startsWith("#") || s.equals("https://www.youtu")) continue;
+				Config.addAcceptableList(s);
+			}
+			
 		} catch (FileNotFoundException e1) {
 
 			GUI.warning("config.txt not exists!","%e%\nDon't worry! I'll make one later...", e1);
 
-		} catch (IOException e) {
-
-			GUI.warning("Exception occurred when reading config.txt", "%e%\nI'll initiate config.txt with default...", e);
-
 		} catch (NullPointerException e2) {
 			
 			GUI.warning("config.txt has no or invalid data!", "NullPointerException : %e%\nI'll initiate config.txt with default...", e2);
+
+		} catch (Exception e) {
+
+			GUI.warning("Exception occurred when reading config.txt", "%e%\nI'll initiate config.txt with default...", e);
 
 		} finally {
 			
@@ -317,20 +318,29 @@ public class Main {
 
 		/** Write <code>properties</code> */
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
-				YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt")))) {
+				YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt"), false))) {
 
 			File cfg = new File(
 					YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt");
 			
 			if (!cfg.exists()) cfg.createNewFile();
 
-			bw.write("SavePath=" + Config.getSaveto() + "\n");
-			bw.write("Format=" + Config.getFormat() + "\n");
-			bw.write("Quality=" + Config.getQuality() + "\n");
-			bw.write("Playlist=" + Config.getPlaylistOption().toComboBox() + "\n");
-			bw.write("FileNameFormat=" + Config.getFileNameFormat() + "\n");
-			bw.write("ClipboardListenOption=" + Config.getClipboardListenOption() + "\n");
+			bw.write("SavePath=" + 				Optional.of(Config.getSaveto())						.orElse(YoutubeAudioDownloader.getProjectpath()) + "\n");
+			bw.write("Format=" + 				Optional.of(Config.getFormat())						.orElse("mp3") + "\n");
+			bw.write("Quality=" +				Optional.of(Config.getQuality())					.orElse("0") + "\n");
+			bw.write("Playlist=" + 				Optional.of(Config.getPlaylistOption().toComboBox()).orElse("--no-playlist") + "\n");
+			bw.write("FileNameFormat=" + 		Optional.of(Config.getFileNameFormat())				.orElse("%(title)s.%(ext)s") + "\n");
+			bw.write("ClipboardListenOption=" + Optional.of(Config.getClipboardListenOption())		.orElse("Download link automatically") + "\n");
+			
 			bw.newLine();
+			bw.write("#If you know a type of link that youtube-dl accepts (listed in https://github.com/ytdl-org/youtube-dl/blob/master/docs/supportedsites.md),\n");
+			bw.write("#and wish YoutubeAudioDownloader detact & download it, you can write how does the link starts(e.g. in youtube, \"https://www.youtu\")\n");
+			bw.write("#Every line starting with # will be ignored, but DO NOT CHANGE lines before these comments.\n");
+			bw.write("#If you want to modify those, please do it in YoutubeAudioDownloader GUI,\n");
+			bw.write("#and let my spaghetti handle that hardcoded shit. :)\n");
+			bw.newLine();
+			
+			bw.write(Config.getAcceptedLinkStr());
 			bw.flush();
 			
 			Main.logProperties("\n\nFinal");
@@ -383,7 +393,13 @@ public class Main {
 		
 		if (executorService != null && !executorService.isShutdown()) executorService.shutdownNow();
 
-		Main.writeProperties();
+		try {
+			Main.writeProperties();
+		} catch (Exception e) {
+			log(e);
+		}
+			
+		
 		
 		LoggerThread.isStop = true;
 		
@@ -394,6 +410,9 @@ public class Main {
 		}
 		
 		logTo.close();
+		
+		gui.disposeAll();
+		
 		System.exit(exitcode);
 		
 	}
@@ -443,6 +462,17 @@ public class Main {
 
 			});
 			
+		}
+		
+	}
+
+	public static void openConfig() {
+
+		File f = new File(YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt");
+		try {
+			Desktop.getDesktop().open(f);
+		} catch (IOException e) {
+			GUI.warning("Cannot open default text file editor!", "Please open" + f.getAbsolutePath() + "\n%e%", e);
 		}
 		
 	}
