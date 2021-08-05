@@ -1,12 +1,10 @@
 package com.awidesky.YoutubeClipboardAutoDownloader.gui;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
 
 import com.awidesky.YoutubeClipboardAutoDownloader.TaskData;
 
@@ -39,7 +37,6 @@ public class TaskStatusModel extends AbstractTableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		new DefaultTableModel();
 		switch (columnIndex) {
 		case 0: // name
 			return rows.get(rowIndex).getVideoName();
