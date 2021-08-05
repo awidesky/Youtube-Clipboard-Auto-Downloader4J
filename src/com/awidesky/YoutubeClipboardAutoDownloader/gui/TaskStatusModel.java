@@ -18,7 +18,7 @@ public class TaskStatusModel extends AbstractTableModel {
 	private static final long serialVersionUID = -7803447765391487650L;
 
 	private static TaskStatusModel instance = new TaskStatusModel();
-	private List<TaskData> rows = Collections.synchronizedList(new ArrayList<>());
+	private List<TaskData> rows = new ArrayList<>();
 
 	private TaskStatusModel() {
 	}
