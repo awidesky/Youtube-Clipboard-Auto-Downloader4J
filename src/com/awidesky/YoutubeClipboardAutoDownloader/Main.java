@@ -325,19 +325,19 @@ public class Main {
 			
 			if (!cfg.exists()) cfg.createNewFile();
 
-			bw.write("SavePath=" + 				Optional.of(Config.getSaveto())						.orElse(YoutubeAudioDownloader.getProjectpath()) + "\n");
-			bw.write("Format=" + 				Optional.of(Config.getFormat())						.orElse("mp3") + "\n");
-			bw.write("Quality=" +				Optional.of(Config.getQuality())					.orElse("0") + "\n");
-			bw.write("Playlist=" + 				Optional.of(Config.getPlaylistOption().toComboBox()).orElse("--no-playlist") + "\n");
-			bw.write("FileNameFormat=" + 		Optional.of(Config.getFileNameFormat())				.orElse("%(title)s.%(ext)s") + "\n");
-			bw.write("ClipboardListenOption=" + Optional.of(Config.getClipboardListenOption())		.orElse("Download link automatically") + "\n");
+			bw.write("SavePath=" + 				Optional.of(Config.getSaveto())						.orElse(YoutubeAudioDownloader.getProjectpath())); 	bw.newLine();
+			bw.write("Format=" + 				Optional.of(Config.getFormat())						.orElse("mp3"));									bw.newLine();
+			bw.write("Quality=" +				Optional.of(Config.getQuality())					.orElse("0"));										bw.newLine();
+			bw.write("Playlist=" + 				Optional.of(Config.getPlaylistOption().toComboBox()).orElse("--no-playlist"));							bw.newLine();
+			bw.write("FileNameFormat=" + 		Optional.of(Config.getFileNameFormat())				.orElse("%(title)s.%(ext)s"));						bw.newLine();
+			bw.write("ClipboardListenOption=" + Optional.of(Config.getClipboardListenOption())		.orElse("Download link automatically"));			bw.newLine();
 			
 			bw.newLine();
-			bw.write("#If you know a type of link that youtube-dl accepts (listed in https://github.com/ytdl-org/youtube-dl/blob/master/docs/supportedsites.md),\n");
-			bw.write("#and wish YoutubeAudioDownloader detact & download it, you can write how does the link starts(e.g. in youtube, \"https://www.youtu\")\n");
-			bw.write("#Every line starting with # will be ignored, but DO NOT CHANGE lines before these comments.\n");
-			bw.write("#If you want to modify those, please do it in YoutubeAudioDownloader GUI,\n");
-			bw.write("#and let my spaghetti handle that hardcoded shit. :)\n");
+			bw.write("#If you know a type of link that youtube-dl accepts (listed in https://github.com/ytdl-org/youtube-dl/blob/master/docs/supportedsites.md),"); bw.newLine();
+			bw.write("#and wish YoutubeAudioDownloader detact & download it, you can write how does the link starts(e.g. in youtube, \"https://www.youtu\")"); bw.newLine();
+			bw.write("#Every line starting with # will be ignored, but DO NOT CHANGE lines before these comments."); bw.newLine();
+			bw.write("#If you want to modify those, please do it in YoutubeAudioDownloader GUI,"); bw.newLine();
+			bw.write("#and let my spaghetti handle that hardcoded shit. :)"); bw.newLine();
 			bw.newLine();
 			
 			bw.write(Config.getAcceptedLinkStr());
@@ -355,7 +355,7 @@ public class Main {
 	
 	public static void logProperties(String status) {
 		
-		Main.log(status + Config.status());
+		log(status + Config.status());
 		
 	}
 
@@ -364,7 +364,7 @@ public class Main {
 	public static void log(String data) {
 
 		loggerQueue.offer(() -> {
-			logTo.println(data);
+			logTo.println(data.replace("\n", System.lineSeparator()));
 		});
 		
 	}
@@ -394,7 +394,7 @@ public class Main {
 		if (executorService != null && !executorService.isShutdown()) executorService.shutdownNow();
 
 		try {
-			Main.writeProperties();
+			writeProperties();
 		} catch (Exception e) {
 			log(e);
 		}

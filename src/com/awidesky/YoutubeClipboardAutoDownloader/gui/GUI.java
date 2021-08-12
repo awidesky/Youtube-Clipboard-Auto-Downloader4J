@@ -338,12 +338,12 @@ public class GUI {
 	public static void error(String title, String content, Exception e) {
 
 		Main.log("\n");
-		String co = content.replace("%e%", (e == null) ? "null" : e.getMessage());
+		String co = (content.replace("%e%", (e == null) ? "null" : e.getMessage()));
 		SwingUtilities.invokeLater(() -> {
 			
 			final JDialog dialog = new JDialog();
 			dialog.setAlwaysOnTop(true);  
-			JOptionPane.showMessageDialog(dialog, co, title, JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(dialog, co.replace("\n", System.lineSeparator()), title.replace("\n", System.lineSeparator()), JOptionPane.ERROR_MESSAGE);
 			
 		});
 		
@@ -365,7 +365,7 @@ public class GUI {
 
 			final JDialog dialog = new JDialog();
 			dialog.setAlwaysOnTop(true);  
-			JOptionPane.showMessageDialog(dialog, co, title, JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(dialog, co.replace("\n", System.lineSeparator()), title.replace("\n", System.lineSeparator()), JOptionPane.WARNING_MESSAGE);
 			
 		});
 		
@@ -406,7 +406,7 @@ public class GUI {
 	}
 	
 	private static boolean showConfirmDialog(String title, String message, JDialog dialog) {
-		return JOptionPane.showConfirmDialog(dialog, message, title,JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+		return JOptionPane.showConfirmDialog(dialog, message.replace("\n", System.lineSeparator()), title.replace("\n", System.lineSeparator()),JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
 	} 
 
 }

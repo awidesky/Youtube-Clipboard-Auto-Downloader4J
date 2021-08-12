@@ -88,7 +88,7 @@ public class Config {
 	}
 	
 	public static String getAcceptedLinkStr() {
-		return acceptableLinks.stream().collect(Collectors.joining("\n"));
+		return acceptableLinks.stream().collect(Collectors.joining(System.lineSeparator()));
 	}
 	
 	
