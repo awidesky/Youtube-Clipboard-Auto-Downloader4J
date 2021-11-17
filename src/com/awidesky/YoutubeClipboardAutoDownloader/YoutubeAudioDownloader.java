@@ -5,10 +5,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -24,34 +27,39 @@ public class YoutubeAudioDownloader {
 	private static Pattern percentPtn = Pattern.compile("[0-9]+\\.*[0-9]+%");
 	private static Pattern versionPtn = Pattern.compile("^\\d{4}\\.\\d{2}\\.\\d{2}$");
 
-	private static Map<String, Runnable> fallBackFix = new HashMap<>();
+	private static Map<String, Callable<Boolean>> fallBackFix = new HashMap<>();
 	
 
-	private static void runFixCommand(String error, String... command) {
+	private static int runFixCommand(String error, String... command) {
 		
+		int ret;
 		ProcessBuilder pb = new ProcessBuilder(command);
 
 		Main.log("\nFound known error : \"" + error + "\"");
-		Main.log("\nTrying to fix error automatically by executing \"" + command + "\"");
+		Main.log("\nTrying to fix error automatically by executing \"" + Arrays.stream(command).collect(Collectors.joining(" ")) + "\"");
 
 		// start process
 		try {
 			
 			Process p = pb.directory(null).start();
+			ret = p.waitFor();
 			
 			try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
 				Main.log(br.readLine());
 			} catch (IOException e1) { throw e1; }
 			
-			Main.log("Executing ended with exit code : " + p.waitFor());
+			Main.log("Executing ended with exit code : " + ret);
 			
 		} catch (Exception e) {
 			
+			ret = -1;
 			GUI.error("Error!", "Error when fixing youtube-dl problem!\n%e%", e);
 			
 		}
 		
 		Main.log("\n");
+		return ret;
+		
 	}
 	
 	
@@ -91,7 +99,7 @@ public class YoutubeAudioDownloader {
 		Main.log("\n");
 
 		fallBackFix.put("ERROR: unable to download video data: HTTP Error 403: Forbidden", () -> {
-			runFixCommand("ERROR: unable to download video data: HTTP Error 403: Forbidden", youtubedlpath + "youtube-dl", "--rm-cache-dir");
+			 return runFixCommand("ERROR: unable to download video data: HTTP Error 403: Forbidden", youtubedlpath + "youtube-dl", "--rm-cache-dir") == 0;
 		});
 		
 		return true;
@@ -192,7 +200,7 @@ public class YoutubeAudioDownloader {
 	}
 
 
-	public static void download(String url, TaskData task, PlayListOption playListOption)  {
+	public static void download(String url, TaskData task, PlayListOption playListOption, String... additionalArgument)  {
 
 		Main.log("\n"); Main.log("\n");
 		Main.logProperties("[Task" + task.getTaskNum() + "|preparing] Current");
@@ -201,11 +209,18 @@ public class YoutubeAudioDownloader {
 		/* download video */
 		Main.log("\n");
 		long startTime = System.nanoTime();
-		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "youtube-dl" + options, "--newline",
+		
+		ArrayList<String> arguments = new ArrayList<>(Arrays.asList(
+				youtubedlpath + "youtube-dl" + options, "--newline",
 				"--extract-audio", playListOption.toCommandArgm(), "--audio-format",
 				Config.getFormat(), "--output", "\"" + Config.getFileNameFormat() + "\"", "--audio-quality",
-				Config.getQuality(), url);
-
+				Config.getQuality()
+				));
+		arguments.addAll(Arrays.asList(additionalArgument));
+		arguments.add(url);
+				
+		ProcessBuilder pb = new ProcessBuilder(arguments);
+		
 		// retrieve command line argument
 		Main.log("[Task" + task.getTaskNum() + "|downloading] Donwloading video by \"" + pb.command().stream().collect(Collectors.joining(" ")) + "\"");
 
@@ -235,6 +250,7 @@ public class YoutubeAudioDownloader {
 			while ((line = br.readLine()) != null) {
 			  
 				if(line.matches("\\[download\\] Downloading video [\\d]+ of [\\d]+")) {
+					Main.log("\n");
 					Scanner sc = new Scanner(line);
 					sc.useDelimiter("[^\\d]+");
 					task.setNowVideoNum(sc.nextInt());
@@ -263,7 +279,7 @@ public class YoutubeAudioDownloader {
 
 			String line = null;
 			StringBuilder sb1 = new StringBuilder("");
-			Runnable fix = null;
+			Callable<Boolean> fix = null;
 
 			while ((line = br.readLine()) != null) {
 
@@ -276,13 +292,22 @@ public class YoutubeAudioDownloader {
 
 			if (!sb1.toString().equals("")) {
 
-				GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum()
-					+ "|downloading] There's Error(s) in youtube-dl proccess!", null);
+				if(fix != null && fix.call()) {
+					task.setVideoName(task.getVideoName() + " (an error occurred but fixed, continuing download)");
+					if(task.getTotalNumVideo() == 1) { //not a PlayList?
+						download(url, task, playListOption);
+					} else {
+						download(url, task, playListOption, "--playlist-start", String.valueOf(task.getNowVideoNum()));
+					}
+					return;
+					
+				}
 
-				if(fix != null) fix.run();
+					GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum()
+					+ "|downloading] There's Error(s) in youtube-dl proccess!", null);
 			}
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 
 			task.setStatus("ERROR");
 			GUI.error("[Task" + task.getTaskNum() + "|downloading] Error when redirecting error output of youtube-dl", "%e%", e);

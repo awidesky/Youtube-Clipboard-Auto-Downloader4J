@@ -87,7 +87,7 @@ public class TaskData {
 	}
 	
 	
-	public int getVideoNum() {
+	public int getNowVideoNum() {
 		return videoNum;
 	}
 
