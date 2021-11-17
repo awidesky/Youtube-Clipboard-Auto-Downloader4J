@@ -31,7 +31,7 @@ import com.awidesky.YoutubeClipboardAutoDownloader.gui.ClipBoardCheckerThread;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
 
-
+// TODO : build에 log 한번 보기- config가 비었으면 loadingFrame 안없어짐...?
 /** Main class */
 public class Main { 
 
