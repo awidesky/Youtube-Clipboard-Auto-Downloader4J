@@ -6,12 +6,12 @@ import java.util.stream.Collectors;
 
 public class Config { 
 	
-	private static String saveto;
-	private static String format;
-	private static String quality;
+	private static String saveto = null;
+	private static String format = null;
+	private static String quality = null;
 	private static PlayListOption playlistOption;
-	private static String fileNameFormat;
-	private static String clipboardListenOption;
+	private static String fileNameFormat = null;
+	private static String clipboardListenOption = null;
 	private static List<String> acceptableLinks = new ArrayList<>();
 	
 	

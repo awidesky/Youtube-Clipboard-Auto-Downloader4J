@@ -31,7 +31,6 @@ import com.awidesky.YoutubeClipboardAutoDownloader.gui.ClipBoardCheckerThread;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
 
-// TODO : build에 log 한번 보기- config가 비었으면 loadingFrame 안없어짐...?
 /** Main class */
 public class Main { 
 
@@ -261,12 +260,12 @@ public class Main {
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
 				YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt")))) {
 
-			String p1 = Optional.of(br.readLine()).orElse("SavePath=" + p)				.split("=")[1];
-			String f1 = Optional.of(br.readLine()).orElse("Format=" + f)				.split("=")[1];
-			String q1 = Optional.of(br.readLine()).orElse("Quality=" + q)				.split("=")[1];
-			String l1 = Optional.of(br.readLine()).orElse("Playlist=" + l)				.split("=")[1];
-			String n1 = Optional.of(br.readLine()).orElse("FileNameFormat=" + n)		.split("=")[1];
-			String c1 = Optional.of(br.readLine()).orElse("ClipboardListenOption=" + c)	.split("=")[1];
+			String p1 = Optional.ofNullable(br.readLine()).orElse("SavePath=" + p)				.split("=")[1];
+			String f1 = Optional.ofNullable(br.readLine()).orElse("Format=" + f)				.split("=")[1];
+			String q1 = Optional.ofNullable(br.readLine()).orElse("Quality=" + q)				.split("=")[1];
+			String l1 = Optional.ofNullable(br.readLine()).orElse("Playlist=" + l)				.split("=")[1];
+			String n1 = Optional.ofNullable(br.readLine()).orElse("FileNameFormat=" + n)		.split("=")[1];
+			String c1 = Optional.ofNullable(br.readLine()).orElse("ClipboardListenOption=" + c)	.split("=")[1];
 
 			p = p1.equals("null") ?  p : p1;
 			f = f1.equals("null") ?  f : f1;
@@ -325,12 +324,12 @@ public class Main {
 			
 			if (!cfg.exists()) cfg.createNewFile();
 
-			bw.write("SavePath=" + 				Optional.of(Config.getSaveto())						.orElse(YoutubeAudioDownloader.getProjectpath())); 	bw.newLine();
-			bw.write("Format=" + 				Optional.of(Config.getFormat())						.orElse("mp3"));									bw.newLine();
-			bw.write("Quality=" +				Optional.of(Config.getQuality())					.orElse("0"));										bw.newLine();
-			bw.write("Playlist=" + 				Optional.of(Config.getPlaylistOption().toComboBox()).orElse("--no-playlist"));							bw.newLine();
-			bw.write("FileNameFormat=" + 		Optional.of(Config.getFileNameFormat())				.orElse("%(title)s.%(ext)s"));						bw.newLine();
-			bw.write("ClipboardListenOption=" + Optional.of(Config.getClipboardListenOption())		.orElse("Download link automatically"));			bw.newLine();
+			bw.write("SavePath=" + 				Optional.ofNullable(Config.getSaveto())						.orElse(YoutubeAudioDownloader.getProjectpath())); 	bw.newLine();
+			bw.write("Format=" + 				Optional.ofNullable(Config.getFormat())						.orElse("mp3"));									bw.newLine();
+			bw.write("Quality=" +				Optional.ofNullable(Config.getQuality())					.orElse("0"));										bw.newLine();
+			bw.write("Playlist=" + 				Optional.ofNullable(Config.getPlaylistOption().toComboBox()).orElse("--no-playlist"));							bw.newLine();
+			bw.write("FileNameFormat=" + 		Optional.ofNullable(Config.getFileNameFormat())				.orElse("%(title)s.%(ext)s"));						bw.newLine();
+			bw.write("ClipboardListenOption=" + Optional.ofNullable(Config.getClipboardListenOption())		.orElse("Download link automatically"));			bw.newLine();
 			
 			bw.newLine();
 			bw.write("#If you know a type of link that youtube-dl accepts (listed in https://github.com/ytdl-org/youtube-dl/blob/master/docs/supportedsites.md),"); bw.newLine();

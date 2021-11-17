@@ -26,15 +26,10 @@ public class YoutubeAudioDownloader {
 
 	private static Map<String, Runnable> fallBackFix = new HashMap<>();
 	
-	static {
-		fallBackFix.put("ERROR: unable to download video data: HTTP Error 403: Forbidden", () -> {
-			runFixCommand("ERROR: unable to download video data: HTTP Error 403: Forbidden", "youtube-dl --rm-cache-dir");
-		});
-	}
 
-	private static void runFixCommand(String error, String command) {
+	private static void runFixCommand(String error, String... command) {
 		
-		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + command);
+		ProcessBuilder pb = new ProcessBuilder(command);
 
 		Main.log("\nFound known error : \"" + error + "\"");
 		Main.log("\nTrying to fix error automatically by executing \"" + command + "\"");
@@ -95,6 +90,10 @@ public class YoutubeAudioDownloader {
 		Main.log("[init] youtubedlpath = " + (youtubedlpath.equals("") ? "system %PATH%" : youtubedlpath));
 		Main.log("\n");
 
+		fallBackFix.put("ERROR: unable to download video data: HTTP Error 403: Forbidden", () -> {
+			runFixCommand("ERROR: unable to download video data: HTTP Error 403: Forbidden", youtubedlpath + "youtube-dl", "--rm-cache-dir");
+		});
+		
 		return true;
 		
 	}
