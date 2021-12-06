@@ -214,6 +214,7 @@ public class Main {
 
 			} else {
 				GUI.error("[Task" + num + "|validating] Not a valid url!",	data + "\nis not valid or unsupported url!", null);
+				t.setStatus("ERROR");
 				return;
 			}
 

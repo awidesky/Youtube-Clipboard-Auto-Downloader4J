@@ -23,6 +23,7 @@ public class YoutubeAudioDownloader {
 
 	private static String projectpath = new File(new File(".").getAbsolutePath()).getParent();
 	private static String youtubedlpath;
+	//private static final String youtubedlExecName = "yt-dlp";
 	private static String options = "";
 	private static Pattern percentPtn = Pattern.compile("[0-9]+\\.*[0-9]+%");
 	private static Pattern versionPtn = Pattern.compile("^\\d{4}\\.\\d{2}\\.\\d{2}$");
@@ -78,7 +79,6 @@ public class YoutubeAudioDownloader {
 		if (checkYoutubedlPath("youtube-dl")) {
 			
 			youtubedlpath = "";
-			
 			
 		} else {
 			
@@ -153,7 +153,6 @@ public class YoutubeAudioDownloader {
 
 		Main.log("Checking youtube-dl path by \"" + ydlfile + " --version\"");
 
-
 		// start process
 		try {
 			
@@ -200,6 +199,58 @@ public class YoutubeAudioDownloader {
 	}
 
 
+
+	/** get video name */
+	public static boolean validateAndSetName(String url, TaskData task, PlayListOption playListOption) {
+		
+		try {
+			Main.log("\n");
+			long startTime = System.nanoTime();
+			ProcessBuilder pbGetName = new ProcessBuilder(youtubedlpath + "youtube-dl", "--get-filename" + ((playListOption.toCommandArgm() == null) ? "" : " " + playListOption.toCommandArgm()),
+						"-o", "\"" + Config.getFileNameFormat().replace("%(ext)s", Config.getFormat()) + "\"", url);
+			
+			// retrieve command line argument
+			Main.log("[Task" + task.getTaskNum() + "|validating] Getting video name by \"" + pbGetName.command().stream().collect(Collectors.joining(" "))	+ "\"");
+
+			// start process
+			Process p1 = pbGetName.directory(null).start();
+			task.setProcess(p1);
+			BufferedReader br1 = new BufferedReader(new InputStreamReader(p1.getInputStream()));
+			String name = br1.readLine();
+			
+			if ((name.contains("WARNING")) || (name.contains("ERROR")) || (p1.waitFor() != 0)) return false;
+			
+			if (playListOption == PlayListOption.YES) {
+				
+				name += " and whole playlist";
+				task.setVideoName(name);
+				
+				int vdnum = 1;
+				while(br1.readLine() != null) vdnum++;
+				task.setTotalNumVideo(vdnum);
+				
+			} else { task.setVideoName(name); }
+			
+			Main.log("[Task" + task.getTaskNum() + "|validating] Video name : " + name);
+			Main.log("[Task" + task.getTaskNum() + "|validating] Ended with exit code : " + p1.waitFor());
+			
+			try {
+				if (br1 != null) br1.close();
+			} catch (IOException i) {
+				GUI.error("[Task" + task.getTaskNum() + "|validating] Error when closing process stream", "%e%", i);
+			}
+			
+			Main.log("[Task" + task.getTaskNum() + "|validating] elapsed time in validating link and downloading video name : "
+					+ ((System.nanoTime() - startTime) / 1e6) + "ms");
+			
+			return true;
+		} catch (Exception e) {
+			GUI.error("Error in getting video name", "[Task" + task.getTaskNum() + "|validating] %e%", e);
+		}
+		return false;
+	}
+	
+	
 	public static void download(String url, TaskData task, PlayListOption playListOption, String... additionalArgument)  {
 
 		Main.log("\n"); Main.log("\n");
@@ -211,8 +262,7 @@ public class YoutubeAudioDownloader {
 		long startTime = System.nanoTime();
 		
 		ArrayList<String> arguments = new ArrayList<>(Arrays.asList(
-				youtubedlpath + "youtube-dl" + options, "--newline",
-				"--extract-audio", playListOption.toCommandArgm(), "--audio-format",
+				youtubedlpath + "youtube-dl" + options, "--newline", "--force-overwrites", "--extract-audio" + ((playListOption.toCommandArgm() == null) ? "" : " " + playListOption.toCommandArgm()), "--audio-format",
 				Config.getFormat(), "--output", "\"" + Config.getFileNameFormat() + "\"", "--audio-quality",
 				Config.getQuality()
 				));
@@ -258,6 +308,9 @@ public class YoutubeAudioDownloader {
 					sc.close();
 				}
 				
+				if(line.startsWith("[ExtractAudio]")) {
+					task.setStatus("Extracting Audio");
+				}
 				
 				Matcher m = percentPtn.matcher(line);
 				if (m.find()) task.setProgress((int)Math.round(Double.parseDouble(m.group().replace("%", ""))));
@@ -300,11 +353,10 @@ public class YoutubeAudioDownloader {
 						download(url, task, playListOption, "--playlist-start", String.valueOf(task.getNowVideoNum()));
 					}
 					return;
-					
 				}
 
-					GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum()
-					+ "|downloading] There's Error(s) in youtube-dl proccess!", null);
+				GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum()
+					+ "|downloading] There's Error(s) in youtube-dl proccess!\n" + sb1.toString(), null);
 			}
 
 		} catch (Exception e) {
@@ -339,55 +391,5 @@ public class YoutubeAudioDownloader {
 		
 	}
 
-	/** get video name */
-	public static boolean validateAndSetName(String url, TaskData task, PlayListOption p) {
-		
-		try {
-			Main.log("\n");
-			long startTime = System.nanoTime();
-			ProcessBuilder pbGetName = new ProcessBuilder(youtubedlpath + "youtube-dl", "--get-filename",
-					p.toCommandArgm(), "-o", Config.getFileNameFormat().replace("%(ext)s", Config.getFormat()), url);
-
-			// retrieve command line argument
-			Main.log("[Task" + task.getTaskNum() + "|validating] Getting video name by \"" + pbGetName.command().stream().collect(Collectors.joining(" "))	+ "\"");
-
-			// start process
-			Process p1 = pbGetName.directory(null).start();
-			task.setProcess(p1);
-			BufferedReader br1 = new BufferedReader(new InputStreamReader(p1.getInputStream()));
-			String name = br1.readLine();
-			
-			if ((name.contains("WARNING")) || (name.contains("ERROR")) || (p1.waitFor() != 0)) return false;
-			
-			if (p == PlayListOption.YES) {
-				
-				name += " and whole playlist";
-				task.setVideoName(name);
-				
-				int vdnum = 1;
-				while(br1.readLine() != null) vdnum++;
-				task.setTotalNumVideo(vdnum);
-				
-			} else { task.setVideoName(name); }
-			
-			Main.log("[Task" + task.getTaskNum() + "|validating] Video name : " + name);
-			Main.log("[Task" + task.getTaskNum() + "|validating] Ended with exit code : " + p1.waitFor());
-			
-			try {
-				if (br1 != null) br1.close();
-			} catch (IOException i) {
-				GUI.error("[Task" + task.getTaskNum() + "|validating] Error when closing process stream", "%e%", i);
-			}
-			
-			Main.log("[Task" + task.getTaskNum() + "|validating] elapsed time in validating link and downloading video name : "
-					+ ((System.nanoTime() - startTime) / 1e6) + "ms");
-			
-			return true;
-		} catch (Exception e) {
-			GUI.error("Error in getting video name", "[Task" + task.getTaskNum() + "|validating] %e%", e);
-		}
-		return false;
-	}
-	
 
 }
