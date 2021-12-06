@@ -272,7 +272,7 @@ public class YoutubeAudioDownloader {
 		ProcessBuilder pb = new ProcessBuilder(arguments);
 		
 		// retrieve command line argument
-		Main.log("[Task" + task.getTaskNum() + "|downloading] Donwloading video by \"" + pb.command().stream().collect(Collectors.joining(" ")) + "\"");
+		Main.log("[Task" + task.getTaskNum() + "|downloading] Downloading video by \"" + pb.command().stream().collect(Collectors.joining(" ")) + "\"");
 
 		// start process
 		Process p = null;
