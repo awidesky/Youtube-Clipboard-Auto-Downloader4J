@@ -81,19 +81,6 @@ public class Main {
 		gui.setLoadingStat(LoadingStatus.READING_PROPERTIES);
 		readProperties();
 
-		if (args != null && args.length != 0) { // For test
-			
-			StringBuilder sb = new StringBuilder("");
-
-			for (String s : args) {
-				sb.append(' ' + s);
-			}
-			
-			log("Extra arguments : " + sb.toString());
-			YoutubeAudioDownloader.setArgsOptions(sb.toString());
-			
-		}
-
 		
 		gui.setLoadingStat(LoadingStatus.PREPARING_THREADS);
 		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());

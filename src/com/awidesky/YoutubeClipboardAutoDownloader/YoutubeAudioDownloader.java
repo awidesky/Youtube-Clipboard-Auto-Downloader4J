@@ -5,10 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.Callable;
@@ -24,7 +24,6 @@ public class YoutubeAudioDownloader {
 	private static String projectpath = new File(new File(".").getAbsolutePath()).getParent();
 	private static String youtubedlpath;
 	//private static final String youtubedlExecName = "yt-dlp";
-	private static String options = "";
 	private static Pattern percentPtn = Pattern.compile("[0-9]+\\.*[0-9]+%");
 	private static Pattern versionPtn = Pattern.compile("^\\d{4}\\.\\d{2}\\.\\d{2}$");
 
@@ -63,10 +62,6 @@ public class YoutubeAudioDownloader {
 		
 	}
 	
-	
-	public static void setArgsOptions(String options) {
-		YoutubeAudioDownloader.options = options;
-	}
 	
 
 	/**
@@ -206,8 +201,12 @@ public class YoutubeAudioDownloader {
 		try {
 			Main.log("\n");
 			long startTime = System.nanoTime();
-			ProcessBuilder pbGetName = new ProcessBuilder(youtubedlpath + "youtube-dl", "--get-filename" + ((playListOption.toCommandArgm() == null) ? "" : " " + playListOption.toCommandArgm()),
-						"-o", "\"" + Config.getFileNameFormat().replace("%(ext)s", Config.getFormat()) + "\"", url);
+			
+			LinkedList<String> args = new LinkedList<>(Arrays.asList(new String[] {youtubedlpath + "youtube-dl", "--get-filename", "-o",
+					"\"" + Config.getFileNameFormat().replace("%(ext)s", Config.getFormat()) + "\"", url
+					}));
+			if(playListOption.toCommandArgm() != null) args.add(2, playListOption.toCommandArgm());
+			ProcessBuilder pbGetName = new ProcessBuilder(args);
 			
 			// retrieve command line argument
 			Main.log("[Task" + task.getTaskNum() + "|validating] Getting video name by \"" + pbGetName.command().stream().collect(Collectors.joining(" "))	+ "\"");
@@ -251,7 +250,7 @@ public class YoutubeAudioDownloader {
 	}
 	
 	
-	public static void download(String url, TaskData task, PlayListOption playListOption, String... additionalArgument)  {
+	public static void download(String url, TaskData task, PlayListOption playListOption, String... additianalOptions)  {
 
 		Main.log("\n"); Main.log("\n");
 		Main.logProperties("[Task" + task.getTaskNum() + "|preparing] Current");
@@ -261,13 +260,13 @@ public class YoutubeAudioDownloader {
 		Main.log("\n");
 		long startTime = System.nanoTime();
 		
-		ArrayList<String> arguments = new ArrayList<>(Arrays.asList(
-				youtubedlpath + "youtube-dl" + options, "--newline", "--force-overwrites", "--extract-audio" + ((playListOption.toCommandArgm() == null) ? "" : " " + playListOption.toCommandArgm()), "--audio-format",
+		LinkedList<String> arguments = new LinkedList<>(Arrays.asList(
+				youtubedlpath + "youtube-dl", "--newline", "--force-overwrites", "--extract-audio", "--audio-format",
 				Config.getFormat(), "--output", "\"" + Config.getFileNameFormat() + "\"", "--audio-quality",
-				Config.getQuality()
+				Config.getQuality(), url
 				));
-		arguments.addAll(Arrays.asList(additionalArgument));
-		arguments.add(url);
+		if(playListOption.toCommandArgm() != null) arguments.add(4, playListOption.toCommandArgm());
+		if(additianalOptions.length != 0) arguments.addAll(1, Arrays.asList(additianalOptions));
 				
 		ProcessBuilder pb = new ProcessBuilder(arguments);
 		
