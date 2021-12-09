@@ -144,7 +144,7 @@ public class Main {
 
 			} catch (InterruptedException | HeadlessException | UnsupportedFlavorException | IOException e1) {
 
-				GUI.error("Error when checking clipboard!", "%e%", e1);
+				GUI.error("Error when checking clipboard!", "%e%", e1, true);
 
 			}
 
@@ -200,8 +200,8 @@ public class Main {
 				YoutubeAudioDownloader.download(url, t, p);
 
 			} else {
-				GUI.error("[Task" + num + "|validating] Not a valid url!",	data + "\nis not valid or unsupported url!", null);
 				t.setStatus("ERROR");
+				GUI.error("[Task" + num + "|validating] Not a valid url!",	data + "\nis not valid or unsupported url!", null, true);
 				return;
 			}
 
@@ -222,7 +222,7 @@ public class Main {
 		} catch (IOException e) {
 
 			logTo = new PrintWriter(System.out, true);
-			GUI.error("Error when creating log flie", "%e%", e);
+			GUI.error("Error when creating log flie", "%e%", e, false);
 			
 		} finally {
 			logger.start();
@@ -271,15 +271,15 @@ public class Main {
 			
 		} catch (FileNotFoundException e1) {
 
-			GUI.warning("config.txt not exists!","%e%\nDon't worry! I'll make one later...", e1);
+			GUI.warning("config.txt not exists!","%e%\nDon't worry! I'll make one later...", e1, false);
 
 		} catch (NullPointerException e2) {
 			
-			GUI.warning("config.txt has no or invalid data!", "NullPointerException : %e%\nI'll initiate config.txt with default...", e2);
+			GUI.warning("config.txt has no or invalid data!", "NullPointerException : %e%\nI'll initiate config.txt with default...", e2, false);
 
 		} catch (Exception e) {
 
-			GUI.warning("Exception occurred when reading config.txt", "%e%\nI'll initiate config.txt with default...", e);
+			GUI.warning("Exception occurred when reading config.txt", "%e%\nI'll initiate config.txt with default...", e, false);
 
 		} finally {
 			
@@ -334,7 +334,7 @@ public class Main {
 			
 		} catch (IOException e) {
 
-			GUI.error("Error when writing config.txt file", "%e%", e);
+			GUI.error("Error when writing config.txt file", "%e%", null,  true);
 
 		} 
 
@@ -419,9 +419,9 @@ public class Main {
 			}
 
 		} catch (IOException e) {
-			GUI.warning("Cannot open default web browser!", "Please visit" + link + "\n%e%", e);
+			GUI.warning("Cannot open default web browser!", "Please visit" + link + "\n%e%", e, false);
 		} catch (URISyntaxException e) {
-			GUI.error("Invalid url!", link + "\n%e%", e);
+			GUI.error("Invalid url!", link + "\n%e%", e, false);
 		}
 
 	}
@@ -459,7 +459,7 @@ public class Main {
 		try {
 			Desktop.getDesktop().open(f);
 		} catch (IOException e) {
-			GUI.warning("Cannot open default text file editor!", "Please open" + f.getAbsolutePath() + "\n%e%", e);
+			GUI.warning("Cannot open default text file editor!", "Please open" + f.getAbsolutePath() + "\n%e%", e, true);
 		}
 		
 	}

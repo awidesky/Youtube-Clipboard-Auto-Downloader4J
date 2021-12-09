@@ -47,7 +47,7 @@ public class TaskStatusModel extends AbstractTableModel {
 		case 3: // status
 			return rows.get(rowIndex).getStatus();
 		}
-		GUI.error("Invalid column index!", "Invalid column index : " + columnIndex, null);
+		GUI.error("Invalid column index!", "Invalid column index : " + columnIndex, null, false);
 		return null; // this should not happen!
 	}
 
@@ -64,7 +64,7 @@ public class TaskStatusModel extends AbstractTableModel {
 		case 3: // status
 			return "Status";
 		}
-		GUI.error("Invalid column index!", "Invalid column index : " + column, null);
+		GUI.error("Invalid column index!", "Invalid column index : " + column, null, false);
 		return "null"; // this should not happen!
 	}
 
