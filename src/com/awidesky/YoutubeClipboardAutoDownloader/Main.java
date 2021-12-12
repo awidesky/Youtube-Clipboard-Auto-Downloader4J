@@ -40,6 +40,8 @@ public class Main {
 	private static ClipBoardCheckerThread clipChecker;
 	private static PrintWriter logTo;
 	
+	public static volatile boolean audioMode = true;
+	
 	private static GUI gui = new GUI();
 	private static LoggerThread logger = new LoggerThread();
 	

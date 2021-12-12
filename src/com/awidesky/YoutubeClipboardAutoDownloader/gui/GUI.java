@@ -10,6 +10,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -42,10 +43,12 @@ public class GUI {
 	
 
 	private JFrame mainFrame;
-	private JButton browse, cleanCompleted, cleanAll, nameFormatHelp, openConfig;
+	private JButton browse, cleanCompleted, cleanAll, nameFormatHelp, openConfig, modeSwitch;
 	private JLabel format, quality, path, nameFormat, playList;
 	private JTextField pathField, nameFormatField;
 	private JComboBox<String> cb_format, cb_quality, cb_playList, cb_clipboardOption;
+	private DefaultComboBoxModel<String> audioFormatCBoxModel = new DefaultComboBoxModel<>(new String[] { "mp3", "best", "aac", "flac", "m4a", "opus", "vorbis", "wav" });
+	private DefaultComboBoxModel<String> videoFormatCBoxModel = new DefaultComboBoxModel<>(new String[] { "3gp", "flv", "mp4", "webm"});
 	private JFileChooser jfc = new JFileChooser();
 	private JTable table;
 	private JScrollPane scrollPane;
@@ -163,7 +166,7 @@ public class GUI {
 		playList = new JLabel("Download Playlist? : ");
 		
 		format.setBounds(26, 23, format.getPreferredSize().width, format.getPreferredSize().height);
-		quality.setBounds(273, 23, quality.getPreferredSize().width, quality.getPreferredSize().height);
+		quality.setBounds(186, 23, quality.getPreferredSize().width, quality.getPreferredSize().height);
 		path.setBounds(12, 80, path.getPreferredSize().width, path.getPreferredSize().height);
 		nameFormat.setBounds(10, 126, nameFormat.getPreferredSize().width, nameFormat.getPreferredSize().height);
 		playList.setBounds(395, 126, playList.getPreferredSize().width, playList.getPreferredSize().height);
@@ -199,6 +202,7 @@ public class GUI {
 		cleanAll = new JButton("clean all");
 		nameFormatHelp = new JButton("<= help?");
 		openConfig = new JButton("open config.txt");
+		modeSwitch = new JButton("<-> download audio");
 		
 		browse.addActionListener((e) -> {
 
@@ -218,29 +222,48 @@ public class GUI {
 		cleanAll.addActionListener((e) -> { TaskStatusModel.getinstance().clearAll(); });
 		nameFormatHelp.addActionListener((e) -> { Main.webBrowse("https://github.com/ytdl-org/youtube-dl#output-template"); });
 		openConfig.addActionListener((e) -> {Main.openConfig();});
+		modeSwitch.addActionListener((e) -> {
+			
+			if(Main.audioMode) {
+				cb_quality.setModel(videoFormatCBoxModel);
+				quality.setText("Video Quality :");
+				modeSwitch.setText("<-> download video");
+			} else {
+				cb_quality.setModel(audioFormatCBoxModel);
+				quality.setText("Audio Quality :");
+				modeSwitch.setText("<-> download audio");
+			}
+
+			cb_quality.setSelectedIndex(0);
+			Main.audioMode = !Main.audioMode;
+			
+		});
 		
 		browse.setBounds(523, 75, browse.getPreferredSize().width, browse.getPreferredSize().height);
 		cleanCompleted.setBounds(14, 418, cleanCompleted.getPreferredSize().width, cleanCompleted.getPreferredSize().height);
 		cleanAll.setBounds(160, 418, cleanAll.getPreferredSize().width, cleanAll.getPreferredSize().height);
 		nameFormatHelp.setBounds(298, 121, nameFormatHelp.getPreferredSize().width, nameFormatHelp.getPreferredSize().height);
 		openConfig.setBounds(490, 418, openConfig.getPreferredSize().width, openConfig.getPreferredSize().height);
+		modeSwitch.setBounds(440, 19, modeSwitch.getPreferredSize().width, modeSwitch.getPreferredSize().height);
 		
 		mainFrame.add(browse);
 		mainFrame.add(cleanCompleted);
 		mainFrame.add(cleanAll);
 		mainFrame.add(nameFormatHelp);
 		mainFrame.add(openConfig);
+		mainFrame.add(modeSwitch);
 		
 	}
 	
 	private void addComboBoxes() {
 		
-		cb_format = new JComboBox<>(new String[] { "mp3", "best", "aac", "flac", "m4a", "opus", "vorbis", "wav" });
+		cb_format = new JComboBox<>(audioFormatCBoxModel);
 		cb_quality = new JComboBox<>(new String[] { "0(best)", "1", "2", "3", "4", "5", "6", "7", "8", "9(worst)" });
 		cb_playList = new JComboBox<>(new String[] { "yes", "no", "ask" });
 		cb_clipboardOption = new JComboBox<>(new String[] { "Download link automatically",
 															"Ask when a link is found",
 															"Stop listening clipboard" });
+		cb_format.setEditable(true);
 		
 		cb_format.setSelectedItem(Config.getFormat());
 		cb_quality.setSelectedIndex(Integer.parseInt(Config.getQuality()));
@@ -252,8 +275,8 @@ public class GUI {
 		cb_playList.addActionListener((e) -> { Config.setPlaylistOption(cb_playList.getSelectedItem().toString()); });
 		cb_clipboardOption.addActionListener((e) -> {Config.setClipboardListenOption(cb_clipboardOption.getSelectedItem().toString());});
 		
-		cb_format.setBounds(83, 19, 96, 22);
-		cb_quality.setBounds(365, 19, 150, 22);
+		cb_format.setBounds(83, 19, 80, 22);
+		cb_quality.setBounds(275, 19, 100, 22);
 		cb_playList.setBounds(518, 122, 90, 22);
 		cb_clipboardOption.setBounds(270, 418, 200, 22);
 

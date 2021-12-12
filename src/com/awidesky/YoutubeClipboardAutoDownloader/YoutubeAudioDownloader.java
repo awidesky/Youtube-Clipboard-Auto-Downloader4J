@@ -23,7 +23,6 @@ public class YoutubeAudioDownloader {
 
 	private static String projectpath = new File(new File(".").getAbsolutePath()).getParent();
 	private static String youtubedlpath;
-	//private static final String youtubedlExecName = "yt-dlp";
 	private static Pattern percentPtn = Pattern.compile("[0-9]+\\.*[0-9]+%");
 	private static Pattern versionPtn = Pattern.compile("^\\d{4}\\.\\d{2}\\.\\d{2}$");
 
