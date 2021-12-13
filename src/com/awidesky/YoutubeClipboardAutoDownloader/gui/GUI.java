@@ -2,6 +2,7 @@ package com.awidesky.YoutubeClipboardAutoDownloader.gui;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -38,12 +39,12 @@ import com.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
 public class GUI {
 	
 	private Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-	private static final JDialog confirmDialogParent = new JDialog();
 	
 	private JFrame loadingFrame;
 	private JLabel loadingStatus;
 	private JProgressBar initProgress;
 	
+	private static final Image icon = new ImageIcon(YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\icon.jpg").getImage();
 
 	private JFrame mainFrame;
 	private JButton browse, cleanCompleted, cleanAll, nameFormatHelp, openConfig, modeSwitch;
@@ -84,9 +85,7 @@ public class GUI {
 		/** make <code>loadingFrame</code> */
 		loadingFrame = new JFrame();
 		loadingFrame.setTitle("loading...");
-		loadingFrame.setIconImage(new ImageIcon(
-				YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\icon.jpg")
-						.getImage());
+		loadingFrame.setIconImage(icon);
 		loadingFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		loadingFrame.setSize(450, 100); //add more height than fxml because it does not think about title length
 		loadingFrame.setLocation(dim.width/2-loadingFrame.getSize().width/2, dim.height/2-loadingFrame.getSize().height/2);
@@ -98,7 +97,6 @@ public class GUI {
 			public void windowClosing(WindowEvent e) {
 				
 				e.getWindow().dispose();
-				confirmDialogParent.dispose();
 				Main.log("LoadingFrame was closed");
 				Main.kill(0);
 
@@ -123,9 +121,7 @@ public class GUI {
 		/** make <code>mainFrame</code> */
 		mainFrame = new JFrame();
 		mainFrame.setTitle("Youtube Audio Auto Downloader " + Main.version);
-		mainFrame.setIconImage(new ImageIcon(
-				YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\icon.jpg")
-						.getImage());
+		mainFrame.setIconImage(icon);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.setSize(630, 495);
 		mainFrame.setLocation(dim.width/2-mainFrame.getSize().width/2, dim.height/2-mainFrame.getSize().height/2);
@@ -209,12 +205,12 @@ public class GUI {
 		cleanAll = new JButton("clean all");
 		nameFormatHelp = new JButton("<= help?");
 		openConfig = new JButton("open config.txt");
-		modeSwitch = new JButton("<-> download audio");
+		modeSwitch = new JButton(" <-> download video ");
 		
 		browse.addActionListener((e) -> {
 
 			if (jfc.showDialog(new JFrame(), null) != JFileChooser.APPROVE_OPTION) {
-				JOptionPane.showMessageDialog(null, "Please choose a directory!", "ERROR!",
+				JOptionPane.showMessageDialog(this.mainFrame, "Please choose a directory!", "ERROR!",
 						JOptionPane.WARNING_MESSAGE);
 				return;
 			}
@@ -253,12 +249,12 @@ public class GUI {
 			cb_format.setModel(videoFormatCBoxModel);
 			cb_quality.setModel(videoQualityCBoxModel);
 			quality.setText("Video Quality :");
-			modeSwitch.setText("<-> download video");
+			modeSwitch.setText("<-> download audio");
 		} else {
 			cb_format.setModel(audioFormatCBoxModel);
 			cb_quality.setModel(audioQualityCBoxModel);
 			quality.setText("Audio Quality :");
-			modeSwitch.setText("<-> download audio");
+			modeSwitch.setText(" <-> download video ");
 		}
 
 		cb_quality.setSelectedIndex(0);
@@ -372,7 +368,6 @@ public class GUI {
 		
 		disposeLoadingFrame();
 		if (mainFrame != null) mainFrame.dispose();
-		confirmDialogParent.dispose();
 		
 		mainFrame = null;
 		
@@ -428,8 +423,9 @@ public class GUI {
 	 * */
 	private static void showErrorDialog(String title, String content) {
 
-		final JDialog dialog = new JDialog();
+		JDialog dialog = new JDialog();
 		dialog.setAlwaysOnTop(true);
+		dialog.setIconImage(icon);
 		
 		if (EventQueue.isDispatchThread()) {
 
@@ -483,6 +479,7 @@ public class GUI {
 		
 		final JDialog dialog = new JDialog();
 		dialog.setAlwaysOnTop(true);
+		dialog.setIconImage(icon);
 		
 		if (EventQueue.isDispatchThread()) {
 
@@ -534,6 +531,7 @@ public class GUI {
 		
 		final JDialog dialog = new JDialog();
 		dialog.setAlwaysOnTop(true);
+		dialog.setIconImage(icon);
 		
 		if (EventQueue.isDispatchThread()) {
 

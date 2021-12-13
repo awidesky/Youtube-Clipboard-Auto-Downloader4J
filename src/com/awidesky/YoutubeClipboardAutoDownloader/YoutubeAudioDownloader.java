@@ -373,7 +373,7 @@ public class YoutubeAudioDownloader {
 				}
 
 				GUI.error("Error in youtube-dl",
-						"[Task" + task.getTaskNum() + "|downloading] There's Error(s) in youtube-dl proccess!", null, true);
+						"[Task" + task.getTaskNum() + "|downloading] There's Error(s) in youtube-dl proccess!\n" + sb1.toString(), null, true);
 			}
 
 		} catch (Exception e) {
@@ -412,7 +412,11 @@ public class YoutubeAudioDownloader {
 
 	private static String getVideoFormat(TaskData task, String url) {
 
-		if("best".equals(Config.getQuality())) return "\"bv*[ext=" + Config.getFormat() + "]+ba\"";
+		Main.log("\n");
+		if("best".equals(Config.getQuality())) {
+			Main.log("[Task" + task.getTaskNum() + "|preparing] Take best quality video with format : " + Config.getFormat());
+			return "\"bv*[ext=" + Config.getFormat() + "]+ba\"";
+		}
 		
 		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "youtube-dl", "--newline", "-F", url);
 
@@ -436,18 +440,18 @@ public class YoutubeAudioDownloader {
 				Main.log("[Task" + task.getTaskNum() + "|preparing] youtube-dl stdout : " + line);
 				
 				if(line.contains("audio only")) {
-					String s = line.split("\\s")[3].strip(); //get bit rate(TBR)
+					String s = line.split("\\s+")[4].strip(); //get bit rate(TBR)
 					int i = Integer.parseInt(s.substring(0, s.length() - 1));
 					if(audioMax < i) {
 						//choose Highest bit rate
 						Main.log("[Task" + task.getTaskNum() + "|preparing] Found highest bitrate audio!");
 						audioMax = i;
-						audio = Integer.parseInt(line.split("\\s")[0].strip());
+						audio = Integer.parseInt(line.split("\\s+")[0].strip());
 					}
 				} else if(line.contains("video only")) {
 					if(line.contains(Config.getFormat()) && line.contains(Config.getQuality())) {
 						Main.log("[Task" + task.getTaskNum() + "|preparing] Found the video format we want!");
-						video = Integer.parseInt(line.split("\\s")[0].strip());
+						video = Integer.parseInt(line.split("\\s+")[0].strip());
 					}
 				}
 			}
@@ -484,7 +488,7 @@ public class YoutubeAudioDownloader {
 					+ "|preparing] Error when Executing youtube-dl to grab video format info", "%e%", e1, true);
 		}
 
-		GUI.information("Cannot grab video format info", "I'll download this video in best quality using flag \"bv,ba\"",
+		GUI.information("Cannot grab video format info!", "I'll download this video in best quality using flag \"bv,ba\"",
 				true);
 		return "\"bv,ba\"";
 
