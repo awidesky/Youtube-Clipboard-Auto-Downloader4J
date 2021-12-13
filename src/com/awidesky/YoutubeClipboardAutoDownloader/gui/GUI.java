@@ -26,6 +26,9 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.JTextComponent;
 
 import com.awidesky.YoutubeClipboardAutoDownloader.Config;
 import com.awidesky.YoutubeClipboardAutoDownloader.LoadingStatus;
@@ -48,7 +51,9 @@ public class GUI {
 	private JTextField pathField, nameFormatField;
 	private JComboBox<String> cb_format, cb_quality, cb_playList, cb_clipboardOption;
 	private DefaultComboBoxModel<String> audioFormatCBoxModel = new DefaultComboBoxModel<>(new String[] { "mp3", "best", "aac", "flac", "m4a", "opus", "vorbis", "wav" });
-	private DefaultComboBoxModel<String> videoFormatCBoxModel = new DefaultComboBoxModel<>(new String[] { "3gp", "flv", "mp4", "webm"});
+	private DefaultComboBoxModel<String> videoFormatCBoxModel = new DefaultComboBoxModel<>(new String[] { "mp4", "webm", "3gp", "flv" });
+	private DefaultComboBoxModel<String> audioQualityCBoxModel = new DefaultComboBoxModel<>(new String[] { "0(best)", "1", "2", "3", "4", "5", "6", "7", "8", "9(worst)" });
+	private DefaultComboBoxModel<String> videoQualityCBoxModel = new DefaultComboBoxModel<>(new String[] { "best", "240p", "360p", "360p", "480p", "720p", "1080p", "1440p", "2160p" });
 	private JFileChooser jfc = new JFileChooser();
 	private JTable table;
 	private JScrollPane scrollPane;
@@ -130,7 +135,7 @@ public class GUI {
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				
+
 				e.getWindow().dispose();
 				Main.kill(0);
 
@@ -145,7 +150,9 @@ public class GUI {
 		addComboBoxes();
 		addTable();
 		disposeLoadingFrame();
+		
 		mainFrame.setVisible(true);
+		browse.requestFocus();
 		
 	}
 	
@@ -166,7 +173,7 @@ public class GUI {
 		playList = new JLabel("Download Playlist? : ");
 		
 		format.setBounds(26, 23, format.getPreferredSize().width, format.getPreferredSize().height);
-		quality.setBounds(186, 23, quality.getPreferredSize().width, quality.getPreferredSize().height);
+		quality.setBounds(200, 23, quality.getPreferredSize().width, quality.getPreferredSize().height);
 		path.setBounds(12, 80, path.getPreferredSize().width, path.getPreferredSize().height);
 		nameFormat.setBounds(10, 126, nameFormat.getPreferredSize().width, nameFormat.getPreferredSize().height);
 		playList.setBounds(395, 126, playList.getPreferredSize().width, playList.getPreferredSize().height);
@@ -221,23 +228,8 @@ public class GUI {
 		cleanCompleted.addActionListener((e) -> { TaskStatusModel.getinstance().clearDone(); });
 		cleanAll.addActionListener((e) -> { TaskStatusModel.getinstance().clearAll(); });
 		nameFormatHelp.addActionListener((e) -> { Main.webBrowse("https://github.com/ytdl-org/youtube-dl#output-template"); });
-		openConfig.addActionListener((e) -> {Main.openConfig();});
-		modeSwitch.addActionListener((e) -> {
-			
-			if(Main.audioMode) {
-				cb_quality.setModel(videoFormatCBoxModel);
-				quality.setText("Video Quality :");
-				modeSwitch.setText("<-> download video");
-			} else {
-				cb_quality.setModel(audioFormatCBoxModel);
-				quality.setText("Audio Quality :");
-				modeSwitch.setText("<-> download audio");
-			}
-
-			cb_quality.setSelectedIndex(0);
-			Main.audioMode = !Main.audioMode;
-			
-		});
+		openConfig.addActionListener((e) -> { Main.openConfig(); });
+		modeSwitch.addActionListener((e) -> { swapMode(); });
 		
 		browse.setBounds(523, 75, browse.getPreferredSize().width, browse.getPreferredSize().height);
 		cleanCompleted.setBounds(14, 418, cleanCompleted.getPreferredSize().width, cleanCompleted.getPreferredSize().height);
@@ -255,28 +247,81 @@ public class GUI {
 		
 	}
 	
+	private void swapMode() {
+		
+		if(Main.audioMode) {
+			cb_format.setModel(videoFormatCBoxModel);
+			cb_quality.setModel(videoQualityCBoxModel);
+			quality.setText("Video Quality :");
+			modeSwitch.setText("<-> download video");
+		} else {
+			cb_format.setModel(audioFormatCBoxModel);
+			cb_quality.setModel(audioQualityCBoxModel);
+			quality.setText("Audio Quality :");
+			modeSwitch.setText("<-> download audio");
+		}
+
+		cb_quality.setSelectedIndex(0);
+		Main.audioMode = !Main.audioMode;
+		
+	}
+
+
 	private void addComboBoxes() {
 		
 		cb_format = new JComboBox<>(audioFormatCBoxModel);
-		cb_quality = new JComboBox<>(new String[] { "0(best)", "1", "2", "3", "4", "5", "6", "7", "8", "9(worst)" });
+		cb_quality = new JComboBox<>(audioQualityCBoxModel);
 		cb_playList = new JComboBox<>(new String[] { "yes", "no", "ask" });
 		cb_clipboardOption = new JComboBox<>(new String[] { "Download link automatically",
 															"Ask when a link is found",
 															"Stop listening clipboard" });
 		cb_format.setEditable(true);
 		
+		if(videoQualityCBoxModel.getIndexOf(Config.getQuality()) == -1) { //It was audio mode
+			cb_quality.setSelectedIndex(Integer.parseInt(Config.getQuality()));
+		} else {
+			swapMode();
+			cb_quality.setSelectedItem(Config.getQuality());
+		}
 		cb_format.setSelectedItem(Config.getFormat());
-		cb_quality.setSelectedIndex(Integer.parseInt(Config.getQuality()));
 		cb_playList.setSelectedItem(Config.getPlaylistOption().toComboBox());
 		cb_clipboardOption.setSelectedItem(Config.getClipboardListenOption());
 
-		cb_format.addActionListener((e) -> { Config.setFormat(cb_format.getSelectedItem().toString()); });
-		cb_quality.addActionListener((e) -> { Config.setQuality(String.valueOf(cb_quality.getSelectedIndex())); });
+		cb_format.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+		
+		((JTextComponent) cb_format.getEditor().getEditorComponent()).getDocument()
+		.addDocumentListener(new DocumentListener() {
+
+			@Override
+			public void removeUpdate(DocumentEvent e) { 
+				Config.setFormat(cb_format.getEditor().getItem().toString());
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				Config.setFormat(cb_format.getEditor().getItem().toString());
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				Config.setFormat(cb_format.getEditor().getItem().toString());
+			}
+
+		});
+ 
+		cb_format.addActionListener((e) -> { 
+	        if(cb_format.getSelectedIndex() >= 0) {
+	        	Config.setFormat(cb_format.getEditor().getItem().toString());
+			} else if("comboBoxEdited".equals(e.getActionCommand())) {
+				Config.setFormat(cb_format.getEditor().getItem().toString());
+	        }
+		});
+		cb_quality.addActionListener((e) -> { Config.setQuality(cb_quality.getSelectedItem().toString()); });
 		cb_playList.addActionListener((e) -> { Config.setPlaylistOption(cb_playList.getSelectedItem().toString()); });
 		cb_clipboardOption.addActionListener((e) -> {Config.setClipboardListenOption(cb_clipboardOption.getSelectedItem().toString());});
 		
 		cb_format.setBounds(83, 19, 80, 22);
-		cb_quality.setBounds(275, 19, 100, 22);
+		cb_quality.setBounds(290, 19, 100, 22);
 		cb_playList.setBounds(518, 122, 90, 22);
 		cb_clipboardOption.setBounds(270, 418, 200, 22);
 

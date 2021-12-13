@@ -47,6 +47,9 @@ public class Config {
 	
 	public static synchronized void setQuality(String quality) {
 		
+		if(quality.matches("0\\(best\\)|9\\(worst\\)")) {
+			quality = quality.substring(0, 1);
+		}
 		Config.quality = quality;
 		
 	}
