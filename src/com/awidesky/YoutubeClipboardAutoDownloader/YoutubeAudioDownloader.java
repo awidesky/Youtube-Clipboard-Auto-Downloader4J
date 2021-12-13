@@ -213,8 +213,8 @@ public class YoutubeAudioDownloader {
 			// start process
 			Process p1 = pbGetName.directory(null).start();
 			task.setProcess(p1);
-			BufferedReader br1 = new BufferedReader(new InputStreamReader(p1.getInputStream()));
-			String name = br1.readLine();
+			BufferedReader br = new BufferedReader(new InputStreamReader(p1.getInputStream()));
+			String name = br.readLine();
 			
 			if ((name.contains("WARNING")) || (name.contains("ERROR")) || (p1.waitFor() != 0)) return false;
 			
@@ -224,15 +224,22 @@ public class YoutubeAudioDownloader {
 				task.setVideoName(name);
 				
 				int vdnum = 1;
-				while(br1.readLine() != null) vdnum++;
+				while(br.readLine() != null) vdnum++;
 				task.setTotalNumVideo(vdnum);
 				
 			} else { task.setVideoName(name); }
+			
+			BufferedReader br1 = new BufferedReader(new InputStreamReader(p1.getErrorStream()));
+			String line;
+			while ((line = br1.readLine()) != null) {
+				Main.log("[Task" + task.getTaskNum() + "|validating] youtube-dl stderr : " + line);
+			}
 			
 			Main.log("[Task" + task.getTaskNum() + "|validating] Video name : " + name);
 			Main.log("[Task" + task.getTaskNum() + "|validating] Ended with exit code : " + p1.waitFor());
 			
 			try {
+				if (br != null) br.close();
 				if (br1 != null) br1.close();
 			} catch (IOException i) {
 				GUI.error("[Task" + task.getTaskNum() + "|validating] Error when closing process stream", "%e%", i, true);
@@ -260,13 +267,26 @@ public class YoutubeAudioDownloader {
 		long startTime = System.nanoTime();
 		
 		LinkedList<String> arguments = new LinkedList<>(Arrays.asList(
-				youtubedlpath + "youtube-dl", "--newline", "--force-overwrites", "--extract-audio", "--audio-format",
-				Config.getFormat(), "--output", "\"" + Config.getFileNameFormat() + "\"", "--audio-quality",
-				Config.getQuality(), url
-				));
+				youtubedlpath + "youtube-dl", "--newline", "--force-overwrites", "--output", "\"" + Config.getFileNameFormat() + "\""));
+		
+		if(Main.audioMode) {
+			arguments.add("--extract-audio");
+			arguments.add("--audio-format");
+			arguments.add(Config.getFormat());
+			arguments.add("--audio-quality");
+			arguments.add(Config.getQuality());
+		} else {
+			arguments.add("-f");
+			arguments.add(getVideoFormat(task, url));
+		}
+
+		arguments.add(url);
+		
 		if(playListOption.toCommandArgm() != null) arguments.add(4, playListOption.toCommandArgm());
 		if(additianalOptions.length != 0) arguments.addAll(1, Arrays.asList(additianalOptions));
-				
+		
+
+		
 		ProcessBuilder pb = new ProcessBuilder(arguments);
 		
 		// retrieve command line argument
@@ -285,7 +305,6 @@ public class YoutubeAudioDownloader {
 			return;
 			
 		}
-		
 		
 		task.setProcess(p);
 		task.setStatus("Downloading");
@@ -389,5 +408,86 @@ public class YoutubeAudioDownloader {
 		
 	}
 
+
+
+	private static String getVideoFormat(TaskData task, String url) {
+
+		if("best".equals(Config.getQuality())) return "\"bv*[ext=" + Config.getFormat() + "]+ba\"";
+		
+		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "youtube-dl", "--newline", "-F", url);
+
+		Main.log("[Task" + task.getTaskNum() + "|preparing] Getting video format info by \""
+				+ pb.command().stream().collect(Collectors.joining(" ")) + "\"");
+		Main.log("[Task" + task.getTaskNum() + "|preparing] Finding " + Config.getFormat() + "/" + Config.getQuality() + "...");
+		
+		int audio = -1, video = -1;
+
+		try {
+			
+			Process p = pb.directory(null).start();
+			task.setProcess(p);
+
+			BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+			String line = null;
+			int audioMax = -1;
+			
+			while ((line = br.readLine()) != null) {
+				Main.log("[Task" + task.getTaskNum() + "|preparing] youtube-dl stdout : " + line);
+				
+				if(line.contains("audio only")) {
+					String s = line.split("\\s")[3].strip(); //get bit rate(TBR)
+					int i = Integer.parseInt(s.substring(0, s.length() - 1));
+					if(audioMax < i) {
+						//choose Highest bit rate
+						Main.log("[Task" + task.getTaskNum() + "|preparing] Found highest bitrate audio!");
+						audioMax = i;
+						audio = Integer.parseInt(line.split("\\s")[0].strip());
+					}
+				} else if(line.contains("video only")) {
+					if(line.contains(Config.getFormat()) && line.contains(Config.getQuality())) {
+						Main.log("[Task" + task.getTaskNum() + "|preparing] Found the video format we want!");
+						video = Integer.parseInt(line.split("\\s")[0].strip());
+					}
+				}
+			}
+
+			
+			BufferedReader br1 = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+			while ((line = br1.readLine()) != null) {
+
+				Main.log("[Task" + task.getTaskNum() + "|preparing] youtube-dl stderr : " + line);
+
+			}
+
+			Main.log("[Task" + task.getTaskNum() + "|preparing] youtube-dl has ended with error code : " + p.waitFor());
+
+			if(audio == -1 || video == -1) {
+				GUI.warning("[Task" + task.getTaskNum()
+					+ "|preparing] Cannot find video format you want!", "I'll download this video in best quality using flag \"bv,ba\"", null, true);
+				return "\"bv,ba\"";
+			}
+			
+			try {
+				if (br != null) br.close();
+				if (br1 != null) br1.close();
+			} catch (IOException i) {
+				GUI.error("[Task" + task.getTaskNum() + "|preparing] Error when closing process stream", "%e%", i, true);
+			}
+			
+			
+			return "\"" + video + "+" + audio + "\"";
+			
+		} catch (Exception e1) {
+			GUI.warning("[Task" + task.getTaskNum()
+					+ "|preparing] Error when Executing youtube-dl to grab video format info", "%e%", e1, true);
+		}
+
+		GUI.information("Cannot grab video format info", "I'll download this video in best quality using flag \"bv,ba\"",
+				true);
+		return "\"bv,ba\"";
+
+	}
 
 }
