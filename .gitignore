@@ -12,7 +12,7 @@ YoutubeAudioAutoDownloader-resources/*
 logs/
 build/
 jre*/
-!config.txt
+config.txt
 
 # Test audio files
 *.mp3
