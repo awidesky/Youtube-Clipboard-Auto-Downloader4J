@@ -198,7 +198,7 @@ public class YoutubeAudioDownloader {
 	public static boolean validateAndSetName(String url, TaskData task, PlayListOption playListOption) {
 		
 		try {
-			Main.log("\n");
+			Main.log("\n\n");
 			long startTime = System.nanoTime();
 			
 			LinkedList<String> args = new LinkedList<>(Arrays.asList(new String[] {youtubedlpath + "youtube-dl", "--get-filename", "-o",
@@ -258,7 +258,7 @@ public class YoutubeAudioDownloader {
 	
 	public static void download(String url, TaskData task, PlayListOption playListOption, String... additianalOptions)  {
 
-		Main.log("\n"); Main.log("\n");
+		Main.log("\n\n");
 		Main.logProperties("[Task" + task.getTaskNum() + "|preparing] Current");
 
 
@@ -278,11 +278,12 @@ public class YoutubeAudioDownloader {
 		} else {
 			arguments.add("-f");
 			arguments.add(getVideoFormat(task, url));
+			Main.log("\n\n");
 		}
 
 		arguments.add(url);
 		
-		if(playListOption.toCommandArgm() != null) arguments.add(4, playListOption.toCommandArgm());
+		if(playListOption.toCommandArgm() != null) arguments.add(3, playListOption.toCommandArgm());
 		if(additianalOptions.length != 0) arguments.addAll(1, Arrays.asList(additianalOptions));
 		
 
@@ -412,13 +413,13 @@ public class YoutubeAudioDownloader {
 
 	private static String getVideoFormat(TaskData task, String url) {
 
-		Main.log("\n");
+		Main.log("\n\n");
 		if("best".equals(Config.getQuality())) {
 			Main.log("[Task" + task.getTaskNum() + "|preparing] Take best quality video with format : " + Config.getFormat());
 			return "\"bv*[ext=" + Config.getFormat() + "]+ba\"";
 		}
 		
-		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "youtube-dl", "--newline", "-F", url);
+		ProcessBuilder pb = new ProcessBuilder(youtubedlpath + "youtube-dl", "--newline", "-F", "--format-sort", "abr", "--no-playlist", url);
 
 		Main.log("[Task" + task.getTaskNum() + "|preparing] Getting video format info by \""
 				+ pb.command().stream().collect(Collectors.joining(" ")) + "\"");
@@ -438,22 +439,24 @@ public class YoutubeAudioDownloader {
 			
 			while ((line = br.readLine()) != null) {
 				Main.log("[Task" + task.getTaskNum() + "|preparing] youtube-dl stdout : " + line);
+				Scanner sc = new Scanner(line.split("\\s+")[0]);
 				
 				if(line.contains("audio only")) {
-					String s = line.split("\\s+")[4].strip(); //get bit rate(TBR)
+					String s = line.split("\\s+")[4]; //get bit rate(TBR)
 					int i = Integer.parseInt(s.substring(0, s.length() - 1));
 					if(audioMax < i) {
 						//choose Highest bit rate
 						Main.log("[Task" + task.getTaskNum() + "|preparing] Found highest bitrate audio!");
 						audioMax = i;
-						audio = Integer.parseInt(line.split("\\s+")[0].strip());
+						audio = sc.nextInt();
 					}
 				} else if(line.contains("video only")) {
 					if(line.contains(Config.getFormat()) && line.contains(Config.getQuality())) {
 						Main.log("[Task" + task.getTaskNum() + "|preparing] Found the video format we want!");
-						video = Integer.parseInt(line.split("\\s+")[0].strip());
+						video = sc.nextInt();
 					}
 				}
+				sc.close();
 			}
 
 			
@@ -469,10 +472,10 @@ public class YoutubeAudioDownloader {
 
 			if(audio == -1 || video == -1) {
 				GUI.warning("[Task" + task.getTaskNum()
-					+ "|preparing] Cannot find video format you want!", "I'll download this video in best quality using flag \"bv,ba\"", null, true);
+					+ "|preparing] Cannot find video format :" + Config.getFormat() + "/" + Config.getQuality(), "I'll download this video in best quality using flag \"bv,ba\"", null, true);
 				return "\"bv,ba\"";
 			}
-			
+
 			try {
 				if (br != null) br.close();
 				if (br1 != null) br1.close();
@@ -480,7 +483,7 @@ public class YoutubeAudioDownloader {
 				GUI.error("[Task" + task.getTaskNum() + "|preparing] Error when closing process stream", "%e%", i, true);
 			}
 			
-			
+			Main.log("[Task" + task.getTaskNum() + "|preparing] Found requested format : " + "\"" + video + "+" + audio + "\"");
 			return "\"" + video + "+" + audio + "\"";
 			
 		} catch (Exception e1) {
@@ -488,8 +491,8 @@ public class YoutubeAudioDownloader {
 					+ "|preparing] Error when Executing youtube-dl to grab video format info", "%e%", e1, true);
 		}
 
-		GUI.information("Cannot grab video format info!", "I'll download this video in best quality using flag \"bv,ba\"",
-				true);
+		GUI.warning("[Task" + task.getTaskNum()
+			+ "|preparing] Cannot find video format :" + Config.getFormat() + "/" + Config.getQuality(), "I'll download this video in best quality using flag \"bv,ba\"", null, true);
 		return "\"bv,ba\"";
 
 	}
