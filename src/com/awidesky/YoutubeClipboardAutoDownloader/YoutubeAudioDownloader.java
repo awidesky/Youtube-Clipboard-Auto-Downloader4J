@@ -267,7 +267,7 @@ public class YoutubeAudioDownloader {
 		long startTime = System.nanoTime();
 		
 		LinkedList<String> arguments = new LinkedList<>(Arrays.asList(
-				youtubedlpath + "youtube-dl", "--newline", "--force-overwrites", "--output", "\"" + Config.getFileNameFormat() + "\""));
+				youtubedlpath + "youtube-dl", "--newline", "--force-overwrites", playListOption.toCommandArgm(), "--output", "\"" + Config.getFileNameFormat() + "\""));
 		
 		if(Main.audioMode) {
 			arguments.add("--extract-audio");
@@ -280,13 +280,11 @@ public class YoutubeAudioDownloader {
 			arguments.add(getVideoFormat(task, url));
 			Main.log("\n\n");
 		}
-
 		arguments.add(url);
 		
-		if(playListOption.toCommandArgm() != null) arguments.add(3, playListOption.toCommandArgm());
 		if(additianalOptions.length != 0) arguments.addAll(1, Arrays.asList(additianalOptions));
-		
 
+		
 		
 		ProcessBuilder pb = new ProcessBuilder(arguments);
 		
@@ -492,7 +490,7 @@ public class YoutubeAudioDownloader {
 		}
 
 		GUI.warning("[Task" + task.getTaskNum()
-			+ "|preparing] Cannot find video format :" + Config.getFormat() + "/" + Config.getQuality(), "I'll download this video in best quality using flag \"bv,ba\"", null, true);
+			 + "|preparing] Cannot find video format :" + Config.getFormat() + "/" + Config.getQuality(), "I'll download this video in best quality using flag \"bv,ba\"", null, true);
 		return "\"bv,ba\"";
 
 	}
