@@ -46,7 +46,7 @@ public class TaskData {
 		return progress;
 	}
 	
-	public void setProgress(int progress) { 
+	public void setProgress(int progress) {
 		this.progress = progress;
 		SwingUtilities.invokeLater(() -> TaskStatusModel.getinstance().updated(this));
 	}

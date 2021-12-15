@@ -130,8 +130,9 @@ public class GUI {
 		mainFrame.addWindowListener(new WindowAdapter() {
 
 			@Override
-			public void windowClosing(WindowEvent e) {
+			public void windowClosing(WindowEvent e) { //TODO : call clearAll() 
 
+				
 				e.getWindow().dispose();
 				Main.kill(0);
 
