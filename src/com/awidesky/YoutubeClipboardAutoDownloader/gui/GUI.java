@@ -7,9 +7,11 @@ import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.Window;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -24,6 +26,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -130,9 +133,8 @@ public class GUI {
 		mainFrame.addWindowListener(new WindowAdapter() {
 
 			@Override
-			public void windowClosing(WindowEvent e) { //TODO : call clearAll() 
+			public void windowClosing(WindowEvent e) {
 
-				
 				e.getWindow().dispose();
 				Main.kill(0);
 
@@ -367,6 +369,11 @@ public class GUI {
 
 	public void disposeAll() {
 		
+		Main.log("\nExisting Windows are :");
+		Stream.of(JWindow.getWindows()).map(Window::toString).forEach(Main::log);
+		Main.log("\n");
+		
+		Stream.of(JWindow.getWindows()).forEach(Window::dispose);
 		disposeLoadingFrame();
 		if (mainFrame != null) mainFrame.dispose();
 		
@@ -427,7 +434,7 @@ public class GUI {
 		JDialog dialog = new JDialog();
 		dialog.setAlwaysOnTop(true);
 		dialog.setIconImage(icon);
-		
+		dialog.dispose();
 		if (EventQueue.isDispatchThread()) {
 
 			JOptionPane.showMessageDialog(dialog, content.replace("\n", System.lineSeparator()), title.replace("\n", System.lineSeparator()), JOptionPane.ERROR_MESSAGE);

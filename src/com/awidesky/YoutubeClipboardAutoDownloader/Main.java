@@ -380,27 +380,29 @@ public class Main {
 		
 		log("YoutubeAudioAutoDownloader exit code : " + exitcode);
 		
+		try {
+			SwingUtilities.invokeAndWait(() -> {
+				TaskStatusModel.getinstance().clearAll();
+				gui.disposeAll();
+			});
+		} catch (InvocationTargetException | InterruptedException e1) {
+			GUI.error("Error when shutting GUI down!", "%e%", e1, false);;
+		}
+		
 		if (executorService != null && !executorService.isShutdown()) executorService.shutdownNow();
 
-		try {
-			writeProperties();
-		} catch (Exception e) {
-			log(e);
-		}
+		writeProperties();
 			
-		
-		
 		LoggerThread.isStop = true;
 		
 		try {
 			logger.join(5000);
 		} catch (InterruptedException e) {
+			logTo.println("Failed to join logger thread!");
 			e.printStackTrace(logTo);
 		}
 		
 		logTo.close();
-		
-		gui.disposeAll();
 		
 		System.exit(exitcode);
 		
