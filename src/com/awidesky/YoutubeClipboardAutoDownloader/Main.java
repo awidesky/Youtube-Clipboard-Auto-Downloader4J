@@ -381,10 +381,16 @@ public class Main {
 		log("YoutubeAudioAutoDownloader exit code : " + exitcode);
 		
 		try {
-			SwingUtilities.invokeAndWait(() -> {
+			Runnable r = () -> {
 				TaskStatusModel.getinstance().clearAll();
 				gui.disposeAll();
-			});
+			};
+			
+			if(SwingUtilities.isEventDispatchThread()) {
+				r.run();
+			} else {
+				SwingUtilities.invokeAndWait(r);
+			}
 		} catch (InvocationTargetException | InterruptedException e1) {
 			GUI.error("Error when shutting GUI down!", "%e%", e1, false);;
 		}
