@@ -50,7 +50,7 @@ public class GUI {
 	private static final Image icon = new ImageIcon(YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\icon.jpg").getImage();
 
 	private JFrame mainFrame;
-	private JButton browse, cleanCompleted, cleanAll, nameFormatHelp, openConfig, modeSwitch;
+	private JButton browse, cleanCompleted, cleanAll, nameFormatHelp, openConfig, modeSwitch, openSaveDir;
 	private JLabel format, quality, path, nameFormat, playList;
 	private JTextField pathField, nameFormatField;
 	private JComboBox<String> cb_format, cb_quality, cb_playList, cb_clipboardOption;
@@ -209,6 +209,7 @@ public class GUI {
 		nameFormatHelp = new JButton("<= help?");
 		openConfig = new JButton("open config.txt");
 		modeSwitch = new JButton(" <-> download video ");
+		openSaveDir = new JButton("open folder");
 		
 		browse.addActionListener((e) -> {
 
@@ -229,6 +230,7 @@ public class GUI {
 		nameFormatHelp.addActionListener((e) -> { Main.webBrowse("https://github.com/ytdl-org/youtube-dl#output-template"); });
 		openConfig.addActionListener((e) -> { Main.openConfig(); });
 		modeSwitch.addActionListener((e) -> { swapMode(); });
+		openSaveDir.addActionListener((e) -> { Main.openSaveFolder(); });
 		
 		browse.setBounds(523, 75, browse.getPreferredSize().width, browse.getPreferredSize().height);
 		cleanCompleted.setBounds(14, 418, cleanCompleted.getPreferredSize().width, cleanCompleted.getPreferredSize().height);
@@ -236,6 +238,7 @@ public class GUI {
 		nameFormatHelp.setBounds(298, 121, nameFormatHelp.getPreferredSize().width, nameFormatHelp.getPreferredSize().height);
 		openConfig.setBounds(490, 418, openConfig.getPreferredSize().width, openConfig.getPreferredSize().height);
 		modeSwitch.setBounds(440, 19, modeSwitch.getPreferredSize().width, modeSwitch.getPreferredSize().height);
+		openSaveDir.setBounds(515, 50, openSaveDir.getPreferredSize().width, openSaveDir.getPreferredSize().height);
 		
 		mainFrame.add(browse);
 		mainFrame.add(cleanCompleted);
@@ -243,6 +246,7 @@ public class GUI {
 		mainFrame.add(nameFormatHelp);
 		mainFrame.add(openConfig);
 		mainFrame.add(modeSwitch);
+		mainFrame.add(openSaveDir);
 		
 	}
 	

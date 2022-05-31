@@ -473,6 +473,17 @@ public class Main {
 		}
 		
 	}
+	
+	public static void openSaveFolder() {
+		
+		File f = new File(Config.getSaveto());
+		try {
+			Desktop.getDesktop().open(f);
+		} catch (IOException e) {
+			GUI.warning("Cannot open directory explorer!", "Please open" + f.getAbsolutePath() + "\n%e%", e, true);
+		}
+		
+	}
 
 }
 
