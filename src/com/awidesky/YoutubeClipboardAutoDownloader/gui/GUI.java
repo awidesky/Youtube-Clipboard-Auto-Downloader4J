@@ -173,7 +173,7 @@ public class GUI {
 		
 		format.setBounds(26, 23, format.getPreferredSize().width, format.getPreferredSize().height);
 		quality.setBounds(200, 23, quality.getPreferredSize().width, quality.getPreferredSize().height);
-		path.setBounds(12, 80, path.getPreferredSize().width, path.getPreferredSize().height);
+		path.setBounds(12, 70, path.getPreferredSize().width, path.getPreferredSize().height);
 		nameFormat.setBounds(10, 126, nameFormat.getPreferredSize().width, nameFormat.getPreferredSize().height);
 		playList.setBounds(395, 126, playList.getPreferredSize().width, playList.getPreferredSize().height);
 		
@@ -193,7 +193,7 @@ public class GUI {
 		pathField.addActionListener((e) -> { Config.setSaveto(pathField.getText()); });
 		nameFormatField.addActionListener((e) -> { Config.setFileNameFormat(nameFormatField.getText()); });
 		
-		pathField.setBounds(65, 76, 456, 22); 
+		pathField.setBounds(65, 65, 456, 22); 
 		nameFormatField.setBounds(115, 122, 172, 22);
 
 		mainFrame.add(pathField);
@@ -232,13 +232,13 @@ public class GUI {
 		modeSwitch.addActionListener((e) -> { swapMode(); });
 		openSaveDir.addActionListener((e) -> { Main.openSaveFolder(); });
 		
-		browse.setBounds(523, 75, browse.getPreferredSize().width, browse.getPreferredSize().height);
+		browse.setBounds(523, 65, browse.getPreferredSize().width, browse.getPreferredSize().height);
 		cleanCompleted.setBounds(14, 418, cleanCompleted.getPreferredSize().width, cleanCompleted.getPreferredSize().height);
 		cleanAll.setBounds(160, 418, cleanAll.getPreferredSize().width, cleanAll.getPreferredSize().height);
 		nameFormatHelp.setBounds(298, 121, nameFormatHelp.getPreferredSize().width, nameFormatHelp.getPreferredSize().height);
 		openConfig.setBounds(490, 418, openConfig.getPreferredSize().width, openConfig.getPreferredSize().height);
 		modeSwitch.setBounds(440, 19, modeSwitch.getPreferredSize().width, modeSwitch.getPreferredSize().height);
-		openSaveDir.setBounds(515, 50, openSaveDir.getPreferredSize().width, openSaveDir.getPreferredSize().height);
+		openSaveDir.setBounds(515, 90, openSaveDir.getPreferredSize().width, openSaveDir.getPreferredSize().height);
 		
 		mainFrame.add(browse);
 		mainFrame.add(cleanCompleted);
