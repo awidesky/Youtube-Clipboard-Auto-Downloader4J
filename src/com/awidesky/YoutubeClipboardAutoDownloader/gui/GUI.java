@@ -201,7 +201,7 @@ public class GUI {
 
 	}
 	
-	private void addButtons() { //TODO : download 위치 파일 탐색기로 여는 버튼 추가 Desktop.getDesktop().ope n(new File("C:\\folder"));
+	private void addButtons() { 
 		
 		browse = new JButton("Browse...");
 		cleanCompleted = new JButton("clean completed");
