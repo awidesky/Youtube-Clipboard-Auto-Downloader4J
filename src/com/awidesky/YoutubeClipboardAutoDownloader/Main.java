@@ -350,7 +350,7 @@ public class Main {
 
 
 
-	public static synchronized void log(String data) {
+	public static void log(String data) {
 
 		loggerQueue.offer(() -> {
 			logTo.println(data.replace("\n", System.lineSeparator()));
