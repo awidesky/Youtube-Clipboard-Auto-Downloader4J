@@ -353,7 +353,7 @@ public class Main {
 	public static void log(String data) {
 
 		loggerQueue.offer(() -> {
-			logTo.println(data.replace("\n", System.lineSeparator()));
+			logTo.println(data.replaceAll("\\R", System.lineSeparator()));
 		});
 		
 	}
