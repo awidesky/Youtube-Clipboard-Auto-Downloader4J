@@ -336,7 +336,7 @@ public class Main {
 			
 		} catch (IOException e) {
 
-			GUI.error("Error when writing config.txt file", "%e%", null,  true);
+			GUI.error("Error when writing config.txt file", "%e%", e,  true);
 
 		} 
 
