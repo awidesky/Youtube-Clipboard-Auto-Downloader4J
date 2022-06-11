@@ -115,7 +115,7 @@ public class Main {
 				Thread.sleep(50);
 
 				final String data = (String) Toolkit.getDefaultToolkit().getSystemClipboard()
-						.getData(DataFlavor.stringFlavor);
+						.getData(DataFlavor.stringFlavor); //file 선택 등의 Exception 확인하고, 문제 없으면 무시
 
 				log("[debug] clipboard : " + data);
 				
