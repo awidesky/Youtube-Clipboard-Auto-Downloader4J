@@ -385,6 +385,18 @@ public class Main {
 	}
 
 	
+	public static void clearTasks() {
+		try {
+			if(SwingUtilities.isEventDispatchThread()) {
+				TaskStatusModel.getinstance().clearAll();
+			} else {
+				SwingUtilities.invokeAndWait(TaskStatusModel.getinstance()::clearAll);
+			}
+		} catch (InvocationTargetException | InterruptedException e1) {
+			GUI.error("Error when shutting GUI down!", "%e%", e1, false);;
+		}
+	}
+	
 	/*
 	 * Kills the application NOW.
 	 * 
@@ -392,21 +404,6 @@ public class Main {
 	public static void kill(int exitcode) {
 		
 		log("YoutubeAudioAutoDownloader exit code : " + exitcode);
-		
-		try {
-			Runnable r = () -> {
-				TaskStatusModel.getinstance().clearAll();
-				gui.disposeAll();
-			};
-			
-			if(SwingUtilities.isEventDispatchThread()) {
-				r.run();
-			} else {
-				SwingUtilities.invokeAndWait(r);
-			}
-		} catch (InvocationTargetException | InterruptedException e1) {
-			GUI.error("Error when shutting GUI down!", "%e%", e1, false);;
-		}
 		
 		if (executorService != null && !executorService.isShutdown()) executorService.shutdownNow();
 

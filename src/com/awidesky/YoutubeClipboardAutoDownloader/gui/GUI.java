@@ -135,6 +135,9 @@ public class GUI {
 			@Override
 			public void windowClosing(WindowEvent e) {
 
+				Main.clearTasks();
+				if(TaskStatusModel.getinstance().getRowCount() != 0) { return; }
+				disposeAll();
 				e.getWindow().dispose();
 				Main.kill(0);
 
