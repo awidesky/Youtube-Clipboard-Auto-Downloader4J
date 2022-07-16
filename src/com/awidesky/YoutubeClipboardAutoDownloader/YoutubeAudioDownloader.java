@@ -155,16 +155,18 @@ public class YoutubeAudioDownloader {
 			
 			try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
 				while ((line = br.readLine()) != null) {
+					Main.log("youtube-dl stdout : " + line);
 					if(line.startsWith("Updating to version")) {
 						isUpdating = true;
 						Matcher m = versionPtn.matcher(line);
-						version = m.group(1);
+						m.find();
+						version = m.group(0);
 					} else if(line.startsWith("Latest version:")) {
 						isUpdating = false;
-						Matcher m = versionPtn.matcher(line.substring(line.indexOf("Current version")));
-						version = m.group(1);
+						Matcher m = versionPtn.matcher(line);
+						m.find(); m.find();
+						version = m.group(0);
 					}
-					Main.log("youtube-dl stdout : " + line);
 				}
 			}
 			
@@ -191,7 +193,7 @@ public class YoutubeAudioDownloader {
 			
 		} catch (Exception e) {
 					
-			Main.log("Error when checking youtube-dl\n\t" + e.getMessage());
+			Main.log("Error when checking youtube-dl\n\t" + e.toString());
 			return false;
 			
 		}
