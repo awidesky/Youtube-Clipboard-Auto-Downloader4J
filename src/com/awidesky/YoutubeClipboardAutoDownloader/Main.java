@@ -181,20 +181,32 @@ public class Main {
 
 		TaskData t = new TaskData(num);
 		
+		t.setUrl(data); 
 		t.setVideoName(data); // temporarily set video name as url
 		t.setDest(Config.getSaveto());
 		t.setStatus("Validating...");
 		
-		if(TaskStatusModel.getinstance().isTaskExits(t)) {
-			if(!GUI.confirm("Download same file in same directory?", data + "is already downloading in " + Config.getSaveto() + ", download anyway?")) {
-				log("[Task" + num + "] is cancelled because same download exists.");
+		System.out.println(t);
+		
+		if(TaskStatusModel.getinstance().isTaskExists(t)) {
+			System.out.println("same exits" + t);
+			
+			if(!TaskStatusModel.getinstance().isTaskDone(t)) {
+				System.out.println("skip" + t);
 				return;
 			}
+			if(!GUI.confirm("Download same file in same directory?", data + "\nis already downloaded (by another Task) in\n" + Config.getSaveto() + "\ndownload anyway?")) {
+				log("[Task" + num + "] is cancelled because same download exists.");
+				System.out.println("killed " + t);
+				return;
+			}
+			System.out.println("download anyway " + t);
 		}
+
+		TaskStatusModel.getinstance().addTask(t);
+		
 		
 		t.setFuture( executorService.submit(() -> { // download worker thread exist
-
-			TaskStatusModel.getinstance().addTask(t);
 
 			String url = "\"" + data + "\"";
 			
@@ -216,6 +228,7 @@ public class Main {
 			}
 
 		}));
+		System.out.println("lived " + t);
 	}
 	
 	private static void prepareLogFile() {

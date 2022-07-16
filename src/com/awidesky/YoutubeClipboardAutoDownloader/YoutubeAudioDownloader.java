@@ -209,8 +209,7 @@ public class YoutubeAudioDownloader {
 
 
 	/** get video name */
-	public static boolean validateAndSetName(String url, TaskData task, PlayListOption playListOption) { //TODO : if same task(same link and destination) is already running, ask if donwload duplicate thing.
-		                                                                                                 //check Synchronized Set asap to check duplicate. if that algorithm is good, stop checking clipboard duplication in clipboardListner
+	public static boolean validateAndSetName(String url, TaskData task, PlayListOption playListOption) {
 		
 		try {
 			Main.log("\n\n");

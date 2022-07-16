@@ -1,8 +1,8 @@
 package com.awidesky.YoutubeClipboardAutoDownloader.gui;
 
 import java.awt.EventQueue;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.SwingUtilities;
@@ -19,7 +19,7 @@ public class TaskStatusModel extends AbstractTableModel {
 	private static final long serialVersionUID = -7803447765391487650L;
 
 	private static TaskStatusModel instance = new TaskStatusModel();
-	private List<TaskData> rows = new ArrayList<>();
+	private List<TaskData> rows = new Vector<>();
 
 	private TaskStatusModel() {
 	}
@@ -109,7 +109,7 @@ public class TaskStatusModel extends AbstractTableModel {
 		return rows.get(row).getProgressToolTip();
 	}
 
-	public boolean isTaskExits(TaskData t) {
+	public boolean isTaskExists(TaskData t) {
 		
 		if (EventQueue.isDispatchThread()) {
 
@@ -123,6 +123,7 @@ public class TaskStatusModel extends AbstractTableModel {
 
 				SwingUtilities.invokeAndWait(() -> {
 					result.set(rows.contains(t));
+					System.out.println(result.get());
 				});
 				return result.get();
 
@@ -132,11 +133,44 @@ public class TaskStatusModel extends AbstractTableModel {
 				Main.log(e);
 				
 			}
-
+			
 			return false;
 
 		}
 		
+	}
+	
+	public boolean isTaskDone(TaskData t) {
+		
+		if(!isTaskExists(t)) {
+			return false;
+		}
+		
+		if (EventQueue.isDispatchThread()) {
+
+			return "Done!".equals(rows.get(rows.indexOf(t)).getStatus());
+			
+		} else {
+			
+			final AtomicReference<Boolean> result = new AtomicReference<>();
+
+			try {
+
+				SwingUtilities.invokeAndWait(() -> {
+					result.set("Done!".equals(rows.get(rows.indexOf(t)).getStatus()));
+				});
+				return result.get();
+
+			} catch (Exception e) {
+				
+				Main.log("Exception when checking existing Task(s) is done");
+				Main.log(e);
+				
+			}
+			
+			return false;
+
+		}
 	}
 
 }

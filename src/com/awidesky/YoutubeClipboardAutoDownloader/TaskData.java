@@ -10,6 +10,7 @@ import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
 public class TaskData {
 	
 	private String videoName = "null"; 
+	private String url = "null"; 
 	private String status = "";
 	private int progress = 0;
 	private String dest = "";
@@ -24,6 +25,14 @@ public class TaskData {
 		this.taskNum = num;
 	}
 	
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
 
 	public String getVideoName() {
 		return videoName;
@@ -117,8 +126,8 @@ public class TaskData {
 
 
 	@Override
-	public int hashCode() {
-		return Objects.hash(dest, taskNum, videoName, videoNum);
+	public String toString() {
+		return "Task : " + taskNum + " dest : " + dest + "video url) : " + url;
 	}
 
 
@@ -131,7 +140,7 @@ public class TaskData {
 			return false;
 		}
 		TaskData other = (TaskData) obj;
-		return Objects.equals(dest, other.dest)	&& Objects.equals(videoName, other.videoName);
+		return Objects.equals(dest, other.dest)	&& Objects.equals(url, other.url);
 	}
 	
 }
