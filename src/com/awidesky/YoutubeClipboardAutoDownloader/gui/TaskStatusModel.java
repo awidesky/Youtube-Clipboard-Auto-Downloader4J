@@ -1,11 +1,14 @@
 package com.awidesky.YoutubeClipboardAutoDownloader.gui;
 
+import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
+import com.awidesky.YoutubeClipboardAutoDownloader.Main;
 import com.awidesky.YoutubeClipboardAutoDownloader.TaskData;
 
 public class TaskStatusModel extends AbstractTableModel {
@@ -104,6 +107,36 @@ public class TaskStatusModel extends AbstractTableModel {
 
 	public String getProgressToolTip(int row) {
 		return rows.get(row).getProgressToolTip();
+	}
+
+	public boolean isTaskExits(TaskData t) {
+		
+		if (EventQueue.isDispatchThread()) {
+
+			return rows.contains(t);
+			
+		} else {
+			
+			final AtomicReference<Boolean> result = new AtomicReference<>();
+
+			try {
+
+				SwingUtilities.invokeAndWait(() -> {
+					result.set(rows.contains(t));
+				});
+				return result.get();
+
+			} catch (Exception e) {
+				
+				Main.log("Exception when checking existing Task(s)");
+				Main.log(e);
+				
+			}
+
+			return false;
+
+		}
+		
 	}
 
 }

@@ -115,7 +115,7 @@ public class Main {
 				Thread.sleep(50);
 
 				final String data = (String) Toolkit.getDefaultToolkit().getSystemClipboard()
-						.getData(DataFlavor.stringFlavor); //file 선택 등의 Exception 확인하고, 문제 없으면 무시
+						.getData(DataFlavor.stringFlavor); //what if file is selected?
 
 				log("[debug] clipboard : " + data);
 				
@@ -181,11 +181,19 @@ public class Main {
 
 		TaskData t = new TaskData(num);
 		
-		t.setFuture( executorService.submit(() -> { // download worker thread
+		t.setVideoName(data); // temporarily set video name as url
+		t.setDest(Config.getSaveto());
+		t.setStatus("Validating...");
+		
+		if(TaskStatusModel.getinstance().isTaskExits(t)) {
+			if(!GUI.confirm("Download same file in same directory?", data + "is already downloading in " + Config.getSaveto() + ", download anyway?")) {
+				log("[Task" + num + "] is cancelled because same download exists.");
+				return;
+			}
+		}
+		
+		t.setFuture( executorService.submit(() -> { // download worker thread exist
 
-			t.setVideoName(data); // temporarily set video name as url
-			t.setDest(Config.getSaveto());
-			t.setStatus("Validating...");
 			TaskStatusModel.getinstance().addTask(t);
 
 			String url = "\"" + data + "\"";

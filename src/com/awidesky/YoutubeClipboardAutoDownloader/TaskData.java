@@ -1,5 +1,6 @@
 package com.awidesky.YoutubeClipboardAutoDownloader;
 
+import java.util.Objects;
 import java.util.concurrent.Future;
 
 import javax.swing.SwingUtilities;
@@ -112,6 +113,25 @@ public class TaskData {
 
 	public void setProcess(Process p) {
 		this.p = p;
+	}
+
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(dest, taskNum, videoName, videoNum);
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof TaskData)) {
+			return false;
+		}
+		TaskData other = (TaskData) obj;
+		return Objects.equals(dest, other.dest)	&& Objects.equals(videoName, other.videoName);
 	}
 	
 }
