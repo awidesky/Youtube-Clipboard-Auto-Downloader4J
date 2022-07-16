@@ -186,21 +186,14 @@ public class Main {
 		t.setDest(Config.getSaveto());
 		t.setStatus("Validating...");
 		
-		System.out.println(t);
-		
 		if(TaskStatusModel.getinstance().isTaskExists(t)) {
-			System.out.println("same exits" + t);
-			
 			if(!TaskStatusModel.getinstance().isTaskDone(t)) {
-				System.out.println("skip" + t);
 				return;
 			}
 			if(!GUI.confirm("Download same file in same directory?", data + "\nis already downloaded (by another Task) in\n" + Config.getSaveto() + "\ndownload anyway?")) {
 				log("[Task" + num + "] is cancelled because same download exists.");
-				System.out.println("killed " + t);
 				return;
 			}
-			System.out.println("download anyway " + t);
 		}
 
 		TaskStatusModel.getinstance().addTask(t);
@@ -228,7 +221,6 @@ public class Main {
 			}
 
 		}));
-		System.out.println("lived " + t);
 	}
 	
 	private static void prepareLogFile() {

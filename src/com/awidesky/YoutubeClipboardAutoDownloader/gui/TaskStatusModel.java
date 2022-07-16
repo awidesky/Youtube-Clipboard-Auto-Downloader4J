@@ -123,7 +123,6 @@ public class TaskStatusModel extends AbstractTableModel {
 
 				SwingUtilities.invokeAndWait(() -> {
 					result.set(rows.contains(t));
-					System.out.println(result.get());
 				});
 				return result.get();
 
