@@ -43,7 +43,7 @@ public class YoutubeAudioDownloader {
 			
 			try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
 				Main.log(br.readLine());
-			} catch (IOException e1) { throw e1; }
+			}
 			
 			Main.log("Executing ended with exit code : " + ret);
 			
@@ -120,7 +120,7 @@ public class YoutubeAudioDownloader {
 				if (!(output = br.readLine()).startsWith("ffmpeg version"))
 					throw new Exception("ffmpeg does not exist in\n" + (youtubedlpath.equals("") ? "system %PATH%" : youtubedlpath));
 				else Main.log(output);
-			} catch (IOException e1) { throw e1; }
+			}
 			
 			Main.log("Executing ffmpeg -version ended with exit code : " + p.waitFor());
 			
@@ -306,15 +306,11 @@ public class YoutubeAudioDownloader {
 		// start process
 		Process p = null;
 		try {
-			
 			p = pb.directory(new File(Config.getSaveto())).start();
-			
 		} catch (IOException e1) {
-			
 			task.setStatus("ERROR");
 			GUI.error("Error when executing youtube-dl", "[Task" + task.getTaskNum() + "|downloading] Couldn't start youtube-dl : %e%" , e1, true);
 			return;
-			
 		}
 		
 		task.setProcess(p);
