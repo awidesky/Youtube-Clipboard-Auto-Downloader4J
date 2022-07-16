@@ -438,7 +438,6 @@ public class GUI {
 		JDialog dialog = new JDialog();
 		dialog.setAlwaysOnTop(true);
 		dialog.setIconImage(icon);
-		dialog.dispose();
 		if (EventQueue.isDispatchThread()) {
 
 			JOptionPane.showMessageDialog(dialog, content.replace("\n", System.lineSeparator()), title.replace("\n", System.lineSeparator()), JOptionPane.ERROR_MESSAGE);
@@ -454,6 +453,7 @@ public class GUI {
 			}
 
 		}
+		dialog.dispose();
 		
 	}
 	
@@ -508,7 +508,7 @@ public class GUI {
 			}
 
 		}
-		
+		dialog.dispose();
 	}
 	
 	
@@ -560,7 +560,7 @@ public class GUI {
 			}
 
 		}
-		
+		dialog.dispose();
 	}
 	
 	
@@ -576,7 +576,9 @@ public class GUI {
 		
 		if (EventQueue.isDispatchThread()) {
 
-			return showConfirmDialog(title, message, dialog);
+			boolean result = showConfirmDialog(title, message, dialog);
+			dialog.dispose();
+			return result;
 			
 		} else {
 			
@@ -587,7 +589,7 @@ public class GUI {
 				SwingUtilities.invokeAndWait(() -> {
 					result.set(showConfirmDialog(title, message, dialog));
 				});
-				
+				dialog.dispose();
 				return result.get();
 
 			} catch (Exception e) {
@@ -598,7 +600,7 @@ public class GUI {
 			return false;
 
 		}
-
+		
 	}
 	
 	private static boolean showConfirmDialog(String title, String message, JDialog dialog) {
