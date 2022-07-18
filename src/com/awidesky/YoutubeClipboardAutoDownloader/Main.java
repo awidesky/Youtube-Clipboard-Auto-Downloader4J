@@ -446,7 +446,7 @@ public class Main {
 
 	}
 	
-	private static class LoggerThread extends Thread {
+	private static class LoggerThread extends Thread { //change to LoggerThread in Utility
 
 		public static volatile boolean isStop = false;
 		
