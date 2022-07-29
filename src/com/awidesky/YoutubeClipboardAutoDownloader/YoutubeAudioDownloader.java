@@ -331,6 +331,7 @@ public class YoutubeAudioDownloader {
 				}
 				
 				if(line.matches("\\[download\\] Downloading video [\\d]+ of [\\d]+")) {
+					task.setStatus("Downloading");
 					Main.log("\n");
 					Scanner sc = new Scanner(line);
 					sc.useDelimiter("[^\\d]+");
