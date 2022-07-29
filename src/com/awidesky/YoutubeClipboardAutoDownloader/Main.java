@@ -23,7 +23,6 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.swing.SwingUtilities;
 
@@ -38,14 +37,11 @@ public class Main {
 	private static String clipboardBefore = "";
 	private static boolean isSecondtime = false;
 	private static ClipBoardCheckerThread clipChecker;
-	private static PrintWriter logTo;
 	
 	public static volatile boolean audioMode = true;
 	
 	private static GUI gui = new GUI();
-	private static LoggerThread logger = new LoggerThread();
-	
-	private static LinkedBlockingQueue<Runnable> loggerQueue = new LinkedBlockingQueue<>();
+	private static LoggerThread logger;
 	
 	private static volatile int taskNum = 0;
 	
@@ -103,6 +99,8 @@ public class Main {
 	
 	private static void checkClipBoard() {
 
+			
+		
 		if (Config.getClipboardListenOption().equals("Stop listening clipboard")) {
 			log("[debug] clipboard ignored due to ClipboardListenOption == \"Stop listening clipboard\"");
 			return;
@@ -232,11 +230,11 @@ public class Main {
 			logFolder.mkdirs();
 			logFile.createNewFile();
 			
-			logTo = new PrintWriter(new FileOutputStream(logFile), true);
+			logger = new LoggerThread(new PrintWriter(new FileOutputStream(logFile), true));
 			
 		} catch (IOException e) {
 
-			logTo = new PrintWriter(System.out, true);
+			logger = new LoggerThread(System.out, true);
 			GUI.error("Error when creating log flie", "%e%", e, false);
 			
 		} finally {
@@ -365,17 +363,13 @@ public class Main {
 
 	public static void log(String data) {
 
-		loggerQueue.offer(() -> {
-			logTo.println(data.replaceAll("\\R", System.lineSeparator()));
-		});
+		logger.log(data);
 		
 	}
 	
 	public static void log(Exception e) {
 		
-		loggerQueue.offer(() -> {
-			e.printStackTrace(logTo);
-		});
+		logger.log(e);
 		
 	}
 
@@ -409,16 +403,7 @@ public class Main {
 
 		writeProperties();
 			
-		LoggerThread.isStop = true;
-		
-		try {
-			logger.join(5000);
-		} catch (InterruptedException e) {
-			logTo.println("Failed to join logger thread!");
-			e.printStackTrace(logTo);
-		}
-		
-		logTo.close();
+		logger.kill(5000);
 		
 		System.exit(exitcode);
 		
@@ -446,32 +431,6 @@ public class Main {
 
 	}
 	
-	private static class LoggerThread extends Thread { //change to LoggerThread in Utility
-
-		public static volatile boolean isStop = false;
-		
-		public LoggerThread() {
-
-			super(() -> {
-
-				while(true) {
-					
-					if(loggerQueue.isEmpty() && isStop) {
-						return;
-					}
-					
-					 try {
-					 	 loggerQueue.take().run();
-					} catch (InterruptedException e) {
-						 logTo.println("LoggerThread Interrupted! : " + e.getMessage());
-					}
-				}
-
-			});
-			
-		}
-		
-	}
 
 	public static void openConfig() {
 

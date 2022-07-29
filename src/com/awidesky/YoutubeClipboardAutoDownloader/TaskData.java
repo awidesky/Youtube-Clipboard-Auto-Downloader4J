@@ -48,6 +48,8 @@ public class TaskData {
 	}
 	
 	public void setStatus(String status) {
+		if(this.status.equals(status)) return;
+		
 		this.status = status;
 		SwingUtilities.invokeLater(() -> TaskStatusModel.getinstance().updated(this));
 	}
