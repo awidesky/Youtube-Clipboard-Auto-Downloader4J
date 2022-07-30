@@ -23,9 +23,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.SwingUtilities;
@@ -238,17 +238,17 @@ public class Main {
 				
 				logger = new LoggerThread(new PrintWriter(new FileOutputStream(logFile), true)) {
 					
-					private static Pattern taskLogPtrn = Pattern.compile(Pattern.quote("[task") + "\\d+");
-					private Map<String, StringBuilder> tasklog = new HashMap<>();
+					private Map<Integer, StringBuilder> tasklog = new HashMap<>();
 					
 					@Override
 					public void log(String data) {
 
-						Matcher m = taskLogPtrn.matcher(data);
-						if(m.find()) {
-							String key = m.group(0);
+						if(data.startsWith("[Task")) {
+							Scanner extractor = new Scanner(data.replaceFirst(Pattern.quote("[Task"), ""));
+							int key = extractor.nextInt();
+							extractor.close();
 							tasklog.computeIfAbsent(key, s -> new StringBuilder()).append(data);
-							if(data.matches(Pattern.quote("[task") + "\\d+" + Pattern.quote("|Finished]"))) {
+							if(data.matches(Pattern.quote("[task") + "\\d+(" + Pattern.quote("|Finished]") + "|" + Pattern.quote("|Canceled]") + ")")) {
 								super.log(tasklog.get(key).toString());
 								tasklog.remove(key);
 							}
