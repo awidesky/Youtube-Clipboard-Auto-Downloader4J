@@ -20,9 +20,13 @@ import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.SwingUtilities;
 
@@ -58,8 +62,8 @@ public class Main {
 	 * */
 	private static boolean setup(String[] args) {
 		
-		prepareLogFile();
 
+		prepareLogFile(Arrays.stream(args).anyMatch("--logbyTask"::equals));
 		try {
 			SwingUtilities.invokeAndWait(() -> {
 				gui.initLoadingFrame();
@@ -221,7 +225,7 @@ public class Main {
 		}));
 	}
 	
-	private static void prepareLogFile() {
+	private static void prepareLogFile(boolean logbyTask) {
 		
 		try {
 			
@@ -230,7 +234,44 @@ public class Main {
 			logFolder.mkdirs();
 			logFile.createNewFile();
 			
-			logger = new LoggerThread(new PrintWriter(new FileOutputStream(logFile), true));
+			if(logbyTask) {
+				
+				logger = new LoggerThread(new PrintWriter(new FileOutputStream(logFile), true)) {
+					
+					private static Pattern taskLogPtrn = Pattern.compile(Pattern.quote("[task") + "\\d+");
+					private Map<String, StringBuilder> tasklog = new HashMap<>();
+					
+					@Override
+					public void log(String data) {
+
+						Matcher m = taskLogPtrn.matcher(data);
+						if(m.find()) {
+							String key = m.group(0);
+							tasklog.computeIfAbsent(key, s -> new StringBuilder()).append(data);
+							if(data.matches(Pattern.quote("[task") + "\\d+" + Pattern.quote("|Finished]"))) {
+								super.log(tasklog.get(key).toString());
+								tasklog.remove(key);
+							}
+						} else {
+							super.log(data);
+						}
+						
+					}
+					
+					@Override
+					public void kill(int timeOut) {
+						if(!tasklog.isEmpty()) {
+							log("Following logs are from task(s) that are not done yet.\n");
+							tasklog.values().stream().map(StringBuilder::toString).forEach(this::log);
+						}
+						super.kill(timeOut);
+					}
+					
+				};
+				
+			} else {
+				logger = new LoggerThread(new PrintWriter(new FileOutputStream(logFile), true));
+			}
 			
 		} catch (IOException e) {
 

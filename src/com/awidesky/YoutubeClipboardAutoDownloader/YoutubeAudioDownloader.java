@@ -426,9 +426,8 @@ public class YoutubeAudioDownloader {
 			
 		}
 
-		Main.log("[Task" + task.getTaskNum() + "|downloaded] Finished!\n");
-
 		Main.log("[Task" + task.getTaskNum() + "|downloaded] elapsed time in working(sucessed) : " + ((System.nanoTime() - startTime) / 1e6) + "ms" );
+		Main.log("[Task" + task.getTaskNum() + "|Finished] Finished!\n");
 		
 	}
 
