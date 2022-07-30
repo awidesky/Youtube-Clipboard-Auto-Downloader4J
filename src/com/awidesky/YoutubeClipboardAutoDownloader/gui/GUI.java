@@ -416,7 +416,6 @@ public class GUI {
 	 * */
 	public static void error(String title, String content, Exception e, boolean waitTillClosed) {
 
-		Main.log("\n");
 		String co = content.replace("%e%", (e == null) ? "null" : e.getMessage());
 		
 		if (waitTillClosed) {
@@ -427,7 +426,7 @@ public class GUI {
 			});
 		}
 		
-		Main.log("[GUI.error] " + title + "\n\t" + co);
+		Main.log("\n[GUI.error] " + title + "\n\t" + co);
 		if(e != null) Main.log(e);
 		
 	}
@@ -470,7 +469,6 @@ public class GUI {
 	 * */
 	public static void warning(String title, String content, Exception e, boolean waitTillClosed) {
 		
-		Main.log("\n");
 		String co = content.replace("%e%", (e == null) ? "null" : e.getMessage());
 		
 		if (waitTillClosed) {
@@ -481,7 +479,7 @@ public class GUI {
 			});
 		}
 		
-		Main.log("[GUI.error] " + title + "\n\t" + co);
+		Main.log("\n[GUI.error] " + title + "\n\t" + co);
 		if(e != null) Main.log(e);
 		
 	}
@@ -524,7 +522,6 @@ public class GUI {
 	 * */
 	public static void information(String title, String content, boolean waitTillClosed) {
 
-		Main.log("\n");
 
 		if (waitTillClosed) {
 			showInfoDialog(title, content);
@@ -534,7 +531,7 @@ public class GUI {
 			});
 		}
 		
-		Main.log("[GUI.information] " + title + "\n\t" + content);
+		Main.log("\n[GUI.information] " + title + "\n\t" + content);
 		
 	}
 	

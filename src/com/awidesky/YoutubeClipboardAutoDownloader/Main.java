@@ -178,8 +178,7 @@ public class Main {  //TODO : chrome right click check
 	private static void submitDownload(String data) {
 
 		int num = taskNum++;
-		log("\n");
-		log("[Task" + num + "] " + "Received a link from your clipboard : " + data);
+		log("\n[Task" + num + "] " + "Received a link from your clipboard : " + data);
 
 		TaskData t = new TaskData(num);
 		
@@ -245,7 +244,7 @@ public class Main {  //TODO : chrome right click check
 					@Override
 					public void log(String data) {
 
-						if(data.startsWith("[Task")) {
+						if(data.strip().startsWith("[Task")) {
 							Matcher m = numPtn.matcher(data);
 							m.find();
 							int key = Integer.parseInt(m.group());
@@ -256,7 +255,7 @@ public class Main {  //TODO : chrome right click check
 							}
 						} else {
 							super.log(data);
-						}//log("\n")
+						}
 						
 					}
 					

@@ -33,7 +33,7 @@ public class YoutubeAudioDownloader {
 		ProcessBuilder pb = new ProcessBuilder(command);
 
 		Main.log("\nFound known error : \"" + error + "\"");
-		Main.log("\nTrying to fix error automatically by executing \"" + Arrays.stream(command).collect(Collectors.joining(" ")) + "\"");
+		Main.log("Trying to fix error automatically by executing \"" + Arrays.stream(command).collect(Collectors.joining(" ")) + "\"");
 
 		// start process
 		try {
@@ -66,7 +66,6 @@ public class YoutubeAudioDownloader {
 	 * */
 	public static boolean checkYoutubedl() {
 
-		Main.log("\n");
 		/* check youtube-dl */
 		if (checkYoutubedlPath("youtube-dl")) {
 			
@@ -87,8 +86,7 @@ public class YoutubeAudioDownloader {
 		}
 		
 		Main.log("[init] projectpath = " + projectpath);
-		Main.log("[init] youtubedlpath = " + (youtubedlpath.equals("") ? "system %PATH%" : youtubedlpath));
-		Main.log("\n");
+		Main.log("[init] youtubedlpath = " + (youtubedlpath.equals("") ? "system %PATH%" : youtubedlpath) + "\n");
 
 		fallBackFix.put("ERROR: unable to download video data: HTTP Error 403: Forbidden", () -> {
 			 return runFixCommand("ERROR: unable to download video data: HTTP Error 403: Forbidden", youtubedlpath + "youtube-dl", "--rm-cache-dir") == 0;
@@ -140,7 +138,7 @@ public class YoutubeAudioDownloader {
 
 	private static boolean checkYoutubedlPath(String ydlfile) {
 		
-		Main.log("Check if youtube-dl path is in " + ydlfile);
+		Main.log("\nCheck if youtube-dl path is in " + ydlfile);
 		ProcessBuilder pb_ydl = new ProcessBuilder(ydlfile, "--update");
 
 		Main.log("Checking youtube-dl path by \"" + pb_ydl.command().stream().collect(Collectors.joining(" ")).trim() + "\"");
@@ -212,7 +210,6 @@ public class YoutubeAudioDownloader {
 	public static boolean validateAndSetName(String url, TaskData task, PlayListOption playListOption) {
 		
 		try {
-			Main.log("\n\n");
 			long startTime = System.nanoTime();
 			
 			LinkedList<String> args = new LinkedList<>(Arrays.asList(new String[] {youtubedlpath + "youtube-dl", "--get-filename", "-o",
@@ -222,7 +219,7 @@ public class YoutubeAudioDownloader {
 			ProcessBuilder pbGetName = new ProcessBuilder(args);
 			
 			// retrieve command line argument
-			Main.log("[Task" + task.getTaskNum() + "|validating] Getting video name by \"" + pbGetName.command().stream().collect(Collectors.joining(" "))	+ "\"");
+			Main.log("\n\n[Task" + task.getTaskNum() + "|validating] Getting video name by \"" + pbGetName.command().stream().collect(Collectors.joining(" "))	+ "\"");
 
 			// start process
 			Process p1 = pbGetName.directory(null).start();
@@ -272,12 +269,10 @@ public class YoutubeAudioDownloader {
 	
 	public static void download(String url, TaskData task, PlayListOption playListOption, String... additianalOptions)  {
 
-		Main.log("\n\n");
-		Main.logProperties("[Task" + task.getTaskNum() + "|preparing] Current");
+		Main.logProperties("\n\n[Task" + task.getTaskNum() + "|preparing] Current\n");
 
 
 		/* download video */
-		Main.log("\n");
 		long startTime = System.nanoTime();
 		
 		LinkedList<String> arguments = new LinkedList<>(Arrays.asList(
