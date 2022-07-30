@@ -53,8 +53,17 @@ public class Main {  //TODO : chrome right click check
 
 	public static void main(String[] args) {
 		
-		if(!setup(args)) kill(1);
+		if(!setup(args)) System.exit(1);
 
+		if("--help".equals(args[0])) {
+			System.out.println("usage : java -jar YoutubeAudioAutoDownloader " + version + ".jar [options]");
+			System.out.println();
+			System.out.println("options :");
+			System.out.println("\t--logbyTask : Log lines from a task is gathered till the task is done/terminated.");
+			System.out.println("\t              Useful when you don't want to see dirty log file when multiple tasks running.");
+			System.out.println("\t--logTime : Every log line will printed with time");
+			return;
+		}
 	}
 	
 	/**
