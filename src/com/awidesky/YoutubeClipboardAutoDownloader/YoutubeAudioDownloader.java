@@ -326,7 +326,7 @@ public class YoutubeAudioDownloader {
 				}
 				
 				if(line.matches("\\[download\\] Downloading video [\\d]+ of [\\d]+")) {
-					Main.log("\n");
+					Main.log("\n"); //TODO : make this log count?
 					Scanner sc = new Scanner(line);
 					sc.useDelimiter("[^\\d]+");
 					task.setNowVideoNum(sc.nextInt());
