@@ -62,8 +62,8 @@ public class Main {  //TODO : chrome right click check
 	 * */
 	private static boolean setup(String[] args) {
 		
+		prepareLogFile(Arrays.stream(args).anyMatch("--logbyTask"::equals), Arrays.stream(args).anyMatch("--logTime"::equals));
 
-		prepareLogFile(Arrays.stream(args).anyMatch("--logbyTask"::equals));
 		try {
 			SwingUtilities.invokeAndWait(() -> {
 				gui.initLoadingFrame();
@@ -224,7 +224,7 @@ public class Main {  //TODO : chrome right click check
 		}));
 	}
 	
-	private static void prepareLogFile(boolean logbyTask) {
+	private static void prepareLogFile(boolean logbyTask, boolean logTime) {
 		
 		try {
 			
@@ -272,6 +272,10 @@ public class Main {  //TODO : chrome right click check
 				
 			} else {
 				logger = new LoggerThread(new PrintWriter(new FileOutputStream(logFile), true));
+			}
+			
+			if(logTime) {
+				logger.setDatePrefix(new SimpleDateFormat("kk-mm-ss"));
 			}
 			
 		} catch (IOException e) {
