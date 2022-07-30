@@ -432,8 +432,9 @@ public class Main {
 		}
 	}
 	
-	/*
-	 * Kills the application NOW.
+	/**
+	 * Kills the application.
+	 * This method can wait up to 5000ms for <code>LoggerThread</code> to terminated.
 	 * 
 	 * */
 	public static void kill(int exitcode) {
