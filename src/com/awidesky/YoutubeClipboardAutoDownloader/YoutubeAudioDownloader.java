@@ -336,7 +336,7 @@ public class YoutubeAudioDownloader {
 					sc.useDelimiter("[^\\d]+");
 					task.setNowVideoNum(sc.nextInt());
 					task.setTotalNumVideo(sc.nextInt());
-					task.setStatus("ininitiating download " + task.getNowVideoNum() + " of " + task.getTotalNumVideo());
+					task.setStatus("Initiating download " + task.getNowVideoNum() + " of " + task.getTotalNumVideo()); //Initiating
 					sc.close();
 				}
 				

@@ -208,7 +208,7 @@ public class GUI {
 		
 		browse = new JButton("Browse...");
 		cleanCompleted = new JButton("clean completed");
-		cleanAll = new JButton("clean all");
+		cleanAll = new JButton("clean all"); //TODO : clear selected instead
 		nameFormatHelp = new JButton("<= help?");
 		openConfig = new JButton("open config.txt");
 		modeSwitch = new JButton(" <-> download video ");
