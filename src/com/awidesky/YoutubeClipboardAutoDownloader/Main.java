@@ -23,9 +23,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.SwingUtilities;
@@ -35,7 +35,7 @@ import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
 
 /** Main class */
-public class Main { 
+public class Main {  //TODO : chrome right click check
 
 	private static ExecutorService executorService;
 	private static String clipboardBefore = "";
@@ -239,29 +239,31 @@ public class Main {
 				logger = new LoggerThread(new PrintWriter(new FileOutputStream(logFile), true)) {
 					
 					private Map<Integer, StringBuilder> tasklog = new HashMap<>();
-					
+					private static Pattern numPtn = Pattern.compile("\\d+");
+					private static Pattern taskTerminatePtn = Pattern.compile(Pattern.quote("[Task") + "\\d+(" + Pattern.quote("|Finished]") + "|" + Pattern.quote("|Canceled]") + ")");
+
 					@Override
 					public void log(String data) {
 
 						if(data.startsWith("[Task")) {
-							Scanner extractor = new Scanner(data.replaceFirst(Pattern.quote("[Task"), ""));
-							int key = extractor.nextInt();
-							extractor.close();
-							tasklog.computeIfAbsent(key, s -> new StringBuilder()).append(data);
-							if(data.matches(Pattern.quote("[task") + "\\d+(" + Pattern.quote("|Finished]") + "|" + Pattern.quote("|Canceled]") + ")")) {
+							Matcher m = numPtn.matcher(data);
+							m.find();
+							int key = Integer.parseInt(m.group());
+							tasklog.computeIfAbsent(key, s -> new StringBuilder()).append(data + "\n");
+							if(taskTerminatePtn.matcher(data).find()) {
 								super.log(tasklog.get(key).toString());
 								tasklog.remove(key);
 							}
 						} else {
 							super.log(data);
-						}
+						}//log("\n")
 						
 					}
 					
 					@Override
 					public void kill(int timeOut) {
 						if(!tasklog.isEmpty()) {
-							log("Following logs are from task(s) that are not done yet.\n");
+							log("Following logs are from task(s) that are not done yet.");
 							tasklog.values().stream().map(StringBuilder::toString).forEach(this::log);
 						}
 						super.kill(timeOut);
