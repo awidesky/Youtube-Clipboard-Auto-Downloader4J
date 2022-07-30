@@ -321,12 +321,14 @@ public class YoutubeAudioDownloader {
 			
 			while ((line = br.readLine()) != null) {
 				
+				String prefix = "[Task" + task.getTaskNum() + "|downloading] youtube-dl stdout : ";
+				
 				if(!Main.audioMode && line.matches("[\\s|\\S]+Downloading [\\d]+ format\\(s\\)\\:[\\s|\\S]+")) {
 					downloadVideoAndAudioSeparately = line.contains("+");
 				}
 				
 				if(line.matches("\\[download\\] Downloading video [\\d]+ of [\\d]+")) {
-					Main.log("\n"); //TODO : make this log count?
+					prefix = "\n\n" + prefix;
 					Scanner sc = new Scanner(line);
 					sc.useDelimiter("[^\\d]+");
 					task.setNowVideoNum(sc.nextInt());
@@ -352,7 +354,7 @@ public class YoutubeAudioDownloader {
 				}
 				
 
-				Main.log("[Task" + task.getTaskNum() + "|downloading] youtube-dl stdout : " + line);
+				Main.log(prefix + line);
 
 			}
 
