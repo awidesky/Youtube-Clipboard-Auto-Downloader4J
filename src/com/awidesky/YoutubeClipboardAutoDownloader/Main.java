@@ -35,7 +35,8 @@ import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
 
 /** Main class */
-public class Main {  //TODO : chrome right click check
+public class Main { //TODO : chrome right click check
+					//TODO : change "clear all" to "clear selected"
 
 	private static ExecutorService executorService;
 	private static String clipboardBefore = "";
