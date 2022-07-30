@@ -20,9 +20,12 @@ import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.SwingUtilities;
@@ -32,7 +35,7 @@ import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
 
 /** Main class */
-public class Main { 
+public class Main {  //TODO : chrome right click check
 
 	private static ExecutorService executorService;
 	private static String clipboardBefore = "";
@@ -50,8 +53,17 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		if(!setup(args)) kill(1);
+		if(!setup(args)) System.exit(1);
 
+		if("--help".equals(args[0])) {
+			System.out.println("usage : java -jar YoutubeAudioAutoDownloader " + version + ".jar [options]");
+			System.out.println();
+			System.out.println("options :");
+			System.out.println("\t--logbyTask : Log lines from a task is gathered till the task is done/terminated.");
+			System.out.println("\t              Useful when you don't want to see dirty log file when multiple tasks running.");
+			System.out.println("\t--logTime : Every log line will printed with time");
+			return;
+		}
 	}
 	
 	/**
@@ -59,7 +71,7 @@ public class Main {
 	 * */
 	private static boolean setup(String[] args) {
 		
-		prepareLogFile();
+		prepareLogFile(Arrays.stream(args).anyMatch("--logbyTask"::equals), Arrays.stream(args).anyMatch("--logTime"::equals));
 
 		try {
 			SwingUtilities.invokeAndWait(() -> {
@@ -175,8 +187,7 @@ public class Main {
 	private static void submitDownload(String data) {
 
 		int num = taskNum++;
-		log("\n");
-		log("[Task" + num + "] " + "Received a link from your clipboard : " + data);
+		log("\n[Task" + num + "] " + "Received a link from your clipboard : " + data);
 
 		TaskData t = new TaskData(num);
 		
@@ -222,7 +233,7 @@ public class Main {
 		}));
 	}
 	
-	private static void prepareLogFile() {
+	private static void prepareLogFile(boolean logbyTask, boolean logTime) {
 		
 		try {
 			
@@ -231,7 +242,50 @@ public class Main {
 			logFolder.mkdirs();
 			logFile.createNewFile();
 			
-			logger = new LoggerThread(new PrintWriter(new FileOutputStream(logFile), true));
+			if(logbyTask) {
+				
+				logger = new LoggerThread(new PrintWriter(new FileOutputStream(logFile), true)) {
+					
+					private Map<Integer, StringBuilder> tasklog = new HashMap<>();
+					private static Pattern numPtn = Pattern.compile("\\d+");
+					private static Pattern taskTerminatePtn = Pattern.compile(Pattern.quote("[Task") + "\\d+(" + Pattern.quote("|Finished]") + "|" + Pattern.quote("|Canceled]") + ")");
+
+					@Override
+					public void log(String data) {
+
+						if(data.strip().startsWith("[Task")) {
+							Matcher m = numPtn.matcher(data);
+							m.find();
+							int key = Integer.parseInt(m.group());
+							tasklog.computeIfAbsent(key, s -> new StringBuilder()).append(data + "\n");
+							if(taskTerminatePtn.matcher(data).find()) {
+								super.log(tasklog.get(key).toString());
+								tasklog.remove(key);
+							}
+						} else {
+							super.log(data);
+						}
+						
+					}
+					
+					@Override
+					public void kill(int timeOut) {
+						if(!tasklog.isEmpty()) {
+							log("Following logs are from task(s) that are not done yet.");
+							tasklog.values().stream().map(StringBuilder::toString).forEach(this::log);
+						}
+						super.kill(timeOut);
+					}
+					
+				};
+				
+			} else {
+				logger = new LoggerThread(new PrintWriter(new FileOutputStream(logFile), true));
+			}
+			
+			if(logTime) {
+				logger.setDatePrefix(new SimpleDateFormat("kk-mm-ss"));
+			}
 			
 		} catch (IOException e) {
 
@@ -392,8 +446,9 @@ public class Main {
 		}
 	}
 	
-	/*
-	 * Kills the application NOW.
+	/**
+	 * Kills the application.
+	 * This method can wait up to 5000ms for <code>LoggerThread</code> to terminated.
 	 * 
 	 * */
 	public static void kill(int exitcode) {

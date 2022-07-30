@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -18,6 +19,9 @@ public class LoggerThread extends Thread {
 	private String prefix = null;
 	
 	public volatile boolean isStop = false;
+	
+	
+	public static final String version = "v1.2.0";
 	
 	public LoggerThread() { 
 		this(System.out, true, Charset.defaultCharset());
@@ -43,9 +47,19 @@ public class LoggerThread extends Thread {
 		logTo = new PrintWriter(wr);
 	}
 	
+	public void setDatePrefix(DateFormat datePrefix) {
+		this.datePrefix = datePrefix;
+	}
+
+	public void setPrefix(String prefix) {
+		this.prefix = prefix;
+	}
+
 	@Override
 	public void run() {
 
+		logTo.println("LoggerThread " + version + " started at [" + new SimpleDateFormat("yyyy/MM/dd-kk:mm:ss").format(new Date()) + "]");
+		
 		while (true) {
 
 			if (loggerQueue.isEmpty() && isStop) {
@@ -66,21 +80,29 @@ public class LoggerThread extends Thread {
 	}
 	
 	public void log(String data) {
-
-		loggerQueue.offer(getLogTask(data));
-		
+		try {
+			loggerQueue.put(getLogTask(data));
+		} catch (InterruptedException e) {
+			if(!isStop) log(e);
+		}
 	}
 	
 	public void log(Exception e) {
-		
-		loggerQueue.offer(getLogTask(e));
-		
+		try {
+			loggerQueue.put(getLogTask(e));
+		} catch (InterruptedException e1) {
+			if(!isStop) log(e1);
+		}
 	}
 	
 	public void log(Object... objs) {
-		loggerQueue.offer(() -> {
-			for(Object o : objs) getLogTask(o).run();
-		});
+		try {
+			loggerQueue.put(() -> {
+				for(Object o : objs) getLogTask(o).run();
+			});
+		} catch (InterruptedException e) {
+			if(!isStop) log(e);
+		}
 	}
 	
 	
@@ -99,10 +121,7 @@ public class LoggerThread extends Thread {
 	}
 	
 	private Runnable getLogTask(Object obj) {
-		return () -> {
-			printPrefix();
-			logTo.println(obj.toString().replaceAll("\\R", System.lineSeparator()));
-		};
+		return getLogTask(obj.toString());
 	}
 	
 
@@ -128,6 +147,7 @@ public class LoggerThread extends Thread {
 			e.printStackTrace(logTo);
 		}
 		
+		this.interrupt();
 		logTo.close();
 		
 	}
