@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
 
 import javax.swing.SwingUtilities;
 
@@ -133,14 +134,14 @@ public class Main {
 					} else {
 
 						Main.log("\n[GUI.linkAcceptChoose] Download link " + data + "? : " + true + "\n");
-						Arrays.stream(data.split("\n")).forEach(Main::submitDownload);
+						Arrays.stream(data.split(Pattern.quote("\n"))).forEach(Main::submitDownload);
 
 					}
 
 					return;
 				}
 
-				Arrays.stream(data.split("\n")).forEach(Main::submitDownload);
+				Arrays.stream(data.split(Pattern.quote("\n"))).forEach(Main::submitDownload);
 
 			} catch (InterruptedException | HeadlessException | UnsupportedFlavorException | IOException e1) {
 
@@ -261,12 +262,12 @@ public class Main {
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
 				YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt")))) {
 
-			String p1 = Optional.ofNullable(br.readLine()).orElse("SavePath=" + p)				.split("=")[1];
-			String f1 = Optional.ofNullable(br.readLine()).orElse("Format=" + f)				.split("=")[1];
-			String q1 = Optional.ofNullable(br.readLine()).orElse("Quality=" + q)				.split("=")[1];
-			String l1 = Optional.ofNullable(br.readLine()).orElse("Playlist=" + l)				.split("=")[1];
-			String n1 = Optional.ofNullable(br.readLine()).orElse("FileNameFormat=" + n)		.split("=")[1];
-			String c1 = Optional.ofNullable(br.readLine()).orElse("ClipboardListenOption=" + c)	.split("=")[1];
+			String p1 = Optional.ofNullable(br.readLine()).orElse("SavePath=" + p)				.split(Pattern.quote("="))[1];
+			String f1 = Optional.ofNullable(br.readLine()).orElse("Format=" + f)				.split(Pattern.quote("="))[1];
+			String q1 = Optional.ofNullable(br.readLine()).orElse("Quality=" + q)				.split(Pattern.quote("="))[1];
+			String l1 = Optional.ofNullable(br.readLine()).orElse("Playlist=" + l)				.split(Pattern.quote("="))[1];
+			String n1 = Optional.ofNullable(br.readLine()).orElse("FileNameFormat=" + n)		.split(Pattern.quote("="))[1];
+			String c1 = Optional.ofNullable(br.readLine()).orElse("ClipboardListenOption=" + c)	.split(Pattern.quote("="))[1];
 
 			p = p1.equals("null") ?  p : p1;
 			f = f1.equals("null") ?  f : f1;
