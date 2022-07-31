@@ -1,6 +1,7 @@
 package com.awidesky.YoutubeClipboardAutoDownloader.gui;
 
 import java.awt.EventQueue;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicReference;
@@ -78,6 +79,19 @@ public class TaskStatusModel extends AbstractTableModel {
 
 	}
 
+	public void removeSelected(int[] selected) {
+
+		
+		if (Arrays.stream(selected).mapToObj(rows::get).anyMatch(TaskData::isNotDone)) 
+			if (!GUI.confirm("Before clearing!", "Some task(s) you chose are not done!\nCancel those task(s)?"))
+				return;
+		
+		Arrays.stream(selected).mapToObj(rows::get).filter(TaskData::isNotDone).forEach(TaskData::kill);
+		Arrays.stream(selected).forEach(rows::remove);
+		fireTableDataChanged();
+
+	}
+	
 	public void clearAll() {
 
 		if (rows.stream().anyMatch(TaskData::isNotDone)) 
@@ -90,9 +104,12 @@ public class TaskStatusModel extends AbstractTableModel {
 
 	}
 
-	public void updated(TaskData t) {
+	public void updated(TaskData t) {  //use Fireupdate, and add checkbox
 
-		fireTableRowsUpdated(rows.indexOf(t), rows.indexOf(t));
+		setValueAt(t.getVideoName(), rows.indexOf(t), 0);
+		setValueAt(t.getDest(), rows.indexOf(t), 0);
+		setValueAt(t.getProgress(), rows.indexOf(t), 0);
+		setValueAt(t.getStatus(), rows.indexOf(t), 0);
 
 	}
 

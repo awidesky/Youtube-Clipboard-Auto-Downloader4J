@@ -50,7 +50,7 @@ public class GUI {
 	private static final Image icon = new ImageIcon(YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\icon.jpg").getImage();
 
 	private JFrame mainFrame;
-	private JButton browse, cleanCompleted, cleanAll, nameFormatHelp, openConfig, modeSwitch, openSaveDir;
+	private JButton browse, cleanCompleted, removeSelected, nameFormatHelp, openConfig, modeSwitch, openSaveDir;
 	private JLabel format, quality, path, nameFormat, playList;
 	private JTextField pathField, nameFormatField;
 	private JComboBox<String> cb_format, cb_quality, cb_playList, cb_clipboardOption;
@@ -208,7 +208,7 @@ public class GUI {
 		
 		browse = new JButton("Browse...");
 		cleanCompleted = new JButton("clean completed");
-		cleanAll = new JButton("clean all"); //TODO : clear selected instead
+		removeSelected = new JButton("remove selected");
 		nameFormatHelp = new JButton("<= help?");
 		openConfig = new JButton("open config.txt");
 		modeSwitch = new JButton(" <-> download video ");
@@ -229,7 +229,7 @@ public class GUI {
 
 		});
 		cleanCompleted.addActionListener((e) -> { TaskStatusModel.getinstance().clearDone(); });
-		cleanAll.addActionListener((e) -> { TaskStatusModel.getinstance().clearAll(); });
+		removeSelected.addActionListener((e) -> { TaskStatusModel.getinstance().removeSelected(table.getSelectedRows()); });
 		nameFormatHelp.addActionListener((e) -> { Main.webBrowse("https://github.com/ytdl-org/youtube-dl#output-template"); });
 		openConfig.addActionListener((e) -> { Main.openConfig(); });
 		modeSwitch.addActionListener((e) -> { swapMode(); });
@@ -237,7 +237,7 @@ public class GUI {
 		
 		browse.setBounds(523, 65, browse.getPreferredSize().width, browse.getPreferredSize().height);
 		cleanCompleted.setBounds(14, 418, cleanCompleted.getPreferredSize().width, cleanCompleted.getPreferredSize().height);
-		cleanAll.setBounds(160, 418, cleanAll.getPreferredSize().width, cleanAll.getPreferredSize().height);
+		removeSelected.setBounds(160, 418, removeSelected.getPreferredSize().width, removeSelected.getPreferredSize().height);
 		nameFormatHelp.setBounds(298, 121, nameFormatHelp.getPreferredSize().width, nameFormatHelp.getPreferredSize().height);
 		openConfig.setBounds(490, 418, openConfig.getPreferredSize().width, openConfig.getPreferredSize().height);
 		modeSwitch.setBounds(440, 19, modeSwitch.getPreferredSize().width, modeSwitch.getPreferredSize().height);
@@ -245,7 +245,7 @@ public class GUI {
 		
 		mainFrame.add(browse);
 		mainFrame.add(cleanCompleted);
-		mainFrame.add(cleanAll);
+		mainFrame.add(removeSelected);
 		mainFrame.add(nameFormatHelp);
 		mainFrame.add(openConfig);
 		mainFrame.add(modeSwitch);
