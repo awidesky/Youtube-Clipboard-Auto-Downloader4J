@@ -56,7 +56,7 @@ public class Main { //TODO : chrome right click check
 		
 		if(!setup(args)) System.exit(1);
 
-		if("--help".equals(args[0])) {
+		if(args.length > 0 && "--help".equals(args[0])) {
 			System.out.println("usage : java -jar YoutubeAudioAutoDownloader " + version + ".jar [options]");
 			System.out.println();
 			System.out.println("options :");
