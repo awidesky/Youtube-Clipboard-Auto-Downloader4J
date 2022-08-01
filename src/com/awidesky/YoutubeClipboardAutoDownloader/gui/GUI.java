@@ -4,10 +4,10 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.Window;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.atomic.AtomicReference;
@@ -50,7 +50,7 @@ public class GUI {
 	private static final Image icon = new ImageIcon(YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\icon.jpg").getImage();
 
 	private JFrame mainFrame;
-	private JButton browse, cleanCompleted, cleanAll, nameFormatHelp, openConfig, modeSwitch, openSaveDir;
+	private JButton browse, cleanCompleted, removeSelected, nameFormatHelp, openConfig, modeSwitch, openSaveDir;
 	private JLabel format, quality, path, nameFormat, playList;
 	private JTextField pathField, nameFormatField;
 	private JComboBox<String> cb_format, cb_quality, cb_playList, cb_clipboardOption;
@@ -208,7 +208,7 @@ public class GUI {
 		
 		browse = new JButton("Browse...");
 		cleanCompleted = new JButton("clean completed");
-		cleanAll = new JButton("clean all"); //TODO : clear selected instead
+		removeSelected = new JButton("remove selected");
 		nameFormatHelp = new JButton("<= help?");
 		openConfig = new JButton("open config.txt");
 		modeSwitch = new JButton(" <-> download video ");
@@ -229,7 +229,7 @@ public class GUI {
 
 		});
 		cleanCompleted.addActionListener((e) -> { TaskStatusModel.getinstance().clearDone(); });
-		cleanAll.addActionListener((e) -> { TaskStatusModel.getinstance().clearAll(); });
+		removeSelected.addActionListener((e) -> { TaskStatusModel.getinstance().removeSelected(table.getSelectedRows()); });
 		nameFormatHelp.addActionListener((e) -> { Main.webBrowse("https://github.com/ytdl-org/youtube-dl#output-template"); });
 		openConfig.addActionListener((e) -> { Main.openConfig(); });
 		modeSwitch.addActionListener((e) -> { swapMode(); });
@@ -237,7 +237,7 @@ public class GUI {
 		
 		browse.setBounds(523, 65, browse.getPreferredSize().width, browse.getPreferredSize().height);
 		cleanCompleted.setBounds(14, 418, cleanCompleted.getPreferredSize().width, cleanCompleted.getPreferredSize().height);
-		cleanAll.setBounds(160, 418, cleanAll.getPreferredSize().width, cleanAll.getPreferredSize().height);
+		removeSelected.setBounds(160, 418, removeSelected.getPreferredSize().width, removeSelected.getPreferredSize().height);
 		nameFormatHelp.setBounds(298, 121, nameFormatHelp.getPreferredSize().width, nameFormatHelp.getPreferredSize().height);
 		openConfig.setBounds(490, 418, openConfig.getPreferredSize().width, openConfig.getPreferredSize().height);
 		modeSwitch.setBounds(440, 19, modeSwitch.getPreferredSize().width, modeSwitch.getPreferredSize().height);
@@ -245,7 +245,7 @@ public class GUI {
 		
 		mainFrame.add(browse);
 		mainFrame.add(cleanCompleted);
-		mainFrame.add(cleanAll);
+		mainFrame.add(removeSelected);
 		mainFrame.add(nameFormatHelp);
 		mainFrame.add(openConfig);
 		mainFrame.add(modeSwitch);
@@ -362,10 +362,11 @@ public class GUI {
 		table.setAutoCreateColumnsFromModel(false);
 		table.getColumn("Progress").setCellRenderer(new ProgressRenderer());
 		table.setFillsViewportHeight(true);
-		table.getColumnModel().getColumn(0).setPreferredWidth(120);
-		table.getColumnModel().getColumn(1).setPreferredWidth(324);
-		table.getColumnModel().getColumn(2).setPreferredWidth(73);
-		table.getColumnModel().getColumn(3).setPreferredWidth(82);
+		table.getColumnModel().getColumn(TableColumnEnum.CHECKBOX.getIndex()).setPreferredWidth(24);
+		table.getColumnModel().getColumn(TableColumnEnum.VIDEO_NAME.getIndex()).setPreferredWidth(120);
+		table.getColumnModel().getColumn(TableColumnEnum.DESTINATION.getIndex()).setPreferredWidth(300);
+		table.getColumnModel().getColumn(TableColumnEnum.PROGRESS.getIndex()).setPreferredWidth(73);
+		table.getColumnModel().getColumn(TableColumnEnum.STATUS.getIndex()).setPreferredWidth(82);
 		
 		scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBounds(8, 168, 600, 240);
