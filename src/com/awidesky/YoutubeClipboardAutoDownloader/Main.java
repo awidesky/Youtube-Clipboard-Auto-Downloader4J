@@ -53,8 +53,19 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		if(!setup(args)) System.exit(1);
-
+		boolean setup = false;
+		try {
+			
+			prepareLogFile(Arrays.stream(args).anyMatch("--logbyTask"::equals), Arrays.stream(args).anyMatch("--logTime"::equals));
+			setup = setup(args);
+			
+		} catch (Exception e) {
+			setup = false;
+			GUI.error("Failed to initiate!", "Application Failed to initiate!\n%e%", e, true);
+		}
+		
+		if(!setup) System.exit(1);
+		
 		if(args.length > 0 && "--help".equals(args[0])) {
 			System.out.println("usage : java -jar YoutubeAudioAutoDownloader " + version + ".jar [options]");
 			System.out.println();
@@ -70,8 +81,6 @@ public class Main {
 	 * @return Whether the procedure went fine
 	 * */
 	private static boolean setup(String[] args) {
-		
-		prepareLogFile(Arrays.stream(args).anyMatch("--logbyTask"::equals), Arrays.stream(args).anyMatch("--logTime"::equals));
 
 		try {
 			SwingUtilities.invokeAndWait(() -> {
@@ -102,7 +111,12 @@ public class Main {
 
 		gui.setLoadingStat(LoadingStatus.LOADING_WINDOW);
 		SwingUtilities.invokeLater(() -> {
-			gui.initMainFrame();
+			try {
+				gui.initMainFrame();
+			} catch (Exception e) {
+				GUI.error("Failed to initiate!", "Application Failed to initiate!\n" + e.getClass().getName() + " : %e%", e, true);
+				Main.kill(1);
+			}
 		});
 		
 		log("\nistening clipboard...\n");
