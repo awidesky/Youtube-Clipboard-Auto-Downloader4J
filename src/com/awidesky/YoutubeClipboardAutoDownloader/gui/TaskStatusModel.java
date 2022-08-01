@@ -41,35 +41,39 @@ public class TaskStatusModel extends AbstractTableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		switch (columnIndex) {
-		case 0: // name
+		switch (TableColumnEnum.valueOfIndex(columnIndex)) {
+		case CHECKBOX:
+			return rows.get(rowIndex).isChecked();
+		case VIDEO_NAME: // name
 			return rows.get(rowIndex).getVideoName();
-		case 1: // path
+		case DESTINATION: // path
 			return rows.get(rowIndex).getDest();
-		case 2: // progress
+		case PROGRESS: // progress
 			return rows.get(rowIndex).getProgress();
-		case 3: // status
+		case STATUS: // status
 			return rows.get(rowIndex).getStatus();
+		default:
+			break;
 		}
 		GUI.error("Invalid column index!", "Invalid column index : " + columnIndex, null, false);
 		return null; // this should not happen!
 	}
 
 	@Override
-	public String getColumnName(int column) {
+	public Class<?> getColumnClass(int column) {
+        return (getValueAt(0, column).getClass());
+    }
+	
+	@Override
+	public String getColumnName(int column) {  //TODO : consider use ENUM. To add checkbox, https://stackoverflow.com/questions/6175944/event-for-check-box-in-jtable-header
 
-		switch (column) {
-		case 0: // name
-			return "Video Name";
-		case 1: // path
-			return "Destination";
-		case 2: // progress
-			return "Progress";
-		case 3: // status
-			return "Status";
+		TableColumnEnum result = TableColumnEnum.valueOfIndex(column);
+		if(result == null) {
+			GUI.error("Invalid column index!", "Invalid column index : " + column, null, false);
+			return "null"; // this should not happen!
+		} else {
+			return result.getName();
 		}
-		GUI.error("Invalid column index!", "Invalid column index : " + column, null, false);
-		return "null"; // this should not happen!
 	}
 
 	public void clearDone() {
@@ -80,7 +84,6 @@ public class TaskStatusModel extends AbstractTableModel {
 	}
 
 	public void removeSelected(int[] selected) {
-
 		
 		if (Arrays.stream(selected).mapToObj(rows::get).anyMatch(TaskData::isNotDone)) 
 			if (!GUI.confirm("Before clearing!", "Some task(s) you chose are not done!\nCancel those task(s)?"))
@@ -104,12 +107,9 @@ public class TaskStatusModel extends AbstractTableModel {
 
 	}
 
-	public void updated(TaskData t) {  //use Fireupdate, and add checkbox
+	public void updated(TaskData t) {  //TODO : use Fireupdate, and add checkbox
 
-		setValueAt(t.getVideoName(), rows.indexOf(t), 0);
-		setValueAt(t.getDest(), rows.indexOf(t), 0);
-		setValueAt(t.getProgress(), rows.indexOf(t), 0);
-		setValueAt(t.getStatus(), rows.indexOf(t), 0);
+		fireTableRowsUpdated(rows.indexOf(t), rows.indexOf(t));
 
 	}
 

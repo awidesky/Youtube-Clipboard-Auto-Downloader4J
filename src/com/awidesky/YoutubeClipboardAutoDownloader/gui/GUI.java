@@ -4,10 +4,10 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.Window;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.atomic.AtomicReference;
@@ -362,10 +362,11 @@ public class GUI {
 		table.setAutoCreateColumnsFromModel(false);
 		table.getColumn("Progress").setCellRenderer(new ProgressRenderer());
 		table.setFillsViewportHeight(true);
-		table.getColumnModel().getColumn(0).setPreferredWidth(120);
-		table.getColumnModel().getColumn(1).setPreferredWidth(324);
-		table.getColumnModel().getColumn(2).setPreferredWidth(73);
-		table.getColumnModel().getColumn(3).setPreferredWidth(82);
+		table.getColumnModel().getColumn(TableColumnEnum.CHECKBOX.getIndex()).setPreferredWidth(24);
+		table.getColumnModel().getColumn(TableColumnEnum.VIDEO_NAME.getIndex()).setPreferredWidth(120);
+		table.getColumnModel().getColumn(TableColumnEnum.DESTINATION.getIndex()).setPreferredWidth(300);
+		table.getColumnModel().getColumn(TableColumnEnum.PROGRESS.getIndex()).setPreferredWidth(73);
+		table.getColumnModel().getColumn(TableColumnEnum.STATUS.getIndex()).setPreferredWidth(82);
 		
 		scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBounds(8, 168, 600, 240);

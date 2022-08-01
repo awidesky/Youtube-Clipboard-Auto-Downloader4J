@@ -14,6 +14,7 @@ public class TaskData {
 	private String status = "";
 	private int progress = 0;
 	private String dest = "";
+	private boolean checked = false;
 	private int taskNum;
 	private int totalNumOfVideo = 1;
 	private int videoNum = 0;
@@ -71,6 +72,16 @@ public class TaskData {
 		this.dest = dest;
 		SwingUtilities.invokeLater(() -> TaskStatusModel.getinstance().updated(this));
 	}
+
+	public boolean isChecked() {
+		return checked;
+	}
+
+
+	public void setChecked(boolean checked) {
+		this.checked = checked;
+	}
+
 
 	public int getTaskNum() {
 		return taskNum;
