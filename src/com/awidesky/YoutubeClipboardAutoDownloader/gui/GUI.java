@@ -50,7 +50,7 @@ public class GUI {
 	private static final Image icon = new ImageIcon(YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\icon.jpg").getImage();
 
 	private JFrame mainFrame;
-	private JButton browse, cleanCompleted, removeSelected, nameFormatHelp, openConfig, modeSwitch, openSaveDir;
+	private JButton browse, cleanCompleted, removeSwitch, nameFormatHelp, openConfig, modeSwitch, openSaveDir;
 	private JLabel format, quality, path, nameFormat, playList;
 	private JTextField pathField, nameFormatField;
 	private JComboBox<String> cb_format, cb_quality, cb_playList, cb_clipboardOption;
@@ -208,7 +208,7 @@ public class GUI {
 		
 		browse = new JButton("Browse...");
 		cleanCompleted = new JButton("clean completed");
-		removeSelected = new JButton("remove selected");
+		removeSwitch = new JButton("remove selected");
 		nameFormatHelp = new JButton("<= help?");
 		openConfig = new JButton("open config.txt");
 		modeSwitch = new JButton(" <-> download video ");
@@ -229,7 +229,7 @@ public class GUI {
 
 		});
 		cleanCompleted.addActionListener((e) -> { TaskStatusModel.getinstance().clearDone(); });
-		removeSelected.addActionListener((e) -> { TaskStatusModel.getinstance().removeSelected(table.getSelectedRows()); });
+		removeSwitch.addActionListener((e) -> { TaskStatusModel.getinstance().removeSelected(table.getSelectedRows()); });
 		nameFormatHelp.addActionListener((e) -> { Main.webBrowse("https://github.com/ytdl-org/youtube-dl#output-template"); });
 		openConfig.addActionListener((e) -> { Main.openConfig(); });
 		modeSwitch.addActionListener((e) -> { swapMode(); });
@@ -237,15 +237,17 @@ public class GUI {
 		
 		browse.setBounds(523, 65, browse.getPreferredSize().width, browse.getPreferredSize().height);
 		cleanCompleted.setBounds(14, 418, cleanCompleted.getPreferredSize().width, cleanCompleted.getPreferredSize().height);
-		removeSelected.setBounds(160, 418, removeSelected.getPreferredSize().width, removeSelected.getPreferredSize().height);
+		removeSwitch.setBounds(160, 418, removeSwitch.getPreferredSize().width, removeSwitch.getPreferredSize().height);
 		nameFormatHelp.setBounds(298, 121, nameFormatHelp.getPreferredSize().width, nameFormatHelp.getPreferredSize().height);
 		openConfig.setBounds(490, 418, openConfig.getPreferredSize().width, openConfig.getPreferredSize().height);
 		modeSwitch.setBounds(440, 19, modeSwitch.getPreferredSize().width, modeSwitch.getPreferredSize().height);
 		openSaveDir.setBounds(515, 90, openSaveDir.getPreferredSize().width, openSaveDir.getPreferredSize().height);
 		
+		removeSwitch.setText("clear All");
+		
 		mainFrame.add(browse);
 		mainFrame.add(cleanCompleted);
-		mainFrame.add(removeSelected);
+		mainFrame.add(removeSwitch);
 		mainFrame.add(nameFormatHelp);
 		mainFrame.add(openConfig);
 		mainFrame.add(modeSwitch);
@@ -367,6 +369,16 @@ public class GUI {
 		table.getColumnModel().getColumn(TableColumnEnum.DESTINATION.getIndex()).setPreferredWidth(300);
 		table.getColumnModel().getColumn(TableColumnEnum.PROGRESS.getIndex()).setPreferredWidth(73);
 		table.getColumnModel().getColumn(TableColumnEnum.STATUS.getIndex()).setPreferredWidth(82);
+		
+		TaskStatusModel.getinstance().setCheckBoxSelectedCalback(b -> {
+			if(b) {
+				removeSwitch.setText("remove selected");
+				removeSwitch.addActionListener((e) -> { TaskStatusModel.getinstance().removeSelected(table.getSelectedRows()); });
+			} else {
+				removeSwitch.setText("clear All");
+				removeSwitch.addActionListener((e) -> { TaskStatusModel.getinstance().clearAll(); });
+			}
+		});
 		
 		scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBounds(8, 168, 600, 240);

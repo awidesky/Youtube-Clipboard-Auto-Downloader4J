@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
@@ -22,6 +23,8 @@ public class TaskStatusModel extends AbstractTableModel {
 	private static TaskStatusModel instance = new TaskStatusModel();
 	private List<TaskData> rows = new Vector<>();
 
+	private Consumer<Boolean> checkBoxSelectedCalback = null;
+	
 	private TaskStatusModel() {
 	}
 
@@ -29,6 +32,10 @@ public class TaskStatusModel extends AbstractTableModel {
 		return instance;
 	}
 
+	public void setCheckBoxSelectedCalback(Consumer<Boolean> checkBoxSelectedCalback) {
+		this.checkBoxSelectedCalback = checkBoxSelectedCalback;
+	}
+	
 	@Override
 	public int getRowCount() {
 		return rows.size();
@@ -61,7 +68,7 @@ public class TaskStatusModel extends AbstractTableModel {
 
 	@Override
 	public Class<?> getColumnClass(int column) {
-        return (getValueAt(0, column).getClass());
+        return (column == TableColumnEnum.CHECKBOX.getIndex()) ? Boolean.class : (getValueAt(0, column).getClass());
     }
 	
 	@Override
@@ -76,6 +83,23 @@ public class TaskStatusModel extends AbstractTableModel {
 		}
 	}
 
+	@Override
+	public void setValueAt(Object value, int row, int col) {
+		super.setValueAt(value, row, col);
+		if(col == TableColumnEnum.CHECKBOX.getIndex()) {
+			boolean result = !(Boolean)this.getValueAt(row, col);
+			rows.get(row).setChecked(result);
+			result = rows.stream().anyMatch(TaskData::isChecked);
+			checkBoxSelectedCalback.accept(result);
+		}
+	}
+	
+	@Override
+	public boolean isCellEditable(int row, int column) {
+		if(column == TableColumnEnum.CHECKBOX.getIndex()) return true;
+		else return false;
+	}
+	
 	public void clearDone() {
 
 		rows.removeIf((t) -> t.getStatus().equals("Done!"));

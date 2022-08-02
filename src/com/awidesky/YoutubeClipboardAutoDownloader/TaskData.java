@@ -80,6 +80,7 @@ public class TaskData {
 
 	public void setChecked(boolean checked) {
 		this.checked = checked;
+		SwingUtilities.invokeLater(() -> TaskStatusModel.getinstance().updated(this));
 	}
 
 
