@@ -194,6 +194,28 @@ public class GUI {
 		nameFormatField =  new JTextField(Config.getFileNameFormat());
 		
 		pathField.addActionListener((e) -> { Config.setSaveto(pathField.getText()); });
+		pathField.getDocument().addDocumentListener(new DocumentListener() {
+
+	        @Override
+	        public void removeUpdate(DocumentEvent e) {
+	        	changed(e);
+	        }
+
+	        @Override
+	        public void insertUpdate(DocumentEvent e) {
+	        	changed(e);
+	        }
+
+	        @Override
+	        public void changedUpdate(DocumentEvent arg0) {
+	        	changed(arg0);
+	        }
+	        
+	        private void changed(DocumentEvent e) {
+	        	Config.setSaveto(pathField.getText());
+	        }
+	        
+	    });
 		nameFormatField.addActionListener((e) -> { Config.setFileNameFormat(nameFormatField.getText()); });
 		
 		pathField.setBounds(65, 65, 456, 22); 
