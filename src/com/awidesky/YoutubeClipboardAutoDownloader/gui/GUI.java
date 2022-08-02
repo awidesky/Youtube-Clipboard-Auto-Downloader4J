@@ -236,8 +236,8 @@ public class GUI {
 		openSaveDir.addActionListener((e) -> { Main.openSaveFolder(); });
 		
 		browse.setBounds(523, 65, browse.getPreferredSize().width, browse.getPreferredSize().height);
-		cleanCompleted.setBounds(14, 418, cleanCompleted.getPreferredSize().width, cleanCompleted.getPreferredSize().height);
-		removeSwitch.setBounds(160, 418, removeSwitch.getPreferredSize().width, removeSwitch.getPreferredSize().height);
+		cleanCompleted.setBounds(8, 418, cleanCompleted.getPreferredSize().width, cleanCompleted.getPreferredSize().height);
+		removeSwitch.setBounds(145, 418, removeSwitch.getPreferredSize().width, removeSwitch.getPreferredSize().height);
 		nameFormatHelp.setBounds(298, 121, nameFormatHelp.getPreferredSize().width, nameFormatHelp.getPreferredSize().height);
 		openConfig.setBounds(490, 418, openConfig.getPreferredSize().width, openConfig.getPreferredSize().height);
 		modeSwitch.setBounds(440, 19, modeSwitch.getPreferredSize().width, modeSwitch.getPreferredSize().height);
@@ -331,7 +331,7 @@ public class GUI {
 		cb_format.setBounds(83, 19, 80, 22);
 		cb_quality.setBounds(290, 19, 100, 22);
 		cb_playList.setBounds(518, 122, 90, 22);
-		cb_clipboardOption.setBounds(270, 418, 200, 22);
+		cb_clipboardOption.setBounds(280, 419, 200, 22);
 
 		mainFrame.add(cb_format);
 		mainFrame.add(cb_quality);
