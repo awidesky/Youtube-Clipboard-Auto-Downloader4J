@@ -115,6 +115,7 @@ public class TaskStatusModel extends AbstractTableModel {
 		
 		Arrays.stream(selected).mapToObj(rows::get).filter(TaskData::isNotDone).forEach(TaskData::kill);
 		Arrays.stream(selected).forEach(rows::remove);
+		if(rows.isEmpty()) checkBoxSelectedCalback.accept(false);
 		fireTableDataChanged();
 
 	}
