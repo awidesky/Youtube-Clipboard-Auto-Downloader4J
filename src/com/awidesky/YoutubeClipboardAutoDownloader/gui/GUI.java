@@ -376,7 +376,8 @@ public class GUI {
 				int row = rowAtPoint(e.getPoint());
 				int column = columnAtPoint(e.getPoint());
 				if (row == -1) return "";
-				if (column == 2) return TaskStatusModel.getinstance().getProgressToolTip(row);
+				if (column == TableColumnEnum.PROGRESS.getIndex()) return TaskStatusModel.getinstance().getProgressToolTip(row);
+				if (column == TableColumnEnum.CHECKBOX.getIndex()) return "click to select this task";
 				return String.valueOf(TaskStatusModel.getinstance().getValueAt(row, column));
 			}
 			
