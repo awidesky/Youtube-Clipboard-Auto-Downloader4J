@@ -305,7 +305,7 @@ public class GUI {
 		cb_playList = new JComboBox<>(new String[] { "yes", "no", "ask" });
 		cb_clipboardOption = new JComboBox<>(new String[] { "Download link automatically",
 															"Ask when a link is found",
-															"Stop listening clipboard" });
+															"Stop listening clipboard" }); //TODO : use ENUM, and different color (green, yellow, red in background)( setForeground, setBackground )
 		cb_format.setEditable(true);
 		
 		if(videoQualityCBoxModel.getIndexOf(Config.getQuality()) == -1) { //It was audio mode
