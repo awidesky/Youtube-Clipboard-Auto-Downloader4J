@@ -110,7 +110,7 @@ public class TaskStatusModel extends AbstractTableModel {
 	public void removeSelected(int[] selected) {
 		
 		if (Arrays.stream(selected).mapToObj(rows::get).anyMatch(TaskData::isNotDone)) 
-			if (!GUI.confirm("Before clearing!", "Some task(s) you chose are not done!\nCancel those task(s)?"))
+			if (!GUI.confirm("Before removing!", "Some task(s) you chose are not done!\nCancel those task(s)?"))
 				return;
 		
 		Arrays.stream(selected).mapToObj(rows::get).filter(TaskData::isNotDone).forEach(TaskData::kill);

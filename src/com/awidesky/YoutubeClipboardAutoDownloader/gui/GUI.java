@@ -10,6 +10,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
@@ -396,9 +397,11 @@ public class GUI {
 		TaskStatusModel.getinstance().setCheckBoxSelectedCalback(b -> {
 			if(b) {
 				removeSwitch.setText("remove selected");
+				Arrays.stream(removeSwitch.getActionListeners()).forEach(removeSwitch::removeActionListener);
 				removeSwitch.addActionListener((e) -> { TaskStatusModel.getinstance().removeSelected(table.getSelectedRows()); });
 			} else {
 				removeSwitch.setText("clear All");
+				Arrays.stream(removeSwitch.getActionListeners()).forEach(removeSwitch::removeActionListener);
 				removeSwitch.addActionListener((e) -> { TaskStatusModel.getinstance().clearAll(); });
 			}
 		});
