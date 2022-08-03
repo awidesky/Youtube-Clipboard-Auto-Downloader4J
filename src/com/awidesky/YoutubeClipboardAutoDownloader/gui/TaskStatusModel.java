@@ -72,7 +72,7 @@ public class TaskStatusModel extends AbstractTableModel {
     }
 	
 	@Override
-	public String getColumnName(int column) {  //TODO : consider use ENUM. To add checkbox, https://stackoverflow.com/questions/6175944/event-for-check-box-in-jtable-header
+	public String getColumnName(int column) {
 
 		TableColumnEnum result = TableColumnEnum.valueOfIndex(column);
 		if(result == null) {
@@ -132,7 +132,7 @@ public class TaskStatusModel extends AbstractTableModel {
 
 	}
 
-	public void updated(TaskData t) {  //TODO : use Fireupdate, and add checkbox
+	public void updated(TaskData t) {
 
 		fireTableRowsUpdated(rows.indexOf(t), rows.indexOf(t));
 
