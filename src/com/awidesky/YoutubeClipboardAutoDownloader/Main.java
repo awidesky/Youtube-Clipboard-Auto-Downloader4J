@@ -329,6 +329,7 @@ public class Main {
 		String c = "Download link automatically"; 
 		
 		Config.addAcceptableList("https://www.youtu");
+		Config.addAcceptableList("youtube.com");
 		
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
 				YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt")))) {
