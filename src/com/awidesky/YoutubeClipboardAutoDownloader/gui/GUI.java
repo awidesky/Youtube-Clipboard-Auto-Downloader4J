@@ -254,7 +254,6 @@ public class GUI {
 
 		});
 		cleanCompleted.addActionListener((e) -> { TaskStatusModel.getinstance().clearDone(); });
-		removeSwitch.addActionListener((e) -> { TaskStatusModel.getinstance().removeSelected(table.getSelectedRows()); });
 		nameFormatHelp.addActionListener((e) -> { Main.webBrowse("https://github.com/ytdl-org/youtube-dl#output-template"); });
 		openConfig.addActionListener((e) -> { Main.openConfig(); });
 		modeSwitch.addActionListener((e) -> { swapMode(); });
@@ -268,7 +267,7 @@ public class GUI {
 		modeSwitch.setBounds(440, 19, modeSwitch.getPreferredSize().width, modeSwitch.getPreferredSize().height);
 		openSaveDir.setBounds(515, 90, openSaveDir.getPreferredSize().width, openSaveDir.getPreferredSize().height);
 		
-		removeSwitch.setText("clear All");
+		switchRemoveSwitch(false);
 		
 		mainFrame.add(browse);
 		mainFrame.add(cleanCompleted);
@@ -394,17 +393,7 @@ public class GUI {
 		table.getColumnModel().getColumn(TableColumnEnum.PROGRESS.getIndex()).setPreferredWidth(73);
 		table.getColumnModel().getColumn(TableColumnEnum.STATUS.getIndex()).setPreferredWidth(82);
 		
-		TaskStatusModel.getinstance().setCheckBoxSelectedCallback(b -> {
-			if(b) {
-				removeSwitch.setText("remove selected");
-				Arrays.stream(removeSwitch.getActionListeners()).forEach(removeSwitch::removeActionListener);
-				removeSwitch.addActionListener((e) -> { TaskStatusModel.getinstance().removeSelected(table.getSelectedRows()); });
-			} else {
-				removeSwitch.setText("clear All");
-				Arrays.stream(removeSwitch.getActionListeners()).forEach(removeSwitch::removeActionListener);
-				removeSwitch.addActionListener((e) -> { TaskStatusModel.getinstance().clearAll(); });
-			}
-		});
+		TaskStatusModel.getinstance().setCheckBoxSelectedCallback(this::switchRemoveSwitch);
 		
 		scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBounds(8, 168, 600, 240);
@@ -413,6 +402,18 @@ public class GUI {
 
 	}
 
+	private void switchRemoveSwitch(boolean selectedMode) {
+		if(selectedMode) {
+			removeSwitch.setText("remove selected");
+			Arrays.stream(removeSwitch.getActionListeners()).forEach(removeSwitch::removeActionListener);
+			removeSwitch.addActionListener((e) -> { switchRemoveSwitch(!TaskStatusModel.getinstance().removeSelected(table.getSelectedRows()));	});
+		} else {
+			removeSwitch.setText("clear All");
+			Arrays.stream(removeSwitch.getActionListeners()).forEach(removeSwitch::removeActionListener);
+			removeSwitch.addActionListener((e) -> { TaskStatusModel.getinstance().clearAll(); });
+		}
+	}
+	
 	public void disposeAll() {
 		
 		Main.log("\nExisting Windows are :");

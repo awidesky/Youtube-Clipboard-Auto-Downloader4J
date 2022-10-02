@@ -107,17 +107,20 @@ public class TaskStatusModel extends AbstractTableModel {
 
 	}
 
-	public void removeSelected(int[] selected) {
+	/**
+	 * @return <code>true</code> if user didn't cancel the removing.
+	 * */
+	public boolean removeSelected(int[] selected) {
 		
 		if (Arrays.stream(selected).mapToObj(rows::get).anyMatch(TaskData::isNotDone)) 
 			if (!GUI.confirm("Before removing!", "Some task(s) you chose are not done!\nCancel those task(s)?"))
-				return;
+				return false;
 		
 		Arrays.stream(selected).mapToObj(rows::get).filter(TaskData::isNotDone).forEach(TaskData::kill);
 		Arrays.stream(selected).forEach(rows::remove);
 		if(rows.isEmpty()) checkBoxSelectedCalback.accept(false);
 		fireTableDataChanged();
-
+		return true;
 	}
 	
 	public void clearAll() {
