@@ -35,9 +35,11 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 
+import com.awidesky.YoutubeClipboardAutoDownloader.ClipBoardOption;
 import com.awidesky.YoutubeClipboardAutoDownloader.Config;
 import com.awidesky.YoutubeClipboardAutoDownloader.LoadingStatus;
 import com.awidesky.YoutubeClipboardAutoDownloader.Main;
+import com.awidesky.YoutubeClipboardAutoDownloader.PlayListOption;
 import com.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
 
 public class GUI {
@@ -302,10 +304,8 @@ public class GUI {
 		
 		cb_format = new JComboBox<>(audioFormatCBoxModel);
 		cb_quality = new JComboBox<>(audioQualityCBoxModel);
-		cb_playList = new JComboBox<>(new String[] { "yes", "no", "ask" });
-		cb_clipboardOption = new JComboBox<>(new String[] { "Download link automatically",
-															"Ask when a link is found",
-															"Stop listening clipboard" }); //TODO : use ENUM, and different color (green, yellow, red in background)( setForeground, setBackground )
+		cb_playList = new JComboBox<>(PlayListOption.getComboBoxList());
+		cb_clipboardOption = new JComboBox<>(ClipBoardOption.getComboBoxList());
 		cb_format.setEditable(true);
 		
 		if(videoQualityCBoxModel.getIndexOf(Config.getQuality()) == -1) { //It was audio mode
@@ -316,7 +316,7 @@ public class GUI {
 		}
 		cb_format.setSelectedItem(Config.getFormat());
 		cb_playList.setSelectedItem(Config.getPlaylistOption().toComboBox());
-		cb_clipboardOption.setSelectedItem(Config.getClipboardListenOption());
+		cb_clipboardOption.setSelectedItem(Config.getClipboardListenOption().toString());
 
 		cb_format.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 		
@@ -349,13 +349,13 @@ public class GUI {
 		});
 		cb_quality.addActionListener((e) -> { Config.setQuality(cb_quality.getSelectedItem().toString()); });
 		cb_playList.addActionListener((e) -> { Config.setPlaylistOption(cb_playList.getSelectedItem().toString()); });
-		cb_clipboardOption.addActionListener((e) -> {Config.setClipboardListenOption(cb_clipboardOption.getSelectedItem().toString());});
+		cb_clipboardOption.addActionListener((e) -> { Config.setClipboardListenOption(cb_clipboardOption.getSelectedItem().toString());	});
 		
 		cb_format.setBounds(83, 19, 80, 22);
 		cb_quality.setBounds(290, 19, 100, 22);
 		cb_playList.setBounds(518, 122, 90, 22);
 		cb_clipboardOption.setBounds(280, 419, 200, 22);
-
+		
 		mainFrame.add(cb_format);
 		mainFrame.add(cb_quality);
 		mainFrame.add(cb_playList);

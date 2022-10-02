@@ -119,17 +119,15 @@ public class Main {
 			}
 		});
 		
-		log("\nistening clipboard...\n");
+		log("\nListening clipboard...\n");
 		return true;
 		
 	}
 	
 	private static void checkClipBoard() {
 
-			
-		
-		if (Config.getClipboardListenOption().equals("Stop listening clipboard")) {
-			log("[debug] clipboard ignored due to ClipboardListenOption == \"Stop listening clipboard\"");
+		if (Config.getClipboardListenOption() == ClipBoardOption.NOLISTEN) {
+			log("[debug] clipboard ignored due to ClipboardListenOption == \"" + ClipBoardOption.NOLISTEN.getString() + "\"");
 			return;
 		}
 
@@ -148,10 +146,12 @@ public class Main {
 				
 				clipboardBefore = data;
 
-				if (!Config.isLinkAcceptable(data))
+				if (!Config.isLinkAcceptable(data)) {
+					log("[debug] " + data + " is ont acceptable!");
 					return;
-
-				if (Config.getClipboardListenOption().equals("Ask when a link is found")) {
+				}
+				
+				if (Config.getClipboardListenOption() == ClipBoardOption.ASK) {
 
 					if (!GUI.confirm("Download link in clipboard?", "Link : " + data)) {
 
@@ -399,7 +399,7 @@ public class Main {
 			bw.write("Quality=" +				Optional.ofNullable(Config.getQuality())					.orElse("0"));										bw.newLine();
 			bw.write("Playlist=" + 				Optional.ofNullable(Config.getPlaylistOption())				.orElse(PlayListOption.NO).toComboBox());			bw.newLine();
 			bw.write("FileNameFormat=" + 		Optional.ofNullable(Config.getFileNameFormat())				.orElse("%(title)s.%(ext)s"));						bw.newLine();
-			bw.write("ClipboardListenOption=" + Optional.ofNullable(Config.getClipboardListenOption())		.orElse("Download link automatically"));			bw.newLine();
+			bw.write("ClipboardListenOption=" + Optional.ofNullable(Config.getClipboardListenOption())		.orElse(ClipBoardOption.AUTOMATIC).getString());	bw.newLine();
 			
 			bw.newLine();
 			bw.write("#If you know a type of link that youtube-dl accepts (listed in https://github.com/ytdl-org/youtube-dl/blob/master/docs/supportedsites.md),"); bw.newLine();

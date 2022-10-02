@@ -11,7 +11,7 @@ public class Config {
 	private static String quality = null;
 	private static PlayListOption playlistOption;
 	private static String fileNameFormat = null;
-	private static String clipboardListenOption = null;
+	private static ClipBoardOption clipboardListenOption = null;
 	private static List<String> acceptableLinks = new ArrayList<>();
 	
 	
@@ -74,12 +74,12 @@ public class Config {
 		Config.fileNameFormat = fileNameFormat;
 	}
 
-	public static String getClipboardListenOption() {
+	public static ClipBoardOption getClipboardListenOption() {
 		return clipboardListenOption;
 	}
 
 	public static void setClipboardListenOption(String clipboardListenOption) {
-		Config.clipboardListenOption = clipboardListenOption;
+		Config.clipboardListenOption = ClipBoardOption.get(clipboardListenOption);
 	}
 
 	public static void addAcceptableList(String s) {

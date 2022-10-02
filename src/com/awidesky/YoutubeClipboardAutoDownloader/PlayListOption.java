@@ -1,5 +1,7 @@
 package com.awidesky.YoutubeClipboardAutoDownloader;
 
+import java.util.stream.Stream;
+
 public enum PlayListOption {
 
 	YES("yes", "--yes-playlist"),
@@ -20,6 +22,10 @@ public enum PlayListOption {
 
 	public String toCommandArgm() {
 		return toCommandArgm;
+	}
+	
+	public static String[] getComboBoxList() {
+		return Stream.of(values()).map(PlayListOption::toComboBox).toArray(String[]::new);
 	}
 	
 	public static PlayListOption get(String s) {
