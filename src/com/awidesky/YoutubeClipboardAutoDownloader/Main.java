@@ -17,6 +17,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -41,6 +42,8 @@ public class Main {
 	private static String clipboardBefore = "";
 	private static boolean isSecondtime = false;
 	private static ClipBoardCheckerThread clipChecker;
+	
+	public static final Charset NATIVECHARSET = Charset.forName(System.getProperty("native.encoding"));
 	
 	public static volatile boolean audioMode = true;
 	
@@ -147,7 +150,7 @@ public class Main {
 				clipboardBefore = data;
 
 				if (!Config.isLinkAcceptable(data)) {
-					log("[debug] " + data + " is ont acceptable!");
+					log("[debug] " + data + " is not acceptable!");
 					return;
 				}
 				

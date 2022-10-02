@@ -41,7 +41,7 @@ public class YoutubeAudioDownloader {
 			Process p = pb.directory(null).start();
 			ret = p.waitFor();
 			
-			try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream(), Main.NATIVECHARSET))) {
 				Main.log(br.readLine());
 			}
 			
@@ -113,7 +113,7 @@ public class YoutubeAudioDownloader {
 			
 			Process p = pb_ffmpeg.directory(null).start();
 			
-			try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream(), Main.NATIVECHARSET))) {
 				String output;
 				if (!(output = br.readLine()).startsWith("ffmpeg version"))
 					throw new Exception("ffmpeg does not exist in\n" + (youtubedlpath.equals("") ? "system %PATH%" : youtubedlpath));
@@ -151,7 +151,7 @@ public class YoutubeAudioDownloader {
 			String line = null;
 			Process p = pb_ydl.directory(null).start();
 			
-			try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream(), Main.NATIVECHARSET))) {
 				while ((line = br.readLine()) != null) {
 					Main.log("youtube-dl stdout : " + line);
 					if(line.startsWith("Updating to version")) {
@@ -178,7 +178,7 @@ public class YoutubeAudioDownloader {
 					err = "Cannot update youtube-dl!\n";
 				}
 				
-				try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()))) {
+				try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream(), Main.NATIVECHARSET))) {
 					err += br.lines().collect(Collectors.joining("", "youtube-dl stderr : ", "\n"));
 				}
 				throw new Exception(err);
@@ -224,7 +224,7 @@ public class YoutubeAudioDownloader {
 			// start process
 			Process p1 = pbGetName.directory(null).start();
 			task.setProcess(p1);
-			BufferedReader br = new BufferedReader(new InputStreamReader(p1.getInputStream()));
+			BufferedReader br = new BufferedReader(new InputStreamReader(p1.getInputStream(), Main.NATIVECHARSET));
 			String name = br.readLine();
 			
 			if ((name.contains("WARNING")) || (name.contains("ERROR")) || (p1.waitFor() != 0)) return false;
@@ -240,7 +240,7 @@ public class YoutubeAudioDownloader {
 				
 			} else { task.setVideoName(name); }
 			
-			BufferedReader br1 = new BufferedReader(new InputStreamReader(p1.getErrorStream()));
+			BufferedReader br1 = new BufferedReader(new InputStreamReader(p1.getErrorStream(), Main.NATIVECHARSET));
 			String line;
 			while ((line = br1.readLine()) != null) {
 				Main.log("[Task" + task.getTaskNum() + "|validating] youtube-dl stderr : " + line);
@@ -314,7 +314,7 @@ public class YoutubeAudioDownloader {
 		task.setProgress(0);
 
 
-		try(BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));) {
+		try(BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream(), Main.NATIVECHARSET));) {
 
 			String line = null;
 			boolean downloadVideoAndAudioSeparately = false, videoDownloadDone = false;
@@ -366,7 +366,7 @@ public class YoutubeAudioDownloader {
 		}
 
 
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));) {
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream(), Main.NATIVECHARSET));) {
 
 			String line = null;
 			StringBuilder sb1 = new StringBuilder("");
