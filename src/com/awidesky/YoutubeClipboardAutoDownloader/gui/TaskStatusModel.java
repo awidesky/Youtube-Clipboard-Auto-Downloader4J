@@ -32,7 +32,7 @@ public class TaskStatusModel extends AbstractTableModel {
 		return instance;
 	}
 
-	public void setCheckBoxSelectedCalback(Consumer<Boolean> checkBoxSelectedCalback) {
+	public void setCheckBoxSelectedCallback(Consumer<Boolean> checkBoxSelectedCalback) {
 		this.checkBoxSelectedCalback = checkBoxSelectedCalback;
 	}
 	

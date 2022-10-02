@@ -394,7 +394,7 @@ public class GUI {
 		table.getColumnModel().getColumn(TableColumnEnum.PROGRESS.getIndex()).setPreferredWidth(73);
 		table.getColumnModel().getColumn(TableColumnEnum.STATUS.getIndex()).setPreferredWidth(82);
 		
-		TaskStatusModel.getinstance().setCheckBoxSelectedCalback(b -> {
+		TaskStatusModel.getinstance().setCheckBoxSelectedCallback(b -> {
 			if(b) {
 				removeSwitch.setText("remove selected");
 				Arrays.stream(removeSwitch.getActionListeners()).forEach(removeSwitch::removeActionListener);
