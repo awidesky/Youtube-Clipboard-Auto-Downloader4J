@@ -55,6 +55,9 @@ public class Main {
 	
 	public static final String version = "v1.7.0";
 
+	
+	//TODO : add verbose flag, and print existing windows should be in it
+	
 	public static void main(String[] args) {
 		
 		boolean setup = false;
