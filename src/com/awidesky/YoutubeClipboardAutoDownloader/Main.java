@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -466,18 +467,26 @@ public class Main {
 	
 	/**
 	 * Kills the application.
-	 * This method can wait up to 5000ms for <code>LoggerThread</code> to terminated.
+	 * This method can wait up to 5seconds for <code>LoggerThread</code> and <code>executorService</code>(2.5seconds each) to terminated.
 	 * 
 	 * */
 	public static void kill(int exitcode) {
 		
 		log("YoutubeAudioAutoDownloader exit code : " + exitcode);
 		
-		if (executorService != null && !executorService.isShutdown()) executorService.shutdownNow();
+		if (executorService != null && !executorService.isShutdown()) {
+			executorService.shutdownNow();
+			try {
+				executorService.awaitTermination(2500, TimeUnit.MILLISECONDS);
+			} catch (InterruptedException e) {
+				logger.log("Failed to wait worker Thread to shutdown!");
+				logger.log(e);
+			}
+		}
 
 		writeProperties();
 			
-		logger.kill(5000);
+		logger.kill(2500);
 		
 		System.exit(exitcode);
 		
