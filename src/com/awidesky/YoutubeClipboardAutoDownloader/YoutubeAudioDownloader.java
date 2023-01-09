@@ -327,7 +327,7 @@ public class YoutubeAudioDownloader {
 					downloadVideoAndAudioSeparately = line.contains("+");
 				}
 				
-				if(line.matches("\\[download\\] Downloading video [\\d]+ of [\\d]+")) {
+				if(line.matches("\\[download\\] Downloading item [\\d]+ of [\\d]+")) {
 					prefix = "\n\n" + prefix;
 					Scanner sc = new Scanner(line);
 					sc.useDelimiter("[^\\d]+");
