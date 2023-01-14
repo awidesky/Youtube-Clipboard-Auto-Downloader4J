@@ -50,13 +50,13 @@ public class Main {
 	
 	private static GUI gui = new GUI();
 	private static LoggerThread logger;
+	public static boolean verbose;
 	
 	private static volatile int taskNum = 0;
 	
 	public static final String version = "v1.7.0";
 
-	
-	//TODO : add verbose flag, and print existing windows should be in it
+	//TODO : more verbose logging?
 	
 	public static void main(String[] args) {
 		
@@ -73,14 +73,20 @@ public class Main {
 		
 		if(!setup) System.exit(1);
 		
-		if(args.length > 0 && "--help".equals(args[0])) {
-			System.out.println("usage : java -jar YoutubeAudioAutoDownloader " + version + ".jar [options]");
-			System.out.println();
-			System.out.println("options :");
-			System.out.println("\t--logbyTask : Log lines from a task is gathered till the task is done/terminated.");
-			System.out.println("\t              Useful when you don't want to see dirty log file when multiple tasks running.");
-			System.out.println("\t--logTime : Every log line will printed with time");
-			return;
+		if(args.length == 0) return;
+		
+		for (String arg : args) {
+			if ("--help".equals(arg)) {
+				System.out.println("usage : java -jar YoutubeAudioAutoDownloader " + version + ".jar [options]");
+				System.out.println();
+				System.out.println("options :");
+				System.out.println("\t--logbyTask : Log lines from a task is gathered till the task is done/terminated.");
+				System.out.println("\t              Useful when you don't want to see dirty log file when multiple tasks running.");
+				System.out.println("\t--logTime : Every log line will printed with time");
+				System.out.println("\t--verbose : Print verbose logs(like GUI Frmaes info, etc.");
+			} else if ("--verbose".equals(arg)) {
+				verbose = true;
+			}
 		}
 	}
 	

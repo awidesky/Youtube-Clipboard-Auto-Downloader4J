@@ -416,9 +416,11 @@ public class GUI {
 	
 	public void disposeAll() {
 		
-		Main.log("\nExisting Windows are :");
-		Stream.of(JWindow.getWindows()).map(Window::toString).forEach(Main::log);
-		Main.log("\n");
+		if (Main.verbose) {
+			Main.log("\nExisting Windows are :");
+			Stream.of(JWindow.getWindows()).map(Window::toString).forEach(Main::log);
+			Main.log("\n");
+		}
 		
 		Stream.of(JWindow.getWindows()).forEach(Window::dispose);
 		disposeLoadingFrame();
