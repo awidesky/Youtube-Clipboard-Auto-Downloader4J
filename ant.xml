@@ -3,7 +3,8 @@
 	<!--ANT 1.7 is required-->
 	<property name="dir.buildfile" value="."/>
 
-	<property name="version" value="v1.6.5"/>
+	<property name="version_num" value="1.6.5"/>
+	<property name="version" value="v${version_num}"/>
 	<property name="target" value="1.8"/>
 	<property name="source" value="1.8"/>
 	<property name="debuglevel" value="source,lines,vars"/>
@@ -13,6 +14,7 @@
 
 	<target depends="clean" name="init">
 		<mkdir dir="${dir.buildfile}/build"/>
+		<mkdir dir="${dir.buildfile}/build/app"/>
 		<mkdir dir="${dir.buildfile}/build/win_standalone"/>
 	</target>
 
@@ -25,38 +27,66 @@
 	</target>
 
 	<target depends="compile" name="create_run_jar">
-		<jar destfile="${dir.buildfile}/build/YoutubeAudioAutoDownloader ${version}.jar" filesetmanifest="mergewithoutmain">
+		<jar destfile="${dir.buildfile}/build/app/YoutubeAudioAutoDownloader ${version}.jar" filesetmanifest="mergewithoutmain">
 			<manifest>
 				<attribute name="Main-Class" value="com.awidesky.YoutubeClipboardAutoDownloader.Main"/>
 				<attribute name="Class-Path" value="."/>
 			</manifest>
 			<fileset dir="${dir.buildfile}/bin"/>
 		</jar>
-		
-		<copy file="${dir.buildfile}/config.txt" tofile="${dir.buildfile}/build/config.txt"/>
-		<copy file="${dir.buildfile}/YoutubeAudioAutoDownloader-resources/icon.jpg" tofile="${dir.buildfile}/build/icon.jpg"/>
-		
+
+		<copy file="${dir.buildfile}/config.txt" tofile="${dir.buildfile}/build/app/config.txt"/>
+		<copy file="${dir.buildfile}/YoutubeAudioAutoDownloader-resources/icon.jpg" tofile="${dir.buildfile}/build/app/icon.jpg"/>
+
 	</target>
 
-	<target depends="create_run_jar" name="deploy">
 
-		<copy todir="${dir.buildfile}/build/win_standalone">
+	<target depends="create_run_jar" name="deploy_launch4j">
+		
+		<copy todir="${dir.buildfile}/build/win_standalone/launch4j">
 			<fileset dir="${dir.buildfile}">
 				<include name="jre/**"/>
 			</fileset>
 		</copy>
 
-		<copy todir="${dir.buildfile}/build/win_standalone">
+		<copy todir="${dir.buildfile}/build/win_standalone/launch4j">
 			<fileset dir="${dir.buildfile}">
 				<include name="YoutubeAudioAutoDownloader-resources/**"/>
 				<exclude name="YoutubeAudioAutoDownloader-resources/icon.ico"/>
 			</fileset>
 		</copy>
 
-		<copy file="${dir.buildfile}/config.txt" tofile="${dir.buildfile}/build/win_standalone/config.txt"/>
-
-		<launch4j configFile="${dir.buildfile}/Launch4J.xml" jar="${dir.buildfile}\build\YoutubeAudioAutoDownloader ${version}.jar" outfile="${dir.buildfile}\build\win_standalone\YoutubeAudioAutoDownloader ${version}.exe"/>
+		<copy file="${dir.buildfile}/config.txt" tofile="${dir.buildfile}/build/win_standalone/launch4j/config.txt"/>
+					
+		<launch4j configFile="${dir.buildfile}/Launch4J.xml" jar="${dir.buildfile}\build\app\YoutubeAudioAutoDownloader ${version}.jar" outfile="${dir.buildfile}\build\win_standalone\launch4j\YoutubeAudioAutoDownloader ${version}.exe"/>
 		
+	</target>
+	
+	<target depends="create_run_jar" name="deploy_jpackage">
+		<exec executable="C:\Program Files\Java\jdk-17\bin\jpackage.exe">        
+			<arg value="-i" />
+			<arg value="${dir.buildfile}/build/app" />
+			<arg value="--type" />
+			<arg value="exe" /> <!--TODO : pkg, deb, rpm with if statement + copy resources too..??-->
+			<arg value="--main-class" />
+			<arg value="com.awidesky.YoutubeClipboardAutoDownloader.Main" />
+			<arg value="--main-jar" />
+			<arg value="YoutubeAudioAutoDownloader ${version}.jar" />
+			<arg value="--dest" />
+			<arg value="${dir.buildfile}/build/win_standalone/jpackage" />
+			<arg value="--icon" />
+			<arg value="${dir.buildfile}/YoutubeAudioAutoDownloader-resources/icon.ico" />
+			<arg value="--win-dir-chooser" />
+			<arg value="--win-menu" />
+			<arg value="--win-shortcut" />
+			<arg value="--app-version" />
+			<arg value="${version_num}" />
+			<arg value="--name" />
+			<arg value="YoutubeAudioAutoDownloader" />
+		</exec>
+	</target>
+	
+	<target depends="deploy_launch4j, deploy_jpackage" name="deploy">
 	</target>
 
 	<target name="clean">
