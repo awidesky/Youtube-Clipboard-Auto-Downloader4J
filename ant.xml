@@ -42,7 +42,7 @@
 
 
 	<target depends="create_run_jar" name="deploy_launch4j">
-		
+
 		<copy todir="${dir.buildfile}/build/win_standalone/launch4j">
 			<fileset dir="${dir.buildfile}">
 				<include name="jre/**"/>
@@ -57,35 +57,56 @@
 		</copy>
 
 		<copy file="${dir.buildfile}/config.txt" tofile="${dir.buildfile}/build/win_standalone/launch4j/config.txt"/>
-					
+
 		<launch4j configFile="${dir.buildfile}/Launch4J.xml" jar="${dir.buildfile}\build\app\YoutubeAudioAutoDownloader ${version}.jar" outfile="${dir.buildfile}\build\win_standalone\launch4j\YoutubeAudioAutoDownloader ${version}.exe"/>
-		
+
 	</target>
-	
+
 	<target depends="create_run_jar" name="deploy_jpackage">
-		<exec executable="C:\Program Files\Java\jdk-17\bin\jpackage.exe">        
-			<arg value="-i" />
+		<exec executable="C:\Program Files\Java\jdk-17\bin\jpackage.exe">
+			<arg value="--input" />
 			<arg value="${dir.buildfile}/build/app" />
-			<arg value="--type" />
-			<arg value="exe" /> <!--TODO : pkg, deb, rpm with if statement + copy resources too..??-->
-			<arg value="--main-class" />
-			<arg value="com.awidesky.YoutubeClipboardAutoDownloader.Main" />
-			<arg value="--main-jar" />
-			<arg value="YoutubeAudioAutoDownloader ${version}.jar" />
 			<arg value="--dest" />
 			<arg value="${dir.buildfile}/build/win_standalone/jpackage" />
-			<arg value="--icon" />
-			<arg value="${dir.buildfile}/YoutubeAudioAutoDownloader-resources/icon.ico" />
-			<arg value="--win-dir-chooser" />
-			<arg value="--win-menu" />
-			<arg value="--win-shortcut" />
-			<arg value="--app-version" />
-			<arg value="${version_num}" />
+			<arg value="--main-jar" />
+			<arg value="YoutubeAudioAutoDownloader ${version}.jar" />
+			<arg value="--main-class" />
+			<arg value="com.awidesky.YoutubeClipboardAutoDownloader.Main" />
 			<arg value="--name" />
 			<arg value="YoutubeAudioAutoDownloader" />
+			<arg value="--icon" />
+			<arg value="${dir.buildfile}/YoutubeAudioAutoDownloader-resources/icon.ico" />
+			<arg value="--app-version" />
+			<arg value="${version_num}" />
+			<arg value="--license-file" />
+			<arg value="${dir.buildfile}/LICENSE" />
+			
+			<if>
+				<os family="windows" />
+				<then>
+					<arg value="--win-dir-chooser" />
+					<arg value="--win-menu" />
+					<arg value="--win-shortcut" />
+				</then>
+				<elseif>
+					<os family="unix" />
+					<then>
+						<arg value="--linux-shortcut" />
+					</then>
+					<elseif>
+						<os family="mac" />
+						<then>
+							<arg value="--mac-package-identifier" />
+							<arg value="YoutubeAudioAutoDownloader${version}" />
+						</then>
+					</elseif>
+				</elseif>
+			</if>
 		</exec>
+
+			<!--TODO : copy resources too..??-->
 	</target>
-	
+
 	<target depends="deploy_launch4j, deploy_jpackage" name="deploy">
 	</target>
 
