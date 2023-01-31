@@ -120,7 +120,7 @@
 	</target>
 
 	<target name="clean">
-		
+		<delete dir="${dir.buildfile}/build"/>
 	</target>
 
 </project>
