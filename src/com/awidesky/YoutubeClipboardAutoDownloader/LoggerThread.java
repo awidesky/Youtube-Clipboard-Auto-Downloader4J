@@ -2,7 +2,6 @@ package com.awidesky.YoutubeClipboardAutoDownloader;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.Writer;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -43,8 +42,8 @@ public class LoggerThread extends Thread {
 		this(new PrintWriter(os, autoFlush, cs));
 	}
 	
-	public LoggerThread(Writer wr) { 
-		logTo = new PrintWriter(wr);
+	public LoggerThread(PrintWriter wr) { 
+		logTo = wr;
 	}
 	
 	public void setDatePrefix(DateFormat datePrefix) {
