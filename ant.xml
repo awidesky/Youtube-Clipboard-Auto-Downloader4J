@@ -13,36 +13,36 @@
 
 	<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask" classpath="${launch4j.dir}/launch4j.jar:${launch4j.dir}/lib/xstream.jar"/>
 
-    <macrodef name="jpackage.exec">
-        <sequential>
-    		<exec executable="C:\Program Files\Java\jdk-17\bin\jpackage.exe">
-    			<arg value="--input" />
-    			<arg value="${jarApp.dir}" />
-    			<arg value="--dest" />
-    			<arg value="${dir.buildfile}/build/win_standalone/jpackage" />
-    			<arg value="--main-jar" />
-    			<arg value="YoutubeAudioAutoDownloader ${version}.jar" />
-    			<arg value="--main-class" />
-    			<arg value="com.awidesky.YoutubeClipboardAutoDownloader.Main" />
-    			<arg value="--name" />
-    			<arg value="YoutubeAudioAutoDownloader" />
-    			<arg value="--icon" />
-    			<arg value="${dir.buildfile}/YoutubeAudioAutoDownloader-resources/icon.ico" />
-    			<arg value="--app-version" />
-    			<arg value="${version_num}" />
-    			<arg value="--license-file" />
-    			<arg value="${dir.buildfile}/LICENSE" />
-    			<arg value="--win-dir-chooser" />
-    			<arg value="--win-menu" />
-    			<arg value="--win-shortcut" />
-    		</exec>
-        </sequential>
-    </macrodef>
+	<macrodef name="jpackage.exec">
+		<sequential>
+			<exec executable="C:\Program Files\Java\jdk-17\bin\jpackage.exe">
+				<arg value="--input" />
+				<arg value="${jarApp.dir}" />
+				<arg value="--dest" />
+				<arg value="${dir.buildfile}/build/win_standalone/jpackage" />
+				<arg value="--main-jar" />
+				<arg value="YoutubeAudioAutoDownloader ${version}.jar" />
+				<arg value="--main-class" />
+				<arg value="com.awidesky.YoutubeClipboardAutoDownloader.Main" />
+				<arg value="--name" />
+				<arg value="YoutubeAudioAutoDownloader" />
+				<arg value="--icon" />
+				<arg value="${dir.buildfile}/YoutubeAudioAutoDownloader-resources/icon.ico" />
+				<arg value="--app-version" />
+				<arg value="${version_num}" />
+				<arg value="--license-file" />
+				<arg value="${dir.buildfile}/LICENSE" />
+				<arg value="--win-dir-chooser" />
+				<arg value="--win-menu" />
+				<arg value="--win-shortcut" />
+			</exec>
+		</sequential>
+	</macrodef>
 
 	
 	<target depends="clean" name="init">
-		<mkdir dir="${dir.buildfile}/build"/>
-		<mkdir dir="${dir.buildfile}/build/YoutubeAudioAutoDownloader_${version}"/>
+		<mkdir dir="${dir.buildfile}/build" />
+		<mkdir dir="${dir.buildfile}/build/YoutubeAudioAutoDownloader_${version}" />
 		<mkdir dir="${dir.buildfile}/build/win_standalone"/>
 	</target>
 
@@ -71,6 +71,13 @@
 
 	<target depends="create_run_jar" name="deploy_launch4j">
 
+		<if>
+		  <available file="${dir.buildfile}/jre" type="dir" />
+		  <then>
+		  	<exec executable="${dir.buildfile}\jremaker.bat"/>
+		  </then>
+		</if>
+		
 		<copy todir="${dir.buildfile}/build/win_standalone/launch4j">
 			<fileset dir="${dir.buildfile}">
 				<include name="jre/**"/>
@@ -98,22 +105,22 @@
 				<exclude name="YoutubeAudioAutoDownloader-resources/icon.ico"/>
 			</fileset>
 		</copy>
-		
+
 		<jpackage.exec/>
-		<rename src="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}.exe" dest="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}_setup_resourceBundled.exe"/>
-		
+		<move src="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}.exe" dest="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}_setup_resourceBundled.exe"/>
+
 		<delete dir="${jarApp.dir}/YoutubeAudioAutoDownloader-resources"/>
-		
+
 		<jpackage.exec/>
-		<rename src="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}.exe" dest="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}_setup.exe"/>
-		
+		<move src="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}.exe" dest="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}_setup.exe"/>
+
 	</target>
 
 	<target depends="deploy_jpackage_win" name="deploy">
 	</target>
 
 	<target name="clean">
-		<delete dir="${dir.buildfile}/build"/>
+		
 	</target>
 
 </project>
