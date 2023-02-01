@@ -48,5 +48,8 @@ Set-content  -NoNewline -Path '.\YoutubeAudioAutoDownloader-resources\ydlver.txt
 Write-output "  youtube-dl version : $youtubedl_version"
 
 
+Write-output "  Generating custom Java Runtime for Launch4j..."
+.\jremaker.bat
+
 
 Write-output "  Done!"
