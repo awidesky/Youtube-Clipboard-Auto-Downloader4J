@@ -107,12 +107,12 @@
 		</copy>
 
 		<jpackage.exec/>
-		<move src="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}.exe" dest="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}_setup_resourceBundled.exe"/>
+		<move file="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}.exe" tofile="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}_setup_resourceBundled.exe"/>
 
 		<delete dir="${jarApp.dir}/YoutubeAudioAutoDownloader-resources"/>
 
 		<jpackage.exec/>
-		<move src="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}.exe" dest="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}_setup.exe"/>
+		<move file="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}.exe" tofile="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}_setup.exe"/>
 
 	</target>
 
