@@ -19,7 +19,7 @@ import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 public class YoutubeAudioDownloader {
 
 
-	private static String projectpath = new File(new File(".").getAbsolutePath()).getParent();
+	private static String projectpath = getProjectRootPath();
 	private static String youtubedlpath;
 	private static Pattern percentPtn = Pattern.compile("[0-9]+\\.*[0-9]+%");
 	private static Pattern versionPtn = Pattern.compile("\\d{4}\\.\\d{2}\\.\\d{2}");
@@ -27,6 +27,17 @@ public class YoutubeAudioDownloader {
 	private static Map<String, Callable<Boolean>> fallBackFix = new HashMap<>();
 	
 
+	/**
+	 * returns String represents the path to the running jar.
+	 * */
+	private static String getProjectRootPath() {
+		String ret = new File(new File(".").getAbsolutePath()).getParent();
+		if (System.getProperty("jpackage.app-path") != null) {
+			ret += File.separator + "app";
+		}
+		return ret;
+	}
+	
 	private static int runFixCommand(String error, String... command) {
 		
 		int ret;
