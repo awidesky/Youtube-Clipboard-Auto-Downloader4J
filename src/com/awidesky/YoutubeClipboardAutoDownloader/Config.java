@@ -1,8 +1,11 @@
 package com.awidesky.YoutubeClipboardAutoDownloader;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 
 public class Config { 
 	
@@ -23,7 +26,12 @@ public class Config {
 	
 	public static synchronized void setSaveto(String saveto) {
 		
-		Config.saveto = saveto;
+		File file = new File(saveto);
+		if(file.isDirectory() && file.exists() || file.mkdirs()) {
+			Config.saveto = saveto;
+		} else {
+			GUI.error("Download Path is invalid!", "Invalid path : " + saveto, null, false);
+		}
 		
 	}
 	
