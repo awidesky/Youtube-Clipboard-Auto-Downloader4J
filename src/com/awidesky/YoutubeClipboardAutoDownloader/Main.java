@@ -106,10 +106,10 @@ public class Main {
 			return false;
 		}
 
-		gui.setLoadingStat(LoadingStatus.CHECKING_YDL);
-		if (!YoutubeAudioDownloader.checkYoutubedl()) return false;
 		gui.setLoadingStat(LoadingStatus.CHECKING_FFMPEG);
 		if (!YoutubeAudioDownloader.checkFfmpeg()) return false;
+		gui.setLoadingStat(LoadingStatus.CHECKING_YDL);
+		if (!YoutubeAudioDownloader.checkYoutubedl()) return false;
 		
 		gui.setLoadingStat(LoadingStatus.READING_PROPERTIES);
 		readProperties();

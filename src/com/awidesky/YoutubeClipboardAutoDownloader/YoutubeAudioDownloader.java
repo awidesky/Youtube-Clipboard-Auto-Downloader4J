@@ -20,7 +20,7 @@ public class YoutubeAudioDownloader {
 
 
 	private static String projectpath = getProjectRootPath();
-	private static String youtubedlpath;
+	private static String youtubedlpath = projectpath + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "ffmpeg" + File.separator + "bin" + File.separator;
 	private static Pattern percentPtn = Pattern.compile("[0-9]+\\.*[0-9]+%");
 	private static Pattern versionPtn = Pattern.compile("\\d{4}\\.\\d{2}\\.\\d{2}");
 	
@@ -72,40 +72,6 @@ public class YoutubeAudioDownloader {
 	
 	
 
-	/**
-	 * @return Whether the procedure went fine
-	 * */
-	public static boolean checkYoutubedl() {
-
-		/* check youtube-dl */
-		if (checkYoutubedlPath("youtube-dl")) {
-			
-			youtubedlpath = "";
-			
-		} else {
-			
-			youtubedlpath = projectpath + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "ffmpeg" + File.separator + "bin" + File.separator;
-			
-			if (!checkYoutubedlPath(youtubedlpath + "youtube-dl")) {
-
-				GUI.error("Error!", "youtube-dl does not exist in\n" + youtubedlpath + "\nor system %PATH%", null, true);
-	 			if (GUI.confirm("youtube-dl does not exist!", "Move to download page of youtube-dl?")) Main.webBrowse("http://ytdl-org.github.io/youtube-dl/download.html");
-				return false;
-				
-			}
-
-		}
-		
-		Main.log("[init] projectpath = " + projectpath);
-		Main.log("[init] youtubedlpath = " + (youtubedlpath.equals("") ? "system %PATH%" : youtubedlpath) + "\n");
-
-		fallBackFix.put("ERROR: unable to download video data: HTTP Error 403: Forbidden", () -> {
-			 return runFixCommand("ERROR: unable to download video data: HTTP Error 403: Forbidden", youtubedlpath + "youtube-dl", "--rm-cache-dir") == 0;
-		});
-		
-		return true;
-		
-	}
 	
 	/**
 	 * @return Whether the procedure went fine
@@ -136,8 +102,19 @@ public class YoutubeAudioDownloader {
 		} catch (Exception e) {
 			
 			GUI.error("Error!", "ffmpeg does not exist in\n" + youtubedlpath + "\nor system %PATH%", null, true);
-	 		if (GUI.confirm("ffmpeg does not exist!", "Move to download page of ffmpeg?")) Main.webBrowse("https://ffmpeg.org/download.html");
-			return false;
+	 		if (GUI.confirm("ffmpeg does not exist!", "Install ffmpeg inside the app?")) {
+	 			try {
+					BinaryInstaller.getFFmpeg();
+					Main.log("ffmpeg installation success. re-checking ffmpeg...");
+					return checkFfmpeg();
+				} catch (IOException e1) {
+					GUI.error("Failed to install ffmpeg!", "%e%", e1, true);
+					return false;
+				}
+	 		} else {
+	 			Main.webBrowse("https://ffmpeg.org/download.html");
+	 			return false;
+	 		}
 			
 		}
 		
@@ -146,6 +123,50 @@ public class YoutubeAudioDownloader {
 		
 	}
 	
+	/**
+	 * @return Whether the procedure went fine
+	 * */
+	public static boolean checkYoutubedl() {
+		
+		/* check youtube-dl */
+		if (checkYoutubedlPath("youtube-dl")) {
+			
+			youtubedlpath = "";
+			
+		} else {
+			
+			if (!checkYoutubedlPath(youtubedlpath + "youtube-dl")) {
+				
+				GUI.error("Error!", "youtube-dl does not exist in\n" + youtubedlpath + "\nor system %PATH%", null, true);
+				if (GUI.confirm("youtube-dl does not exist!", "Install youtube-dl inside the app?")) {
+					try {
+						BinaryInstaller.getYtdlp();
+						Main.log("youtube-dl installation success. re-checking youtube-dl...");
+						return checkYoutubedl();
+					} catch (IOException e) {
+						GUI.error("Failed to install yt-dlp!", "%e%", e, true);
+						return false;
+					}
+
+				} else {
+					Main.webBrowse("http://ytdl-org.github.io/youtube-dl/download.html");
+					return false;
+				}
+				
+			}
+			
+		}
+		
+		Main.log("[init] projectpath = " + projectpath);
+		Main.log("[init] youtubedlpath = " + (youtubedlpath.equals("") ? "system %PATH%" : youtubedlpath) + "\n");
+		
+		fallBackFix.put("ERROR: unable to download video data: HTTP Error 403: Forbidden", () -> {
+			return runFixCommand("ERROR: unable to download video data: HTTP Error 403: Forbidden", youtubedlpath + "youtube-dl", "--rm-cache-dir") == 0;
+		});
+		
+		return true;
+		
+	}
 
 	private static boolean checkYoutubedlPath(String ydlfile) {
 		
@@ -213,6 +234,9 @@ public class YoutubeAudioDownloader {
 
 	public static String getProjectpath() {
 		return projectpath;
+	}
+	public static String getYoutubedlpath() {
+		return projectpath + File.separator + "YoutubeAudioAutoDownloader-resources";
 	}
 
 

@@ -2,8 +2,8 @@ package com.awidesky.YoutubeClipboardAutoDownloader;
 
 public enum LoadingStatus {
 
-	CHECKING_YDL("Checking youtube-dl installation...", 17),
-	CHECKING_FFMPEG("Checking ffmpeg installation...", 42), 
+	CHECKING_FFMPEG("Checking ffmpeg installation...", 17), 
+	CHECKING_YDL("Checking youtube-dl installation...", 42),
 	READING_PROPERTIES("Reading properties...", 77), 
 	PREPARING_THREADS("Preparing threads...", 83), 
 	LOADING_WINDOW("Loading window components...", 100);
