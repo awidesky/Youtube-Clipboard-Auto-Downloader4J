@@ -27,6 +27,8 @@ import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
+import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
+
 public class BinaryInstaller {
 
 	public static final String FFMPEG_URL = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"; 
@@ -62,9 +64,7 @@ public class BinaryInstaller {
 		Files.delete(Paths.get(root, "ffmpeg.zip"));
 		deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "doc"));
 		
-		SwingUtilities.invokeLater(() -> {
-			loadingFrame.setVisible(false);
-		});
+		hideProgress();
 		Main.log("ffmpeg installed!!");
 	}
 	
@@ -139,6 +139,7 @@ public class BinaryInstaller {
 			Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 			loadingFrame = new JFrame();
 			loadingFrame.setTitle(title);
+			loadingFrame.setIconImage(GUI.ICON);
 			loadingFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			loadingFrame.setSize(420, 100);
 			loadingFrame.setLocation(dim.width / 2 - loadingFrame.getSize().width / 2,

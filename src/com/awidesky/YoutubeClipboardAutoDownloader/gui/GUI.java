@@ -50,7 +50,7 @@ public class GUI {
 	private JLabel loadingStatus;
 	private JProgressBar initProgress;
 	
-	private static final Image icon = new ImageIcon(YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\icon.jpg").getImage();
+	public static final Image ICON = new ImageIcon(YoutubeAudioDownloader.getProjectpath() + "\\YoutubeAudioAutoDownloader-resources\\icon.jpg").getImage();
 
 	private JFrame mainFrame;
 	private JButton browse, cleanCompleted, removeSwitch, nameFormatHelp, openConfig, modeSwitch, openSaveDir;
@@ -91,7 +91,7 @@ public class GUI {
 		/** make <code>loadingFrame</code> */
 		loadingFrame = new JFrame();
 		loadingFrame.setTitle("loading...");
-		loadingFrame.setIconImage(icon);
+		loadingFrame.setIconImage(ICON);
 		loadingFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		loadingFrame.setSize(450, 100); //add more height than fxml because it does not think about title length
 		loadingFrame.setLocation(dim.width/2-loadingFrame.getSize().width/2, dim.height/2-loadingFrame.getSize().height/2);
@@ -127,7 +127,7 @@ public class GUI {
 		/** make <code>mainFrame</code> */
 		mainFrame = new JFrame();
 		mainFrame.setTitle("Youtube Audio Auto Downloader " + Main.version);
-		mainFrame.setIconImage(icon);
+		mainFrame.setIconImage(ICON);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.setSize(630, 495);
 		mainFrame.setLocation(dim.width/2-mainFrame.getSize().width/2, dim.height/2-mainFrame.getSize().height/2);
@@ -481,7 +481,7 @@ public class GUI {
 
 		JDialog dialog = new JDialog();
 		dialog.setAlwaysOnTop(true);
-		dialog.setIconImage(icon);
+		dialog.setIconImage(ICON);
 		if (EventQueue.isDispatchThread()) {
 
 			JOptionPane.showMessageDialog(dialog, content.replace("\n", System.lineSeparator()), title.replace("\n", System.lineSeparator()), JOptionPane.ERROR_MESSAGE);
@@ -534,7 +534,7 @@ public class GUI {
 		
 		final JDialog dialog = new JDialog();
 		dialog.setAlwaysOnTop(true);
-		dialog.setIconImage(icon);
+		dialog.setIconImage(ICON);
 		
 		if (EventQueue.isDispatchThread()) {
 
@@ -585,7 +585,7 @@ public class GUI {
 		
 		final JDialog dialog = new JDialog();
 		dialog.setAlwaysOnTop(true);
-		dialog.setIconImage(icon);
+		dialog.setIconImage(ICON);
 		
 		if (EventQueue.isDispatchThread()) {
 
