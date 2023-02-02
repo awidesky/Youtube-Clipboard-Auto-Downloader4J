@@ -44,6 +44,8 @@
 		<mkdir dir="${dir.buildfile}/build" />
 		<mkdir dir="${dir.buildfile}/build/YoutubeAudioAutoDownloader_${version}" />
 		<mkdir dir="${dir.buildfile}/build/win_standalone"/>
+		<mkdir dir="${jarApp.dir}"/>
+		<mkdir dir="${jarApp.dir}/YoutubeAudioAutoDownloader-resources"/>
 	</target>
 
 	<target depends="init" name="compile">
@@ -64,7 +66,7 @@
 		</jar>
 
 		<copy file="${dir.buildfile}/config.txt" tofile="${jarApp.dir}/config.txt"/>
-		<copy file="${dir.buildfile}/YoutubeAudioAutoDownloader-resources/icon.jpg" tofile="${jarApp.dir}/icon.jpg"/>
+		<copy file="${dir.buildfile}/YoutubeAudioAutoDownloader-resources/icon.jpg" tofile="${jarApp.dir}/YoutubeAudioAutoDownloader-resources/icon.jpg"/>
 
 	</target>
 
