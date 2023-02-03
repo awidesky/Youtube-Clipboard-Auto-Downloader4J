@@ -340,7 +340,7 @@ public class YoutubeAudioDownloader {
 			p = pb.directory(new File(Config.getSaveto())).start();
 		} catch (IOException e1) {
 			task.setStatus("ERROR");
-			GUI.error("Error when executing youtube-dl", "[Task" + task.getTaskNum() + "|downloading] Couldn't start youtube-dl : %e%" , e1, true);
+			GUI.error("Error [" + task.getVideoName() + "]", "[Task" + task.getTaskNum() + "|downloading] Couldn't start youtube-dl :\n%e%" , e1, true);
 			return;
 		}
 		
@@ -396,7 +396,7 @@ public class YoutubeAudioDownloader {
 		} catch (IOException e) {
 
 			task.setStatus("ERROR");
-			GUI.error("[Task" + task.getTaskNum() + "|downloading] Error when redirecting output of youtube-dl", "%e%", e, true);
+			GUI.error("Error [" + task.getVideoName() + "]", "[Task" + task.getTaskNum() + "|downloading] Error when redirecting output of youtube-dl\n%e%", e, true);
 			
 		}
 
@@ -428,14 +428,14 @@ public class YoutubeAudioDownloader {
 					return;
 				}
 
-				GUI.error("Error in youtube-dl",
+				GUI.error("Error [" + task.getVideoName() + "]",
 						"[Task" + task.getTaskNum() + "|downloading] There's Error(s) in youtube-dl proccess!\n" + sb1.toString(), null, true);
 			}
 
 		} catch (Exception e) {
 
 			task.setStatus("ERROR");
-			GUI.error("[Task" + task.getTaskNum() + "|downloading] Error when redirecting error output of youtube-dl", "%e%", e, true);
+			GUI.error("Error [" + task.getVideoName() + "]", "[Task" + task.getTaskNum() + "|downloading] Error when redirecting error output of youtube-dl\n%e%", e, true);
 
 		}
 
@@ -454,7 +454,7 @@ public class YoutubeAudioDownloader {
 		} catch (InterruptedException e) {
 			
 			task.setStatus("ERROR");
-			GUI.error("Error when waiting youtube-dl process", "[Task" + task.getTaskNum() + "|downloading] Failed to wait youtube-dl process : %e%", e, true);
+			GUI.error("Error [" + task.getVideoName() + "]", "[Task" + task.getTaskNum() + "|downloading] Failed to wait youtube-dl process : %e%", e, true);
 			
 		}
 
