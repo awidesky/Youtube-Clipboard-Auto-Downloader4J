@@ -27,7 +27,7 @@ public class Config {
 	public static synchronized void setSaveto(String saveto) {
 		
 		File file = new File(saveto);
-		if(file.isDirectory() && file.exists() || file.mkdirs()) {
+		if((file.exists() || file.mkdirs()) && file.isDirectory()) {
 			Config.saveto = saveto;
 		} else {
 			GUI.error("Download Path is invalid!", "Invalid path : " + saveto, null, false);

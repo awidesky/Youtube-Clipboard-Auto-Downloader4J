@@ -196,29 +196,6 @@ public class GUI {
 		pathField = new JTextField(Config.getSaveto());
 		nameFormatField =  new JTextField(Config.getFileNameFormat());
 		
-		pathField.addActionListener((e) -> { Config.setSaveto(pathField.getText()); });
-		pathField.getDocument().addDocumentListener(new DocumentListener() {
-
-	        @Override
-	        public void removeUpdate(DocumentEvent e) {
-	        	changed(e);
-	        }
-
-	        @Override
-	        public void insertUpdate(DocumentEvent e) {
-	        	changed(e);
-	        }
-
-	        @Override
-	        public void changedUpdate(DocumentEvent arg0) {
-	        	changed(arg0);
-	        }
-	        
-	        private void changed(DocumentEvent e) {
-	        	Config.setSaveto(pathField.getText());
-	        }
-	        
-	    });
 		nameFormatField.addActionListener((e) -> { Config.setFileNameFormat(nameFormatField.getText()); });
 		
 		pathField.setBounds(65, 65, 456, 22); 
@@ -248,7 +225,6 @@ public class GUI {
 			}
 
 			String path = jfc.getSelectedFile().getAbsolutePath();
-			Config.setSaveto(path);
 			pathField.setText(path);
 			jfc.setCurrentDirectory(new File(path));
 
@@ -451,6 +427,21 @@ public class GUI {
 	}
 	
 
+	public String getSavePath() {
+		final AtomicReference<String> result = new AtomicReference<>();
+		try {
+			SwingUtilities.invokeAndWait(() -> {
+				result.set(pathField.getText());
+			});
+		} catch (Exception e) {
+			error("Failed to wait for EDT!", "Unable to get TextField data!\n%e%", e, false);
+			return Config.getSaveto();
+		}
+		return result.get();
+	} 
+	
+	
+	
 
 	/**
 	 * show error dialog.
@@ -647,5 +638,6 @@ public class GUI {
 	
 	private static boolean showConfirmDialog(String title, String message, JDialog dialog) {
 		return JOptionPane.showConfirmDialog(dialog, message, title,JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
-	} 
+	}
+
 }

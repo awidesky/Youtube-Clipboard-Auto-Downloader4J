@@ -249,6 +249,7 @@ public class Main {
 			if (YoutubeAudioDownloader.validateAndSetName(url, t, p)) {
 
 				t.setStatus("Preparing...");
+				Config.setSaveto(gui.getSavePath());
 				YoutubeAudioDownloader.download(url, t, p);
 
 			} else {
