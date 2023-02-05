@@ -1,4 +1,4 @@
-package com.awidesky.YoutubeClipboardAutoDownloader.gui;
+package com.awidesky.YoutubeClipboardAutoDownloader.enums;
 
 import java.util.HashMap;
 import java.util.Map;

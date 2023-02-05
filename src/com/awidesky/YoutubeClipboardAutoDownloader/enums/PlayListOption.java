@@ -1,4 +1,4 @@
-package com.awidesky.YoutubeClipboardAutoDownloader;
+package com.awidesky.YoutubeClipboardAutoDownloader.enums;
 
 import java.util.stream.Stream;
 

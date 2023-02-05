@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.awidesky.YoutubeClipboardAutoDownloader.enums.ClipBoardOption;
+import com.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 
 public class Config { 

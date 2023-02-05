@@ -24,22 +24,23 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.SwingUtilities;
 
-import com.awidesky.YoutubeClipboardAutoDownloader.gui.ClipBoardCheckerThread;
+import com.awidesky.YoutubeClipboardAutoDownloader.enums.ClipBoardOption;
+import com.awidesky.YoutubeClipboardAutoDownloader.enums.LoadingStatus;
+import com.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
+import com.awidesky.YoutubeClipboardAutoDownloader.workers.ClipBoardCheckerThread;
+import com.awidesky.YoutubeClipboardAutoDownloader.workers.DownloadTaskWorker;
+import com.awidesky.YoutubeClipboardAutoDownloader.workers.LoggerThread;
 
 /** Main class */
 public class Main { 
 
-	private static ExecutorService executorService;
 	private static String clipboardBefore = "";
 	private static boolean isSecondtime = false;
 	private static ClipBoardCheckerThread clipChecker;
@@ -116,7 +117,6 @@ public class Main {
 
 		
 		gui.setLoadingStat(LoadingStatus.PREPARING_THREADS);
-		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		clipChecker = new ClipBoardCheckerThread();
 		clipChecker.start(); //A daemon thread that will check clipboard
 
@@ -236,7 +236,7 @@ public class Main {
 		TaskStatusModel.getinstance().addTask(t);
 		
 		
-		t.setFuture( executorService.submit(() -> { // download worker thread exist
+		t.setFuture(DownloadTaskWorker.submit(() -> {
 
 			String url = "\"" + data + "\"";
 			
@@ -458,11 +458,6 @@ public class Main {
 	}
 
 	
-	public static ExecutorService getExecutorservice() {
-		return executorService;
-	}
-
-	
 	public static void clearTasks() {
 		try {
 			if(SwingUtilities.isEventDispatchThread()) {
@@ -484,15 +479,7 @@ public class Main {
 		
 		log("YoutubeAudioAutoDownloader exit code : " + exitcode);
 		
-		if (executorService != null && !executorService.isShutdown()) {
-			executorService.shutdownNow();
-			try {
-				executorService.awaitTermination(2500, TimeUnit.MILLISECONDS);
-			} catch (InterruptedException e) {
-				logger.log("Failed to wait worker Thread to shutdown!");
-				logger.log(e);
-			}
-		}
+		DownloadTaskWorker.kill();
 
 		writeProperties();
 			

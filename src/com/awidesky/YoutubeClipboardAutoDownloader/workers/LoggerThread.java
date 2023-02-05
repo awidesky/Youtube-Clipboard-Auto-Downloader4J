@@ -1,4 +1,4 @@
-package com.awidesky.YoutubeClipboardAutoDownloader;
+package com.awidesky.YoutubeClipboardAutoDownloader.workers;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;

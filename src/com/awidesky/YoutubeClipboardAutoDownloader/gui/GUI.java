@@ -35,12 +35,13 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 
-import com.awidesky.YoutubeClipboardAutoDownloader.ClipBoardOption;
 import com.awidesky.YoutubeClipboardAutoDownloader.Config;
-import com.awidesky.YoutubeClipboardAutoDownloader.LoadingStatus;
 import com.awidesky.YoutubeClipboardAutoDownloader.Main;
-import com.awidesky.YoutubeClipboardAutoDownloader.PlayListOption;
 import com.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
+import com.awidesky.YoutubeClipboardAutoDownloader.enums.ClipBoardOption;
+import com.awidesky.YoutubeClipboardAutoDownloader.enums.LoadingStatus;
+import com.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
+import com.awidesky.YoutubeClipboardAutoDownloader.enums.TableColumnEnum;
 
 public class GUI {
 	

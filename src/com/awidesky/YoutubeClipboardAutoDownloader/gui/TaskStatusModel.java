@@ -12,6 +12,7 @@ import javax.swing.table.AbstractTableModel;
 
 import com.awidesky.YoutubeClipboardAutoDownloader.Main;
 import com.awidesky.YoutubeClipboardAutoDownloader.TaskData;
+import com.awidesky.YoutubeClipboardAutoDownloader.enums.TableColumnEnum;
 
 public class TaskStatusModel extends AbstractTableModel {
 
