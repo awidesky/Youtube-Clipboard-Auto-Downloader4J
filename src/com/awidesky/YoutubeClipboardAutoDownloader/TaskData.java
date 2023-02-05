@@ -19,6 +19,9 @@ public class TaskData {
 	private int totalNumOfVideo = 1;
 	private int videoNum = 0;
 	
+	/** Is this task finished or failed? */
+	private boolean isDone = false;
+	
 	private Future<?> fu;
 	private Process p;
 	
@@ -88,15 +91,25 @@ public class TaskData {
 		return taskNum;
 	}
 
-	public void done() {
+	public void finished() {
+		isDone = true;
+		setStatus("Done!");
+		setProgress(100);
 		fu = null;
 		p = null;
-		setProgress(100);
-		setStatus("Done!");
+	}
+	
+	public void failed() {
+		isDone = true;
+		kill();
+		setStatus("ERROR");
+		setProgress(-1);
+		fu = null;
+		p = null;
 	}
 
 	public boolean isNotDone() {
-		return !status.equals("Done!");
+		return !isDone;
 	}
 
 	public void setTotalNumVideo(int vdnum) {

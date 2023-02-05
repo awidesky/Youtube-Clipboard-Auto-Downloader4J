@@ -57,8 +57,6 @@ public class Main {
 	
 	public static final String version = "v1.7.0";
 
-	//TODO : more verbose logging?
-	
 	public static void main(String[] args) {
 		
 		boolean setup = false;
@@ -254,14 +252,14 @@ public class Main {
 				if((file.exists() || file.mkdirs()) && file.isDirectory()) {
 					Config.setSaveto(save);
 				} else {
-					t.setStatus("ERROR");
+					t.failed();
 					GUI.error("Download Path is invalid!", "Invalid path : " + save, null, false);
 					return;
 				}
 				YoutubeAudioDownloader.download(url, t, p);
 
 			} else {
-				t.setStatus("ERROR");
+				t.failed();
 				GUI.error("[Task" + num + "|validating] Not a valid url!",	data + "\nis unvalid or unsupported url!", null, true);
 				return;
 			}

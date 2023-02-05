@@ -340,7 +340,7 @@ public class YoutubeAudioDownloader {
 		try {
 			p = pb.directory(new File(Config.getSaveto())).start();
 		} catch (IOException e1) {
-			task.setStatus("ERROR");
+			task.failed();
 			GUI.error("Error [" + task.getVideoName() + "]", "[Task" + task.getTaskNum() + "|downloading] Couldn't start youtube-dl :\n%e%" , e1, true);
 			return;
 		}
@@ -396,7 +396,7 @@ public class YoutubeAudioDownloader {
 
 		} catch (IOException e) {
 
-			task.setStatus("ERROR");
+			task.failed();
 			GUI.error("Error [" + task.getVideoName() + "]", "[Task" + task.getTaskNum() + "|downloading] Error when redirecting output of youtube-dl\n%e%", e, true);
 			
 		}
@@ -410,7 +410,7 @@ public class YoutubeAudioDownloader {
 
 			while ((line = br.readLine()) != null) {
 
-				task.setStatus("ERROR");
+				task.failed();
 				sb1.append(line);
 				Main.log("[Task" + task.getTaskNum() + "|downloading] youtube-dl stderr : " + line);
 				fix = fallBackFix.get(line);
@@ -435,7 +435,7 @@ public class YoutubeAudioDownloader {
 
 		} catch (Exception e) {
 
-			task.setStatus("ERROR");
+			task.failed();
 			GUI.error("Error [" + task.getVideoName() + "]", "[Task" + task.getTaskNum() + "|downloading] Error when redirecting error output of youtube-dl\n%e%", e, true);
 
 		}
@@ -444,17 +444,17 @@ public class YoutubeAudioDownloader {
 		try {
 			
 			if( (errorCode = p.waitFor()) != 0) { 
-				task.setStatus("ERROR");
+				task.failed();
 				GUI.error("Error in youtube-dl", "[Task" + task.getTaskNum() + "|downloading] youtube-dl has ended with error code : " + errorCode, null, true);
 				Main.log("[Task" + task.getTaskNum() + "|downloading] elapsed time in downloading(failed) : " + ((System.nanoTime() - startTime) / 1e6) + "ms" );
 				return;
 			} else {
-				task.done();
+				task.finished();
 			}
 			
 		} catch (InterruptedException e) {
 			
-			task.setStatus("ERROR");
+			task.failed();
 			GUI.error("Error [" + task.getVideoName() + "]", "[Task" + task.getTaskNum() + "|downloading] Failed to wait youtube-dl process : %e%", e, true);
 			
 		}

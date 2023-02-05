@@ -193,7 +193,7 @@ public class TaskStatusModel extends AbstractTableModel {
 		
 		if (EventQueue.isDispatchThread()) {
 
-			return "Done!".equals(rows.get(rows.indexOf(t)).getStatus());
+			return !rows.get(rows.indexOf(t)).isNotDone();
 			
 		} else {
 			
@@ -202,7 +202,7 @@ public class TaskStatusModel extends AbstractTableModel {
 			try {
 
 				SwingUtilities.invokeAndWait(() -> {
-					result.set("Done!".equals(rows.get(rows.indexOf(t)).getStatus()));
+					result.set(!rows.get(rows.indexOf(t)).isNotDone());
 				});
 				return result.get();
 
