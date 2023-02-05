@@ -31,7 +31,7 @@ public class YoutubeAudioDownloader {
 	 * returns String represents the path to the running jar.
 	 * */
 	private static String getProjectRootPath() {
-		String ret = new File(new File(".").getAbsolutePath()).getParent();
+		String ret = new File("").getAbsolutePath();
 		if (System.getProperty("jpackage.app-path") != null) {
 			ret += File.separator + "app";
 		}
