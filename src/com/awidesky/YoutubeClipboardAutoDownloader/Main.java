@@ -249,12 +249,20 @@ public class Main {
 			if (YoutubeAudioDownloader.validateAndSetName(url, t, p)) {
 
 				t.setStatus("Preparing...");
-				Config.setSaveto(gui.getSavePath());
+				String save = gui.getSavePath();
+				File file = new File(save);
+				if((file.exists() || file.mkdirs()) && file.isDirectory()) {
+					Config.setSaveto(save);
+				} else {
+					t.setStatus("ERROR");
+					GUI.error("Download Path is invalid!", "Invalid path : " + save, null, false);
+					return;
+				}
 				YoutubeAudioDownloader.download(url, t, p);
 
 			} else {
 				t.setStatus("ERROR");
-				GUI.error("[Task" + num + "|validating] Not a valid url!",	data + "\nis not valid or unsupported url!", null, true);
+				GUI.error("[Task" + num + "|validating] Not a valid url!",	data + "\nis unvalid or unsupported url!", null, true);
 				return;
 			}
 
