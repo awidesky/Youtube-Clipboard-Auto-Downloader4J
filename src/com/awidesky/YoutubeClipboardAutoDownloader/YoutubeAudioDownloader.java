@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import com.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
+import com.awidesky.YoutubeClipboardAutoDownloader.util.SwingDialogs;
 
 public class YoutubeAudioDownloader {
 
@@ -62,7 +63,7 @@ public class YoutubeAudioDownloader {
 		} catch (Exception e) {
 			
 			ret = -1;
-			GUI.error("Error!", "Error when fixing youtube-dl problem!\n%e%", e, false);
+			SwingDialogs.error("Error!", "Error when fixing youtube-dl problem!\n%e%", e, false);
 			
 		}
 		
@@ -102,14 +103,14 @@ public class YoutubeAudioDownloader {
 			
 		} catch (Exception e) {
 			
-			GUI.error("Error!", "ffmpeg does not exist in\n" + youtubedlpath + "\nor system %PATH%", null, true);
-	 		if (GUI.confirm("ffmpeg does not exist!", "Install ffmpeg inside the app?")) {
+			SwingDialogs.error("Error!", "ffmpeg does not exist in\n" + youtubedlpath + "\nor system %PATH%", null, true);
+	 		if (SwingDialogs.confirm("ffmpeg does not exist!", "Install ffmpeg inside the app?")) {
 	 			try {
 					BinaryInstaller.getFFmpeg();
 					Main.log("ffmpeg installation success. re-checking ffmpeg...");
 					return checkFfmpeg();
 				} catch (IOException e1) {
-					GUI.error("Failed to install ffmpeg!", "%e%", e1, true);
+					SwingDialogs.error("Failed to install ffmpeg!", "%e%", e1, true);
 					return false;
 				}
 	 		} else {
@@ -138,14 +139,14 @@ public class YoutubeAudioDownloader {
 			
 			if (!checkYoutubedlPath(youtubedlpath + "youtube-dl")) {
 				
-				GUI.error("Error!", "youtube-dl does not exist in\n" + youtubedlpath + "\nor system %PATH%", null, true);
-				if (GUI.confirm("youtube-dl does not exist!", "Install youtube-dl inside the app?")) {
+				SwingDialogs.error("Error!", "youtube-dl does not exist in\n" + youtubedlpath + "\nor system %PATH%", null, true);
+				if (SwingDialogs.confirm("youtube-dl does not exist!", "Install youtube-dl inside the app?")) {
 					try {
 						BinaryInstaller.getYtdlp();
 						Main.log("youtube-dl installation success. re-checking youtube-dl...");
 						return checkYoutubedl();
 					} catch (IOException e) {
-						GUI.error("Failed to install yt-dlp!", "%e%", e, true);
+						SwingDialogs.error("Failed to install yt-dlp!", "%e%", e, true);
 						return false;
 					}
 
@@ -255,7 +256,8 @@ public class YoutubeAudioDownloader {
 			ProcessBuilder pbGetName = new ProcessBuilder(args);
 			
 			// retrieve command line argument
-			Main.log("\n\n[Task" + task.getTaskNum() + "|validating] Getting video name by \"" + pbGetName.command().stream().collect(Collectors.joining(" "))	+ "\"");
+			//TODO : how set prifix? delete Main.log or make it private...?
+			logTask.log("\n\n[Task" + task.getTaskNum() + "|validating] Getting video name by \"" + pbGetName.command().stream().collect(Collectors.joining(" "))	+ "\"");
 
 			// start process
 			Process p1 = pbGetName.directory(null).start();

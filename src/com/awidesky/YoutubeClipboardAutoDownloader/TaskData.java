@@ -6,8 +6,11 @@ import java.util.concurrent.Future;
 import javax.swing.SwingUtilities;
 
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
+import com.awidesky.YoutubeClipboardAutoDownloader.util.Logger;
 
 public class TaskData {
+	
+	public final Logger logger;
 	
 	private String videoName = "null"; 
 	private String url = "null"; 
@@ -25,8 +28,9 @@ public class TaskData {
 	private Future<?> fu;
 	private Process p;
 	
-	public TaskData(int num) {
+	public TaskData(int num, Logger logger) {
 		this.taskNum = num;
+		this.logger = logger;
 	}
 	
 

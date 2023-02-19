@@ -13,7 +13,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -21,10 +20,7 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.SwingUtilities;
@@ -34,9 +30,11 @@ import com.awidesky.YoutubeClipboardAutoDownloader.enums.LoadingStatus;
 import com.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
+import com.awidesky.YoutubeClipboardAutoDownloader.util.Logger;
+import com.awidesky.YoutubeClipboardAutoDownloader.util.LoggerThread;
+import com.awidesky.YoutubeClipboardAutoDownloader.util.SwingDialogs;
 import com.awidesky.YoutubeClipboardAutoDownloader.workers.ClipBoardCheckerThread;
 import com.awidesky.YoutubeClipboardAutoDownloader.workers.DownloadTaskWorker;
-import com.awidesky.YoutubeClipboardAutoDownloader.workers.LoggerThread;
 
 /** Main class */
 public class Main { 
@@ -50,8 +48,11 @@ public class Main {
 	public static volatile boolean audioMode = true;
 	
 	private static GUI gui = new GUI();
-	private static LoggerThread logger;
+	private static LoggerThread loggerThread;
+	private static Logger logger;
 	public static boolean verbose;
+	public static boolean logbyTask;
+	public static boolean logTime;
 	
 	private static volatile int taskNum = 0;
 	
@@ -62,12 +63,14 @@ public class Main {
 		boolean setup = false;
 		try {
 			
-			prepareLogFile(Arrays.stream(args).anyMatch("--logbyTask"::equals), Arrays.stream(args).anyMatch("--logTime"::equals));
+			logbyTask = Arrays.stream(args).anyMatch("--logbyTask"::equals);
+			logTime = Arrays.stream(args).anyMatch("--logTime"::equals);
+			prepareLogFile();
 			setup = setup(args);
 			
 		} catch (Exception e) {
 			setup = false;
-			GUI.error("Failed to initiate!", "Application Failed to initiate!\n%e%", e, true);
+			SwingDialogs.error("Failed to initiate!", "Application Failed to initiate!\n%e%", e, true);
 		}
 		
 		if(!setup) System.exit(1);
@@ -125,7 +128,7 @@ public class Main {
 			try {
 				gui.initMainFrame();
 			} catch (Exception e) {
-				GUI.error("Failed to initiate!", "Application Failed to initiate!\n" + e.getClass().getName() + " : %e%", e, true);
+				SwingDialogs.error("Failed to initiate!", "Application Failed to initiate!\n" + e.getClass().getName() + " : %e%", e, true);
 				Main.kill(1);
 			}
 		});
@@ -164,7 +167,7 @@ public class Main {
 				
 				if (Config.getClipboardListenOption() == ClipBoardOption.ASK) {
 
-					if (!GUI.confirm("Download link in clipboard?", "Link : " + data)) {
+					if (!SwingDialogs.confirm("Download link in clipboard?", "Link : " + data)) {
 
 						Main.log("\n[GUI.linkAcceptChoose] Download link " + data + "? : " + false + "\n");
 
@@ -182,7 +185,7 @@ public class Main {
 
 			} catch (InterruptedException | HeadlessException | UnsupportedFlavorException | IOException e1) {
 
-				GUI.error("Error when checking clipboard!", "%e%", e1, true);
+				SwingDialogs.error("Error when checking clipboard!", "%e%", e1, true);
 
 			}
 
@@ -212,9 +215,10 @@ public class Main {
 	private static void submitDownload(String data) {
 
 		int num = taskNum++;
-		log("\n[Task" + num + "] " + "Received a link from your clipboard : " + data);
+		Logger logTask = loggerThread.getLogger("[Task" + num + "]");
+		logTask.log("Received a link from your clipboard : " + data);
 
-		TaskData t = new TaskData(num);
+		TaskData t = new TaskData(num, logTask);
 		
 		t.setUrl(data); 
 		t.setVideoName(data); // temporarily set video name as url
@@ -225,8 +229,8 @@ public class Main {
 			if(!TaskStatusModel.getinstance().isTaskDone(t)) {
 				return;
 			}
-			if(!GUI.confirm("Download same file in same directory?", data + "\nis already downloaded (by another Task) in\n" + Config.getSaveto() + "\ndownload anyway?")) {
-				log("[Task" + num + "] is cancelled because same download exists.");
+			if(!SwingDialogs.confirm("Download same file in same directory?", data + "\nis already downloaded (by another Task) in\n" + Config.getSaveto() + "\ndownload anyway?")) {
+				logTask.log("is cancelled because same download exists.");
 				return;
 			}
 		}
@@ -241,7 +245,7 @@ public class Main {
 			PlayListOption p = Config.getPlaylistOption();
 			
 			if (p == PlayListOption.ASK && data.contains("list=")) {
-				p = (GUI.confirm("Download entire Playlist?", "PlayList Link : " + url)) ? PlayListOption.YES : PlayListOption.NO;
+				p = (SwingDialogs.confirm("Download entire Playlist?", "PlayList Link : " + url)) ? PlayListOption.YES : PlayListOption.NO;
 			}
 					
 			if (YoutubeAudioDownloader.validateAndSetName(url, t, p)) {
@@ -253,21 +257,21 @@ public class Main {
 					Config.setSaveto(save);
 				} else {
 					t.failed();
-					GUI.error("Download Path is invalid!", "Invalid path : " + save, null, false);
+					SwingDialogs.error("Download Path is invalid!", "Invalid path : " + save, null, false);
 					return;
 				}
 				YoutubeAudioDownloader.download(url, t, p);
 
 			} else {
 				t.failed();
-				GUI.error("[Task" + num + "|validating] Not a valid url!",	data + "\nis unvalid or unsupported url!", null, true);
+				SwingDialogs.error("[Task" + num + "|validating] Not a valid url!",	data + "\nis unvalid or unsupported url!", null, true);
 				return;
 			}
 
 		}));
 	}
 	
-	private static void prepareLogFile(boolean logbyTask, boolean logTime) {
+	private static void prepareLogFile() {
 		
 		try {
 			
@@ -276,62 +280,35 @@ public class Main {
 			logFolder.mkdirs();
 			logFile.createNewFile();
 			
-			if(logbyTask) {
-				
-				logger = new LoggerThread(new PrintWriter(new FileOutputStream(logFile), true)) {
-					
-					private Map<Integer, StringBuilder> tasklog = new HashMap<>();
-					private static Pattern numPtn = Pattern.compile("\\d+");
-					private static Pattern taskTerminatePtn = Pattern.compile(Pattern.quote("[Task") + "\\d+(" + Pattern.quote("|Finished]") + "|" + Pattern.quote("|Canceled]") + ")");
-
-					@Override
-					public void log(String data) {
-
-						if(data.strip().startsWith("[Task")) {
-							Matcher m = numPtn.matcher(data);
-							m.find();
-							int key = Integer.parseInt(m.group());
-							tasklog.computeIfAbsent(key, s -> new StringBuilder()).append(data + "\n");
-							if(taskTerminatePtn.matcher(data).find()) {
-								super.log(tasklog.get(key).toString());
-								tasklog.remove(key);
-							}
-						} else {
-							super.log(data);
-						}
-						
-					}
-					
-					@Override
-					public void kill(int timeOut) {
-						if(!tasklog.isEmpty()) {
-							log("Following logs are from task(s) that are not done yet.");
-							tasklog.values().stream().map(StringBuilder::toString).forEach(this::log);
-						}
-						super.kill(timeOut);
-					}
-					
-				};
-				
-			} else {
-				logger = new LoggerThread(new PrintWriter(new FileOutputStream(logFile), true));
-			}
-			
-			if(logTime) {
-				logger.setDatePrefix(new SimpleDateFormat("kk-mm-ss"));
-			}
+			loggerThread = new LoggerThread(new FileOutputStream(logFile), true);
 			
 		} catch (IOException e) {
 
-			logger = new LoggerThread(System.out, true);
-			GUI.error("Error when creating log flie", "%e%", e, false);
+			loggerThread = new LoggerThread(System.out, true);
+			SwingDialogs.error("Error when creating log flie", "%e%", e, false);
 			
 		} finally {
-			logger.start();
+			SwingDialogs.setLogger(loggerThread.getLogger());
+			logger = loggerThread.getLogger();
+			loggerThread.start();
 		}
 		
 	}
 
+	public Logger getLogger() {
+		
+		Logger ret;
+		if(logbyTask) {
+			ret = loggerThread.getBufferedLogger(null);
+		} else {
+			ret = loggerThread.getLogger(null);
+		}
+		if(logTime) {
+			ret.setDatePrefix(new SimpleDateFormat("kk-mm-ss"));
+		}
+		return ret;
+		
+	}
 	
 	/**
 	 * note - this method should be Exception-proof.
@@ -374,15 +351,15 @@ public class Main {
 			
 		} catch (FileNotFoundException e1) {
 
-			GUI.warning("config.txt not exists!","%e%\nDon't worry! I'll make one later...", e1, false);
+			SwingDialogs.warning("config.txt not exists!","%e%\nDon't worry! I'll make one later...", e1, false);
 
 		} catch (NullPointerException e2) {
 			
-			GUI.warning("config.txt has no or invalid data!", "NullPointerException : %e%\nI'll initiate config.txt with default...", e2, false);
+			SwingDialogs.warning("config.txt has no or invalid data!", "NullPointerException : %e%\nI'll initiate config.txt with default...", e2, false);
 
 		} catch (Exception e) {
 
-			GUI.warning("Exception occurred when reading config.txt", "%e%\nI'll initiate config.txt with default...", e, false);
+			SwingDialogs.warning("Exception occurred when reading config.txt", "%e%\nI'll initiate config.txt with default...", e, false);
 
 		} finally {
 			
@@ -437,7 +414,7 @@ public class Main {
 			
 		} catch (IOException e) {
 
-			GUI.error("Error when writing config.txt file", "%e%", e,  true);
+			SwingDialogs.error("Error when writing config.txt file", "%e%", e,  true);
 
 		} 
 
@@ -472,7 +449,7 @@ public class Main {
 				SwingUtilities.invokeAndWait(TaskStatusModel.getinstance()::clearAll);
 			}
 		} catch (InvocationTargetException | InterruptedException e1) {
-			GUI.error("Error when shutting GUI down!", "%e%", e1, false);;
+			SwingDialogs.error("Error when shutting GUI down!", "%e%", e1, false);;
 		}
 	}
 	
@@ -489,7 +466,7 @@ public class Main {
 
 		writeProperties();
 			
-		logger.kill(2500);
+		loggerThread.kill(2500);
 		
 		System.exit(exitcode);
 		
@@ -510,9 +487,9 @@ public class Main {
 			}
 
 		} catch (IOException e) {
-			GUI.warning("Cannot open default web browser!", "Please visit" + link + "\n%e%", e, false);
+			SwingDialogs.warning("Cannot open default web browser!", "Please visit" + link + "\n%e%", e, false);
 		} catch (URISyntaxException e) {
-			GUI.error("Invalid url!", link + "\n%e%", e, false);
+			SwingDialogs.error("Invalid url!", link + "\n%e%", e, false);
 		}
 
 	}
@@ -524,7 +501,7 @@ public class Main {
 		try {
 			Desktop.getDesktop().open(f);
 		} catch (IOException e) {
-			GUI.warning("Cannot open default text file editor!", "Please open" + f.getAbsolutePath() + "\n%e%", e, true);
+			SwingDialogs.warning("Cannot open default text file editor!", "Please open" + f.getAbsolutePath() + "\n%e%", e, true);
 		}
 		
 	}
@@ -535,7 +512,7 @@ public class Main {
 		try {
 			Desktop.getDesktop().open(f);
 		} catch (IOException e) {
-			GUI.warning("Cannot open directory explorer!", "Please open" + f.getAbsolutePath() + "\n%e%", e, true);
+			SwingDialogs.warning("Cannot open directory explorer!", "Please open" + f.getAbsolutePath() + "\n%e%", e, true);
 		}
 		
 	}
