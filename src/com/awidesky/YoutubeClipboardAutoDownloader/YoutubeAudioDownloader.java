@@ -346,7 +346,7 @@ public class YoutubeAudioDownloader {
 		}
 		
 		task.setProcess(p);
-		task.setStatus("initiating download");
+		task.setStatus("Initiating Download");
 		task.setProgress(0);
 
 
@@ -379,7 +379,7 @@ public class YoutubeAudioDownloader {
 				
 				Matcher m = percentPtn.matcher(line);
 				if (m.find() && line.contains("ETA")) {
-					task.setStatus("Downloading");
+					task.setStatus("Downloading (" + task.getNowVideoNum() + "/" + task.getTotalNumVideo() + ")");
 					int num = (int)Math.round(Double.parseDouble(m.group().replace("%", "")));
 					if(downloadVideoAndAudioSeparately) {
 						task.setProgress(((videoDownloadDone) ? 50 : 0) + num/2);

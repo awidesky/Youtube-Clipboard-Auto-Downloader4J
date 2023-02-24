@@ -17,7 +17,7 @@ public class TaskData {
 	private boolean checked = false;
 	private int taskNum;
 	private int totalNumOfVideo = 1;
-	private int videoNum = 0;
+	private int videoNum = 1;
 	
 	/** Is this task finished or failed? */
 	private boolean isDone = false;
