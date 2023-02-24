@@ -374,7 +374,7 @@ public class YoutubeAudioDownloader {
 				}
 				
 				if(line.startsWith("[ExtractAudio]")) {
-					task.setStatus("Extracting Audio");
+					task.setStatus("Extracting Audio (" + task.getNowVideoNum() + "/" + task.getTotalNumVideo() + ")");
 				}
 				
 				Matcher m = percentPtn.matcher(line);
