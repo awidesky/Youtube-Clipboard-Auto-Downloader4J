@@ -15,7 +15,7 @@
 
 	<macrodef name="jpackage.exec">
 		<sequential>
-			<exec executable="C:\Program Files\Java\jdk-17\bin\jpackage.exe">
+			<exec executable="jpackage.exe">
 				<arg value="--input" />
 				<arg value="${jarApp.dir}" />
 				<arg value="--dest" />
@@ -71,15 +71,17 @@
 	</target>
 
 
-	<target depends="create_run_jar" name="deploy_launch4j">
+	<target name="checkCustomJRE" unless="customjre.exists">
+		<available file="${dir.buildfile}/jre" type="dir" property="file.exists"/>
+	</target>
+	<target depends="checkCustomJRE" name="make_custom_jre" unless="${file.exists}">
+		<exec executable="cmd">
+			<arg line="/c jremaker.bat"/>
+		</exec>
+	</target>
+	
+	<target depends="create_run_jar, make_custom_jre" name="deploy_launch4j">
 
-		<if>
-		  <available file="${dir.buildfile}/jre" type="dir" />
-		  <then>
-		  	<exec executable="${dir.buildfile}\jremaker.bat"/>
-		  </then>
-		</if>
-		
 		<copy todir="${dir.buildfile}/build/win_standalone/launch4j">
 			<fileset dir="${dir.buildfile}">
 				<include name="jre/**"/>
@@ -118,7 +120,7 @@
 
 	</target>
 
-	<target depends="deploy_jpackage_win" name="deploy">
+	<target depends="deploy_jpackage_win, deploy_launch4j" name="deploy">
 	</target>
 
 	<target name="clean">
