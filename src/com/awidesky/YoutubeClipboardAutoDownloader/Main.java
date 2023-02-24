@@ -218,7 +218,7 @@ public class Main {
 		
 		t.setUrl(data); 
 		t.setVideoName(data); // temporarily set video name as url
-		t.setDest(Config.getSaveto());
+		t.setDest(gui.getSavePath());
 		t.setStatus("Validating...");
 		
 		if(TaskStatusModel.getinstance().isTaskExists(t)) {
@@ -247,7 +247,7 @@ public class Main {
 			if (YoutubeAudioDownloader.validateAndSetName(url, t, p)) {
 
 				t.setStatus("Preparing...");
-				String save = gui.getSavePath();
+				String save = t.getDest();
 				File file = new File(save);
 				if((file.exists() || file.mkdirs()) && file.isDirectory()) {
 					Config.setSaveto(save);
@@ -281,8 +281,8 @@ public class Main {
 				logger = new LoggerThread(new PrintWriter(new FileOutputStream(logFile), true)) {
 					
 					private Map<Integer, StringBuilder> tasklog = new HashMap<>();
-					private static Pattern numPtn = Pattern.compile("\\d+");
-					private static Pattern taskTerminatePtn = Pattern.compile(Pattern.quote("[Task") + "\\d+(" + Pattern.quote("|Finished]") + "|" + Pattern.quote("|Canceled]") + ")");
+					private Pattern numPtn = Pattern.compile("\\d+");
+					private Pattern taskTerminatePtn = Pattern.compile(Pattern.quote("[Task") + "\\d+(" + Pattern.quote("|Finished]") + "|" + Pattern.quote("|Canceled]") + ")");
 
 					@Override
 					public void log(String data) {
