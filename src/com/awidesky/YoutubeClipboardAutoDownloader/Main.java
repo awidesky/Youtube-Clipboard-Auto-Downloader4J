@@ -223,7 +223,7 @@ public class Main {
 		
 		t.setUrl(data); 
 		t.setVideoName(data); // temporarily set video name as url
-		t.setDest(Config.getSaveto());
+		t.setDest(gui.getSavePath());
 		t.setStatus("Validating...");
 		
 		if(TaskStatusModel.getinstance().isTaskExists(t)) {
@@ -252,7 +252,7 @@ public class Main {
 			if (YoutubeAudioDownloader.validateAndSetName(url, t, p)) {
 
 				t.setStatus("Preparing...");
-				String save = gui.getSavePath();
+				String save = t.getDest();
 				File file = new File(save);
 				if((file.exists() || file.mkdirs()) && file.isDirectory()) {
 					Config.setSaveto(save);
@@ -282,6 +282,51 @@ public class Main {
 			logFile.createNewFile();
 			
 			loggerThread = new LoggerThread(new FileOutputStream(logFile), true);
+
+			/*if(logbyTask) {
+				
+				logger = new LoggerThread(new PrintWriter(new FileOutputStream(logFile), true)) {
+					
+					private Map<Integer, StringBuilder> tasklog = new HashMap<>();
+					private Pattern numPtn = Pattern.compile("\\d+");
+					private Pattern taskTerminatePtn = Pattern.compile(Pattern.quote("[Task") + "\\d+(" + Pattern.quote("|Finished]") + "|" + Pattern.quote("|Canceled]") + ")");
+
+					@Override
+					public void log(String data) {
+
+						if(data.strip().startsWith("[Task")) {
+							Matcher m = numPtn.matcher(data);
+							m.find();
+							int key = Integer.parseInt(m.group());
+							tasklog.computeIfAbsent(key, s -> new StringBuilder()).append(data + "\n");
+							if(taskTerminatePtn.matcher(data).find()) {
+								super.log(tasklog.get(key).toString());
+								tasklog.remove(key);
+							}
+						} else {
+							super.log(data);
+						}
+						
+					}
+					
+					@Override
+					public void kill(int timeOut) {
+						if(!tasklog.isEmpty()) {
+							log("Following logs are from task(s) that are not done yet.");
+							tasklog.values().stream().map(StringBuilder::toString).forEach(this::log);
+						}
+						super.kill(timeOut);
+					}
+					
+				};
+				
+			} else {
+				logger = new LoggerThread(new PrintWriter(new FileOutputStream(logFile), true));
+			}*/
+			
+			if(logTime) {
+				logger.setDatePrefix(new SimpleDateFormat("kk-mm-ss"));
+			}
 			
 		} catch (IOException e) {
 
