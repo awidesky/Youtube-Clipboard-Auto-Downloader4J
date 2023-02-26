@@ -65,7 +65,7 @@ public class GUI {
 	private JTable table;
 	private JScrollPane scrollPane;
 	
-	private Logger logger = Main.getLogger("[GUI] ");
+	private Logger logger = null;
 	
 	public GUI() {
 		
@@ -88,6 +88,8 @@ public class GUI {
 	 * 
 	 * */
 	public void initLoadingFrame() {
+		
+		logger = Main.getLogger("[GUI] ");
 		
 		/** make <code>loadingFrame</code> */
 		loadingFrame = new JFrame();
