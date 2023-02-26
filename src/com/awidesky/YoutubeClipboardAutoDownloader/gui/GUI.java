@@ -39,6 +39,7 @@ import com.awidesky.YoutubeClipboardAutoDownloader.enums.ClipBoardOption;
 import com.awidesky.YoutubeClipboardAutoDownloader.enums.LoadingStatus;
 import com.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
 import com.awidesky.YoutubeClipboardAutoDownloader.enums.TableColumnEnum;
+import com.awidesky.YoutubeClipboardAutoDownloader.util.Logger;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.SwingDialogs;
 
 public class GUI {
@@ -64,6 +65,7 @@ public class GUI {
 	private JTable table;
 	private JScrollPane scrollPane;
 	
+	private Logger logger = Main.getLogger("[GUI] ");
 	
 	public GUI() {
 		
@@ -102,7 +104,7 @@ public class GUI {
 			public void windowClosing(WindowEvent e) {
 				
 				e.getWindow().dispose();
-				Main.log("LoadingFrame was closed");
+				logger.log("LoadingFrame was closed");
 				Main.kill(0);
 
 			}
@@ -392,9 +394,10 @@ public class GUI {
 	public void disposeAll() {
 		
 		if (Main.verbose) {
-			Main.log("\nExisting Windows are :");
-			Stream.of(JWindow.getWindows()).map(Window::toString).forEach(Main::log);
-			Main.log("\n");
+			logger.newLine();
+			logger.log("Existing Windows are :");
+			Stream.of(JWindow.getWindows()).map(Window::toString).forEach(logger::log);
+			logger.newLine();
 		}
 		
 		Stream.of(JWindow.getWindows()).forEach(Window::dispose);

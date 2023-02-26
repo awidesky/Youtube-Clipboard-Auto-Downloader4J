@@ -13,6 +13,8 @@ import javax.swing.table.AbstractTableModel;
 import com.awidesky.YoutubeClipboardAutoDownloader.Main;
 import com.awidesky.YoutubeClipboardAutoDownloader.TaskData;
 import com.awidesky.YoutubeClipboardAutoDownloader.enums.TableColumnEnum;
+import com.awidesky.YoutubeClipboardAutoDownloader.util.Logger;
+import com.awidesky.YoutubeClipboardAutoDownloader.util.SwingDialogs;
 
 public class TaskStatusModel extends AbstractTableModel {
 
@@ -22,6 +24,7 @@ public class TaskStatusModel extends AbstractTableModel {
 	private static final long serialVersionUID = -7803447765391487650L;
 
 	private static TaskStatusModel instance = new TaskStatusModel();
+	private static Logger log = Main.getLogger("[TaskStatusModel] ");
 	private List<TaskData> rows = new Vector<>();
 
 	private Consumer<Boolean> checkBoxSelectedCalback = null;
@@ -63,7 +66,7 @@ public class TaskStatusModel extends AbstractTableModel {
 		default:
 			break;
 		}
-		GUI.error("Invalid column index!", "Invalid column index : " + columnIndex, null, false);
+		SwingDialogs.error("Invalid column index!", "Invalid column index : " + columnIndex, null, false);
 		return null; // this should not happen!
 	}
 
@@ -77,7 +80,7 @@ public class TaskStatusModel extends AbstractTableModel {
 
 		TableColumnEnum result = TableColumnEnum.valueOfIndex(column);
 		if(result == null) {
-			GUI.error("Invalid column index!", "Invalid column index : " + column, null, false);
+			SwingDialogs.error("Invalid column index!", "Invalid column index : " + column, null, false);
 			return "null"; // this should not happen!
 		} else {
 			return result.getName();
@@ -114,7 +117,7 @@ public class TaskStatusModel extends AbstractTableModel {
 	public boolean removeSelected(int[] selected) {
 		
 		if (Arrays.stream(selected).mapToObj(rows::get).anyMatch(TaskData::isNotDone)) 
-			if (!GUI.confirm("Before removing!", "Some task(s) you chose are not done!\nCancel those task(s)?"))
+			if (!SwingDialogs.confirm("Before removing!", "Some task(s) you chose are not done!\nCancel those task(s)?"))
 				return false;
 		
 		Arrays.stream(selected).mapToObj(rows::get).filter(TaskData::isNotDone).forEach(TaskData::kill);
@@ -127,7 +130,7 @@ public class TaskStatusModel extends AbstractTableModel {
 	public void clearAll() {
 
 		if (rows.stream().anyMatch(TaskData::isNotDone)) 
-			if (!GUI.confirm("Before clearing!", "Some task(s) are not done!\nCancel all task(s) and clear list?"))
+			if (!SwingDialogs.confirm("Before clearing!", "Some task(s) are not done!\nCancel all task(s) and clear list?"))
 				return;
 		
 		rows.stream().filter(TaskData::isNotDone).forEach(TaskData::kill);
@@ -174,8 +177,8 @@ public class TaskStatusModel extends AbstractTableModel {
 
 			} catch (Exception e) {
 				
-				Main.log("Exception when checking existing Task(s)");
-				Main.log(e);
+				log.log("Exception when checking existing Task(s)");
+				log.log(e);
 				
 			}
 			
@@ -208,8 +211,8 @@ public class TaskStatusModel extends AbstractTableModel {
 
 			} catch (Exception e) {
 				
-				Main.log("Exception when checking existing Task(s) is done");
-				Main.log(e);
+				log.log("Exception when checking existing Task(s) is done");
+				log.log(e);
 				
 			}
 			

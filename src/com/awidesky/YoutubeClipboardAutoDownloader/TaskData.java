@@ -137,7 +137,7 @@ public class TaskData {
 		if(isNotDone()) {
 			if (p != null) p.destroy();
 			if (fu != null) fu.cancel(true);
-			Main.log("[Task" + taskNum + "|Canceled] Task number " + taskNum + " has killed!");
+			logger.log("[Canceled] Task number " + taskNum + " has killed!");
 		}
 	}
 

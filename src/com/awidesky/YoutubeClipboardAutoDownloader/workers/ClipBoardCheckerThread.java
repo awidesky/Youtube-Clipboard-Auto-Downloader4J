@@ -3,10 +3,12 @@ package com.awidesky.YoutubeClipboardAutoDownloader.workers;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import com.awidesky.YoutubeClipboardAutoDownloader.Main;
+import com.awidesky.YoutubeClipboardAutoDownloader.util.Logger;
 
 public class ClipBoardCheckerThread extends Thread {
 
 	private static LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
+	private static Logger log = Main.getLogger("[ClipBoardChecker] ");
 	
 	public ClipBoardCheckerThread() {
 
@@ -17,7 +19,8 @@ public class ClipBoardCheckerThread extends Thread {
 				 try {
 				 	 queue.take().run();
 				} catch (InterruptedException e) {
-					 Main.log("ClipBoardCheckerThread Interrupted! : " + e.getMessage());
+					 log.log("ClipBoardCheckerThread Interrupted!");
+					 log.log(e);
 				}
 			}
 

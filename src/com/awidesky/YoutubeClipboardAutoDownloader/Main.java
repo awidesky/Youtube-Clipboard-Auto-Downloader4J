@@ -103,8 +103,8 @@ public class Main {
 			});
 		} catch (InvocationTargetException | InterruptedException e2) {
 
-			log("[init] failed wating EDT!");
-			log(e2);
+			logger.log("[init] failed wating EDT!");
+			logger.log(e2);
 			return false;
 		}
 
@@ -133,7 +133,8 @@ public class Main {
 			}
 		});
 		
-		log("\nListening clipboard...\n");
+		logger.newLine();
+		logger.log("Listening clipboard...\n");
 		return true;
 		
 	}
@@ -141,7 +142,7 @@ public class Main {
 	private static void checkClipBoard() {
 
 		if (Config.getClipboardListenOption() == ClipBoardOption.NOLISTEN) {
-			log("[debug] clipboard ignored due to ClipboardListenOption == \"" + ClipBoardOption.NOLISTEN.getString() + "\"");
+			logger.log("[debug] clipboard ignored due to ClipboardListenOption == \"" + ClipBoardOption.NOLISTEN.getString() + "\"");
 			return;
 		}
 
@@ -154,14 +155,14 @@ public class Main {
 				final String data = (String) Toolkit.getDefaultToolkit().getSystemClipboard()
 						.getData(DataFlavor.stringFlavor); //what if file is selected?
 
-				log("[debug] clipboard : " + data);
+				logger.log("[debug] clipboard : " + data);
 				
 				if (isRedundant(data)) return;
 				
 				clipboardBefore = data;
 
 				if (!Config.isLinkAcceptable(data)) {
-					log("[debug] " + data + " is not acceptable!");
+					logger.log("[debug] " + data + " is not acceptable!");
 					return;
 				}
 				
@@ -169,11 +170,11 @@ public class Main {
 
 					if (!SwingDialogs.confirm("Download link in clipboard?", "Link : " + data)) {
 
-						Main.log("\n[GUI.linkAcceptChoose] Download link " + data + "? : " + false + "\n");
+						logger.log("[GUI.linkAcceptChoose] Download link " + data + "? : " + false + "\n");
 
 					} else {
 
-						Main.log("\n[GUI.linkAcceptChoose] Download link " + data + "? : " + true + "\n");
+						logger.log("[GUI.linkAcceptChoose] Download link " + data + "? : " + true + "\n");
 						Arrays.stream(data.split(Pattern.quote("\n"))).forEach(Main::submitDownload);
 
 					}
@@ -215,7 +216,7 @@ public class Main {
 	private static void submitDownload(String data) {
 
 		int num = taskNum++;
-		Logger logTask = loggerThread.getLogger("[Task" + num + "]");
+		Logger logTask = loggerThread.getLogger("[Task" + num + "] ");
 		logTask.log("Received a link from your clipboard : " + data);
 
 		TaskData t = new TaskData(num, logTask);
@@ -289,7 +290,7 @@ public class Main {
 			
 		} finally {
 			SwingDialogs.setLogger(loggerThread.getLogger());
-			logger = loggerThread.getLogger();
+			logger = loggerThread.getLogger("[Main] ");
 			loggerThread.start();
 		}
 		
@@ -370,7 +371,8 @@ public class Main {
 			Config.setFileNameFormat(n);
 			Config.setClipboardListenOption(c);
 			
-			Main.logProperties("\n\nInitial");
+			logger.newLine();
+			logProperties(logger, "Initial properties :");
 			
 		}
 
@@ -410,7 +412,8 @@ public class Main {
 			bw.write(Config.getAcceptedLinkStr());
 			bw.flush();
 			
-			Main.logProperties("\n\nFinal");
+			logger.newLine();
+			logProperties(logger, "Final properties :");
 			
 		} catch (IOException e) {
 
@@ -420,24 +423,12 @@ public class Main {
 
 	}
 	
-	public static void logProperties(String status) {
-		
-		log(status + Config.status());
-		
+	public static Logger getLogger(String prefix) {
+		return loggerThread.getLogger(prefix);
 	}
 
-
-
-	public static void log(String data) {
-
-		logger.log(data);
-		
-	}
-	
-	public static void log(Exception e) {
-		
-		logger.log(e);
-		
+	public static void logProperties(Logger logTo, String status) {
+		logTo.log(status + Config.status());
 	}
 
 	
@@ -460,7 +451,7 @@ public class Main {
 	 * */
 	public static void kill(int exitcode) {
 		
-		log("YoutubeAudioAutoDownloader exit code : " + exitcode);
+		logger.log("YoutubeAudioAutoDownloader exit code : " + exitcode);
 		
 		DownloadTaskWorker.kill();
 

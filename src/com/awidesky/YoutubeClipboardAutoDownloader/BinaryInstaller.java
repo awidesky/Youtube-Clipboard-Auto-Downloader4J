@@ -28,6 +28,7 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
+import com.awidesky.YoutubeClipboardAutoDownloader.util.Logger;
 
 public class BinaryInstaller {
 
@@ -41,12 +42,13 @@ public class BinaryInstaller {
 	
 	private static final int BUFFER_SIZE = 1024 * 1024;
 	
+	private static final Logger log = Main.getLogger("[util.BinaryInstaller] ");
 	
 	public static void getFFmpeg() throws MalformedURLException, IOException {
 		
 		deleteDirectoryRecursion(Paths.get(root, "ffmpeg"));
 		
-		Main.log("Installing ffmpeg...");
+		log.log("Installing ffmpeg...");
 		long filesize = getFileSize(new URL(FFMPEG_URL));
 		if(filesize <= 0) throw new IOException("Unable to reach " + FFMPEG_URL);
 		showProgress("Downloading ffmpeg...", filesize);
@@ -65,18 +67,18 @@ public class BinaryInstaller {
 		deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "doc"));
 		
 		hideProgress();
-		Main.log("ffmpeg installed!!");
+		log.log("ffmpeg installed!!");
 	}
 	
 	public static void getYtdlp() throws MalformedURLException, IOException {
-		Main.log("Installing yt-dlp...");
+		log.log("Installing yt-dlp...");
 		long filesize = getFileSize(new URL(YTDLP_URL));
 		if(filesize <= 0) throw new IOException("Unable to reach " + YTDLP_URL);
 		showProgress("Downloading yt-dlp...", filesize);
 		
 		download(new URL(YTDLP_URL), new File(root + File.separator + "ffmpeg" + File.separator + "bin"  + File.separator + "youtube-dl.exe"));
 		hideProgress();
-		Main.log("yt-dlp installed!!");
+		log.log("yt-dlp installed!!");
 	}
 
 	private static void download(URL url, File dest) throws IOException {
@@ -90,12 +92,12 @@ public class BinaryInstaller {
 		try (ReadableByteChannel in = Channels.newChannel(url.openStream());
 				FileChannel out = new FileOutputStream(dest).getChannel()) {
 			
-			Main.log("Downloading from " + url.toString() + " to " + dest.getAbsolutePath());
-			Main.log("Buffer size : " + formatFileSize(BUFFER_SIZE));
+			log.log("Downloading from " + url.toString() + " to " + dest.getAbsolutePath());
+			log.log("Buffer size : " + formatFileSize(BUFFER_SIZE));
 			
 			ByteBuffer bytebuf = ByteBuffer.allocateDirect(BUFFER_SIZE);
 			long total = getFileSize(url);
-			Main.log("Target file size : " + formatFileSize(total));
+			log.log("Target file size : " + formatFileSize(total));
 			int written = 0;
 			boolean eof = false;
   			while (true) {
@@ -115,7 +117,7 @@ public class BinaryInstaller {
 		
 		if(ee != null) throw ee;
 		
-		Main.log("Successfully downloaded " + url.toString());
+		log.log("Successfully downloaded " + url.toString());
 	}
 	
 	private static long getFileSize(URL url) {
@@ -161,7 +163,7 @@ public class BinaryInstaller {
 		
 	}
 	private static void updateUI(long now, long total) {
-		Main.log("Progress : " + formatFileSize(now) + " / " + formatFileSize(total) + " (" + ((int)(100.0 * now / total)) + "%)");
+		log.log("Progress : " + formatFileSize(now) + " / " + formatFileSize(total) + " (" + ((int)(100.0 * now / total)) + "%)");
 		SwingUtilities.invokeLater(() -> {
 			loadingStatus.setText(formatFileSize(now) + " / " + formatFileSize(total));
 			progress.setValue((int) (100.0 * now / total));
@@ -215,7 +217,7 @@ public class BinaryInstaller {
 
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(source.toFile()))) {
 
-        	Main.log("Unzip " + source.toAbsolutePath().toString() + " to " + target.toAbsolutePath().toString());
+        	log.log("Unzip " + source.toAbsolutePath().toString() + " to " + target.toAbsolutePath().toString());
             // list files in zip
             ZipEntry zipEntry = zis.getNextEntry();
 
@@ -247,7 +249,7 @@ public class BinaryInstaller {
                     }
 
                     // copy files, nio
-                    Main.log("copy to " + newPath.toAbsolutePath().toString());
+                    log.log("copy to " + newPath.toAbsolutePath().toString());
                     Files.copy(zis, newPath, StandardCopyOption.REPLACE_EXISTING);
 
                     // copy files, classic
@@ -267,7 +269,7 @@ public class BinaryInstaller {
 
         }
         
-        Main.log("Successfully Unzipped " + source.toAbsolutePath().toString());
+        log.log("Successfully Unzipped " + source.toAbsolutePath().toString());
         
     }
     
