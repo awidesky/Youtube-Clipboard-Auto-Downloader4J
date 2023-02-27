@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -176,102 +178,61 @@ public class YoutubeAudioDownloader {
 	}
 
 	private static boolean checkYoutubedlPath(String ydlfile, Logger log) {
-		
+
 		log.log("Check if youtube-dl path is in " + ydlfile);
 		ProcessBuilder pb_ydl = new ProcessBuilder(ydlfile, "--update");
 
-		log.log("Checking youtube-dl path by \"" + pb_ydl.command().stream().collect(Collectors.joining(" ")).trim() + "\"");
+		log.log("Checking youtube-dl by \"" + pb_ydl.command().stream().collect(Collectors.joining(" ")).trim()
+				+ "\"");
 
-		boolean isUpdating = false;
-		String version = "Unknown";
-		// start process
-				try {
-					
-					String line = null; 
-					Process p = pb_ydl.directory(null).start();
-					
-					try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
-						
-						if (versionPtn.matcher(line = br.readLine()).matches()) { // valid path
-							
-							log.log("Found valid command to execute youtube-dl : " + ydlfile);
-							log.log("youtube-dl version : " + line);
-							
-							if ( (Integer.parseInt(new SimpleDateFormat("yyyyMM").format(new Date())) - Integer.parseInt(line.substring(0, 7).replace(".", ""))) > 1 ) { //update if yputube-dl version is older than a month 
-								try {
-									int e;
-									if ((e = new ProcessBuilder(ydlfile, "--update").start().waitFor()) != 0) throw new Exception("Error code : " + e);
-								} catch (Exception e) { 
-									GUI.error("Error when updating youtube-dl", "%e%\nI couldn't update youtube-dl!", e, true);
-								}
-							} else {log.log("youtube-dl version is not older than a month");}
-							
-							log.log("Executing youtube-dl --version ended with exit code : " + p.waitFor());
-							
-							return true;
-							
-						} else { return false; }
-						
-					} catch(IOException e1) { throw e1; }
-					
-				} catch (Exception e) {
-							
-					log.log("Error when checking youtube-dl\n\t" + e.getMessage());
-					return false;
-					
-				}
-				
 		// start process
 		try {
-			
+
 			String line = null;
 			Process p = pb_ydl.directory(null).start();
-			
-			try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream(), Main.NATIVECHARSET))) {
-				while ((line = br.readLine()) != null) {
-					log.log("youtube-dl stdout : " + line);
-					if(line.startsWith("Updating to version")) {
-						isUpdating = true;
-						Matcher m = versionPtn.matcher(line);
-						m.find();
-						version = m.group(0);
-					} else if(line.startsWith("Latest version:")) {
-						isUpdating = false;
-						Matcher m = versionPtn.matcher(line);
-						m.find(); m.find();
-						version = m.group(0);
-					}
-				}
-			}
-			
-			int exit = p.waitFor();
-			log.log("Executing youtube-dl --version ended with exit code : " + exit);
-			
-			if(exit != 0) {
-				String err = "";
 
-				if(isUpdating) {
-					err = "Cannot update youtube-dl!\n";
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+
+				if (versionPtn.matcher(line = br.readLine()).matches()) { // valid path
+
+					log.log("Found valid command to execute youtube-dl : " + ydlfile);
+					log.log("youtube-dl version : " + line);
+
+					if ((Integer.parseInt(new SimpleDateFormat("yyyyMM").format(new Date()))
+							- Integer.parseInt(line.substring(0, 7).replace(".", ""))) > 1) { // update if yputube-dl
+																								// version is older than
+																								// a month
+						try {
+							int e;
+							if ((e = new ProcessBuilder(ydlfile, "--update").start().waitFor()) != 0)
+								throw new Exception("Error code : " + e);
+						} catch (Exception e) {
+							SwingDialogs.error("Error when updating youtube-dl", "%e%\nI couldn't update youtube-dl!",
+									e, true);
+						}
+					} else {
+						log.log("youtube-dl version is not older than a month");
+					}
+
+					log.log("Executing youtube-dl --version ended with exit code : " + p.waitFor());
+
+					return true;
+
+				} else {
+					return false;
 				}
-				
-				try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream(), Main.NATIVECHARSET))) {
-					err += br.lines().collect(Collectors.joining("", "youtube-dl stderr : ", "\n"));
-				}
-				throw new Exception(err);
+
+			} catch (IOException e1) {
+				throw e1;
 			}
-			
-			log.log("Found valid command to execute youtube-dl : " + ydlfile);
-			log.log("youtube-dl version : " + version);
-			
-			return true;
-			
+
 		} catch (Exception e) {
-					
-			log.log("Error when checking youtube-dl\n\t" + e.toString());
+
+			log.log("Error when checking youtube-dl\n\t" + e.getMessage());
 			return false;
-			
+
 		}
-		
+
 	}
 	
 
