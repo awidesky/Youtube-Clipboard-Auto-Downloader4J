@@ -1,4 +1,4 @@
-package com.awidesky.YoutubeClipboardAutoDownloader.workers;
+package com.awidesky.YoutubeClipboardAutoDownloader.util.workers;
 
 import java.util.concurrent.LinkedBlockingQueue;
 

@@ -1,4 +1,4 @@
-package com.awidesky.YoutubeClipboardAutoDownloader.workers;
+package com.awidesky.YoutubeClipboardAutoDownloader.util.workers;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import com.awidesky.YoutubeClipboardAutoDownloader.Main;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.Logger;
 
-public class DownloadTaskWorker {
+public class TaskThreadPool {
 
 	private static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	private static Logger log = Main.getLogger("[ClipBoardChecker] ");

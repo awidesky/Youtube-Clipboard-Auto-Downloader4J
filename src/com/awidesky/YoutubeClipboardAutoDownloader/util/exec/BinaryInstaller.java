@@ -1,4 +1,4 @@
-package com.awidesky.YoutubeClipboardAutoDownloader;
+package com.awidesky.YoutubeClipboardAutoDownloader.util.exec;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -27,6 +27,8 @@ import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
+import com.awidesky.YoutubeClipboardAutoDownloader.Main;
+import com.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.Logger;
 

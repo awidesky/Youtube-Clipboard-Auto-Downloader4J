@@ -33,8 +33,8 @@ import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.Logger;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.LoggerThread;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.SwingDialogs;
-import com.awidesky.YoutubeClipboardAutoDownloader.workers.ClipBoardCheckerThread;
-import com.awidesky.YoutubeClipboardAutoDownloader.workers.DownloadTaskWorker;
+import com.awidesky.YoutubeClipboardAutoDownloader.util.workers.ClipBoardCheckerThread;
+import com.awidesky.YoutubeClipboardAutoDownloader.util.workers.TaskThreadPool;
 
 /** Main class */
 public class Main { 
@@ -239,7 +239,7 @@ public class Main {
 		TaskStatusModel.getinstance().addTask(t);
 		
 		
-		t.setFuture(DownloadTaskWorker.submit(() -> {
+		t.setFuture(TaskThreadPool.submit(() -> {
 
 			String url = "\"" + data + "\"";
 			
@@ -498,7 +498,7 @@ public class Main {
 		
 		logger.log("YoutubeAudioAutoDownloader exit code : " + exitcode);
 		
-		DownloadTaskWorker.kill();
+		TaskThreadPool.kill();
 
 		writeProperties();
 			
