@@ -3,14 +3,12 @@ package com.awidesky.YoutubeClipboardAutoDownloader;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -20,6 +18,7 @@ import com.awidesky.YoutubeClipboardAutoDownloader.util.Logger;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.SwingDialogs;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.exec.BinaryInstaller;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.exec.ProcessExecutor;
+import com.awidesky.YoutubeClipboardAutoDownloader.util.exec.YTDLPFallbacks;
 
 public class YoutubeAudioDownloader {
 
@@ -29,9 +28,6 @@ public class YoutubeAudioDownloader {
 	private static Pattern percentPtn = Pattern.compile("[0-9]+\\.*[0-9]+%");
 	private static Pattern versionPtn = Pattern.compile("\\d{4}\\.\\d{2}\\.\\d{2}");
 	
-	private static Map<String, Callable<Boolean>> fallBackFix = new HashMap<>(); //TODO : use Predicate<String>
-	
-
 	/**
 	 * returns String represents the path to the running jar.
 	 * */
@@ -42,27 +38,6 @@ public class YoutubeAudioDownloader {
 		}
 		return ret;
 	}
-	
-	private static boolean runFixCommand(String error, String... command) {
-
-		Logger log = Main.getLogger("[runFixCommand] ");
-		
-		log.log("\nFound known error : \"" + error + "\"");
-		log.log("Trying to fix error automatically by executing \"" + Arrays.stream(command).collect(Collectors.joining(" ")) + "\"");
-
-		// start process
-		try {
-			log.log("Executing ended with exit code : " + ProcessExecutor.runNow(log, null, command));
-		} catch (Exception e) {
-			SwingDialogs.error("Error!", "Error when fixing youtube-dl problem!\n%e%", e, false);
-			return false;
-		}
-		return true;
-		
-	}
-	
-	
-
 	
 	/**
 	 * @return Whether the procedure went fine
@@ -139,10 +114,6 @@ public class YoutubeAudioDownloader {
 		log.log("projectpath = " + projectpath);
 		log.log("youtubedlpath = " + (youtubedlpath.equals("") ? "system %PATH%" : youtubedlpath) + "\n");
 		
-		fallBackFix.put("ERROR: unable to download video data: HTTP Error 403: Forbidden", () -> {
-			return runFixCommand("ERROR: unable to download video data: HTTP Error 403: Forbidden", youtubedlpath + "youtube-dl", "--rm-cache-dir");
-		});
-		
 		return true;
 		
 	}
@@ -202,8 +173,11 @@ public class YoutubeAudioDownloader {
 	public static String getProjectpath() {
 		return projectpath;
 	}
-	public static String getYoutubedlpath() {
+	public static String getResourcePath() {
 		return projectpath + File.separator + "YoutubeAudioAutoDownloader-resources";
+	}
+	public static String getYoutubedlPath() {
+		return youtubedlpath;
 	}
 
 
@@ -350,22 +324,19 @@ public class YoutubeAudioDownloader {
 				try {
 
 					String line = null;
-					StringBuilder sb1 = new StringBuilder("");
-					Callable<Boolean> fix = null;
+					List<String> lines = new ArrayList<>();
 
 					while ((line = br.readLine()) != null) {
 
-						task.failed();
-						sb1.append(line);
 						task.logger.log("[downloading] youtube-dl stderr : " + line);
-						fix = fallBackFix.get(line);
+						lines.add(line);
 						
 					}
 
-					if (!sb1.toString().equals("")) {
+					if (!lines.isEmpty()) {
 
-						if (fix != null && fix.call()) {
-							task.setVideoName(task.getVideoName() + " (an error occurred but fixed, continuing download)");
+						if (lines.stream().map(YTDLPFallbacks::runFixCommand).allMatch(b -> b)) {
+							task.setVideoName(task.getVideoName() + " (error occurred but fixed, continuing download)");
 							if (task.getTotalNumVideo() == 1) { // not a PlayList?
 								download(url, task, playListOption);
 							} else {
@@ -374,8 +345,10 @@ public class YoutubeAudioDownloader {
 							return;
 						}
 
+						task.failed();
 						SwingDialogs.error("Error [" + task.getVideoName() + "]",
-								"[Task" + task.getTaskNum() + "|downloading] There's Error(s) in youtube-dl proccess!\n" + sb1.toString(), null, true);
+								"[Task" + task.getTaskNum() + "|downloading] There's Error(s) in youtube-dl proccess!\n"
+										+ lines.stream().collect(Collectors.joining("\n")), null, true);
 					}
 
 				} catch (Exception e) {

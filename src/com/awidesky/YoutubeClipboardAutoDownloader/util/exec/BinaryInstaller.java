@@ -36,7 +36,7 @@ public class BinaryInstaller {
 
 	public static final String FFMPEG_URL = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"; 
 	public static final String YTDLP_URL = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe"; 
-	private static final String root = YoutubeAudioDownloader.getYoutubedlpath();
+	private static final String root = YoutubeAudioDownloader.getResourcePath();
 	
 	private static JLabel loadingStatus;
 	private static JProgressBar progress;
