@@ -295,17 +295,17 @@ public class YoutubeAudioDownloader {
 							sc.useDelimiter("[^\\d]+");
 							task.setNowVideoNum(sc.nextInt());
 							task.setTotalNumVideo(sc.nextInt());
-							task.setStatus("Initiating download " + task.getNowVideoNum() + " of " + task.getTotalNumVideo()); //Initiating
+							task.setStatus("Initiating download (" + task.getNowVideoNum() + "/" + task.getTotalNumVideo() + ")"); //Initiating
 							sc.close();
 						}
 						
 						if(line.startsWith("[ExtractAudio]")) {
-							task.setStatus("Extracting Audio");
+							task.setStatus("Extracting Audio (" + task.getNowVideoNum() + "/" + task.getTotalNumVideo() + ")");
 						}
 						
 						Matcher m = percentPtn.matcher(line);
 						if (m.find() && line.contains("ETA")) {
-							task.setStatus("Downloading");
+							task.setStatus("Downloading (" + task.getNowVideoNum() + "/" + task.getTotalNumVideo() + ")");
 							int num = (int)Math.round(Double.parseDouble(m.group().replace("%", "")));
 							if(downloadVideoAndAudioSeparately) {
 								task.setProgress(((videoDownloadDone) ? 50 : 0) + num/2);

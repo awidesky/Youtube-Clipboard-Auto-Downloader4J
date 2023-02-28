@@ -62,7 +62,7 @@ public class Main {
 		
 		boolean setup = false;
 		try {
-			
+			//TODO : dev these
 			logbyTask = Arrays.stream(args).anyMatch("--logbyTask"::equals);
 			logTime = Arrays.stream(args).anyMatch("--logTime"::equals);
 			prepareLogFile();
@@ -168,7 +168,7 @@ public class Main {
 				
 				if (Config.getClipboardListenOption() == ClipBoardOption.ASK) {
 
-					if (!SwingDialogs.confirm("Download link in clipboard?", "Link : " + data)) {
+					if (!SwingDialogs.confirm("Download link from clipboard?", "Link : " + data)) {
 
 						logger.log("[GUI.linkAcceptChoose] Download link " + data + "? : " + false + "\n");
 
