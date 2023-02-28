@@ -3,6 +3,8 @@ package com.awidesky.YoutubeClipboardAutoDownloader;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -186,7 +188,7 @@ public class YoutubeAudioDownloader {
 	public static boolean validateAndSetName(String url, TaskData task, PlayListOption playListOption) {
 		
 		try {
-			long startTime = System.nanoTime();
+			Instant startTime = Instant.now();
 			
 			LinkedList<String> args = new LinkedList<>(Arrays.asList(new String[] {youtubedlpath + "youtube-dl", "--get-filename", "-o",
 					"\"" + Config.getFileNameFormat().replace("%(ext)s", Config.getFormat()) + "\"", url
@@ -224,10 +226,12 @@ public class YoutubeAudioDownloader {
 			});
 			task.setProcess(p1);
 			int exit = p1.waitFor();
+			Duration diff = Duration.between(startTime, Instant.now());
 			task.logger.log("[validating] Video name : " + task.getVideoName());
 			task.logger.log("[validating] Ended with exit code : " + exit);
-			task.logger.log("[validating] elapsed time in validating link and downloading video name : "
-					+ ((System.nanoTime() - startTime) / 1e6) + "ms"); //TODO
+			task.logger.log("[validating] elapsed time in validating link and downloading video name : " + String.format("%d min %d sec", 
+                    diff.toMinutes(),
+                    diff.toSecondsPart()));
 			if (exit != 0) {
 				task.failed();
 				return false;
@@ -245,7 +249,7 @@ public class YoutubeAudioDownloader {
 		Main.logProperties(task.logger, "[preparing] Current properties :");
 
 		/* download video */
-		long startTime = System.nanoTime();
+		Instant startTime = Instant.now();
 		
 		LinkedList<String> arguments = new LinkedList<>(Arrays.asList(
 				youtubedlpath + "youtube-dl", "--newline", "--force-overwrites", playListOption.toCommandArgm(), "--output", "\"" + Config.getFileNameFormat() + "\""));
@@ -370,16 +374,23 @@ public class YoutubeAudioDownloader {
 		task.setProgress(0);
 
 		
-		int errorCode;
 		try {
+			int errorCode = p.waitFor();
+			Duration diff = Duration.between(startTime, Instant.now());
 			
-			if( (errorCode = p.waitFor()) != 0) { 
+			if(errorCode != 0) { 
 				task.failed();
 				SwingDialogs.error("Error in youtube-dl", "[Task" + task.getTaskNum() + "|downloading] youtube-dl has ended with error code : " + errorCode, null, true);
-				task.logger.log("[downloading] elapsed time in downloading(failed) : " + ((System.nanoTime() - startTime) / 1e6) + "ms" ); //TODO : format time
+				task.logger.log("[downloading] elapsed time in downloading(failed) : " + String.format("%d min %d sec", 
+		                diff.toMinutes(),
+		                diff.toSecondsPart()));
 				return;
 			} else {
 				task.finished();
+				task.logger.log("[downloaded] elapsed time in working(sucessed) : " + String.format("%d min %d sec", 
+		                diff.toMinutes(),
+		                diff.toSecondsPart()));
+				task.logger.log("[finished] Finished!\n");
 			}
 			
 		} catch (InterruptedException e) {
@@ -388,9 +399,6 @@ public class YoutubeAudioDownloader {
 			SwingDialogs.error("Error [" + task.getVideoName() + "]", "[Task" + task.getTaskNum() + "|downloading] Failed to wait youtube-dl process : %e%", e, true);
 			
 		}
-
-		task.logger.log("[downloaded] elapsed time in working(sucessed) : " + ((System.nanoTime() - startTime) / 1e6) + "ms" );
-		task.logger.log("[finished] Finished!\n");
 		
 	}
 
