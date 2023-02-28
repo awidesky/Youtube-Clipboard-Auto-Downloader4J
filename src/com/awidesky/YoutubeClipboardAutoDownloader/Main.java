@@ -169,6 +169,7 @@ public class Main {
 							return null;
 						}
 					}).filter(o -> o != null).forEach(o -> logger.log("[debug] \t" + o));
+					return;
 				}
 				final String data = (String)cb.getData(DataFlavor.stringFlavor);
 
