@@ -10,7 +10,6 @@ import java.util.function.Consumer;
 public abstract class TaskLogger extends AbstractLogger {
 
 	private DateFormat datePrefix = null;
-	private String prefix = null;
 	
 	public volatile boolean isStop = false;
 	
