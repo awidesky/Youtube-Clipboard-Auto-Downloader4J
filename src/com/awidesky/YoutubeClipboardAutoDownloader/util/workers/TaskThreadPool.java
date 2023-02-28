@@ -10,9 +10,12 @@ import com.awidesky.YoutubeClipboardAutoDownloader.util.Logger;
 
 public class TaskThreadPool {
 
-	private static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+	private static ExecutorService executorService; 
 	private static Logger log = Main.getLogger("[ClipBoardChecker] ");
 	
+	public static void setup() {
+		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+	}
 	public static Future<?> submit(Runnable task) {
 		return executorService.submit(task);
 	}

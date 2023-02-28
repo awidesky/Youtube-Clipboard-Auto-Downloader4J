@@ -118,6 +118,8 @@ public class Main {
 
 		
 		gui.setLoadingStat(LoadingStatus.PREPARING_THREADS);
+		loggerThread.start();
+		TaskThreadPool.setup();
 		clipChecker = new ClipBoardCheckerThread();
 		clipChecker.start(); //A daemon thread that will check clipboard
 
@@ -336,7 +338,6 @@ public class Main {
 		} finally {
 			SwingDialogs.setLogger(loggerThread.getLogger());
 			logger = loggerThread.getLogger("[Main] ");
-			loggerThread.start();
 		}
 		
 	}
