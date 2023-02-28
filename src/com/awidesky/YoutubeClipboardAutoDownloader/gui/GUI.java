@@ -427,7 +427,7 @@ public class GUI {
 		
 		loadingStatus.setText(stat.getStatus());
 		initProgress.setValue(stat.getProgress());
-		
+
 	}
 	
 

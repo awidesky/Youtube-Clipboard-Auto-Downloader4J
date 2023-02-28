@@ -3,6 +3,7 @@ package com.awidesky.YoutubeClipboardAutoDownloader;
 import java.awt.Desktop;
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.BufferedReader;
@@ -22,6 +23,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.swing.SwingUtilities;
 
@@ -107,6 +109,13 @@ public class Main {
 			logger.log(e2);
 			return false;
 		}
+		
+		
+		gui.setLoadingStat(LoadingStatus.PREPARING_THREADS);
+		loggerThread.start();
+		TaskThreadPool.setup();
+		clipChecker = new ClipBoardCheckerThread();
+		clipChecker.start(); //A daemon thread that will check clipboard
 
 		gui.setLoadingStat(LoadingStatus.CHECKING_FFMPEG);
 		if (!YoutubeAudioDownloader.checkFfmpeg()) return false;
@@ -115,13 +124,6 @@ public class Main {
 		
 		gui.setLoadingStat(LoadingStatus.READING_PROPERTIES);
 		readProperties();
-
-		
-		gui.setLoadingStat(LoadingStatus.PREPARING_THREADS);
-		loggerThread.start();
-		TaskThreadPool.setup();
-		clipChecker = new ClipBoardCheckerThread();
-		clipChecker.start(); //A daemon thread that will check clipboard
 
 		Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener((e) -> { checkClipBoard(); }); 
 
@@ -154,8 +156,21 @@ public class Main {
 
 				Thread.sleep(50);
 
-				final String data = (String) Toolkit.getDefaultToolkit().getSystemClipboard()
-						.getData(DataFlavor.stringFlavor); //what if file is selected?
+				Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
+				if (!cb.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
+					logger.log("[debug] Non-String Clipboard input!");
+					logger.log("[debug] clipboard data Flavor(s) : " + Arrays.stream(cb.getAvailableDataFlavors()).map(DataFlavor::getHumanPresentableName).collect(Collectors.joining(", ")));
+					logger.log("[debug] These can be represented as :");
+					Arrays.stream(cb.getAvailableDataFlavors()).map(t -> {
+						try {
+							return cb.getData(t);
+						} catch (UnsupportedFlavorException | IOException e) {
+							logger.log(e);
+							return null;
+						}
+					}).filter(o -> o != null).forEach(o -> logger.log("[debug] \t" + o));
+				}
+				final String data = (String)cb.getData(DataFlavor.stringFlavor);
 
 				logger.log("[debug] clipboard : " + data);
 				
