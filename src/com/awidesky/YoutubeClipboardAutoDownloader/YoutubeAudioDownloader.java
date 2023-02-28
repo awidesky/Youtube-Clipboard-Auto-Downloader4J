@@ -142,7 +142,7 @@ public class YoutubeAudioDownloader {
 								if ((e = ProcessExecutor.runNow(log, null, ydlfile, "--update")) != 0)
 									throw new Exception("Error code : " + e);
 							} catch (Exception e) {
-								SwingDialogs.error("Error when updating youtube-dl", "%e%\nCannot update youtube-dl!",
+								SwingDialogs.warning("Failed to update youtube-dl", "%e%\nCannot update youtube-dl!\nUse version " + line + "instead...",
 										e, true);
 							}
 							
