@@ -42,7 +42,7 @@ public abstract class AbstractLogger implements Logger {
 	 * */
 	protected String getPrefix() {
 		StringBuilder sb = new StringBuilder("");
-		if(datePrefix != null) sb.append("[" + datePrefix.format(new Date()) + "]");
+		if(datePrefix != null) sb.append(datePrefix.format(new Date()));
 		if(prefix != null) sb.append(prefix);
 		return sb.toString();
 	}
