@@ -281,8 +281,6 @@ public class YoutubeAudioDownloader {
 					String line = null;
 					boolean downloadVideoAndAudioSeparately = false, videoDownloadDone = false;
 					
-					task.logger.setPrefix("[Task" + task.getTaskNum() + "] [downloading] youtube-dl stdout : ");
-						
 					while ((line = br.readLine()) != null) {
 						
 						if(!Main.audioMode && line.matches("[\\s|\\S]+Downloading [\\d]+ format\\(s\\)\\:[\\s|\\S]+")) {
@@ -314,11 +312,9 @@ public class YoutubeAudioDownloader {
 							}
 							if(num == 100) videoDownloadDone = !videoDownloadDone; 
 						}
-						task.logger.log(line);
+						task.logger.log("[downloading] youtube-dl stdout : " + line);
 					}
 
-					task.logger.setPrefix("[Task" + task.getTaskNum() + "] ");
-					
 				} catch (IOException e) {
 					task.failed();
 					SwingDialogs.error("Error [" + task.getVideoName() + "]", "[Task" + task.getTaskNum() + "|downloading] Error when redirecting output of youtube-dl\n%e%", e, true);
