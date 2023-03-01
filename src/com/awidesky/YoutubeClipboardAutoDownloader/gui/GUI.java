@@ -394,14 +394,12 @@ public class GUI {
 	}
 	
 	public void disposeAll() {
-		
-		if (Main.verbose) {
-			logger.newLine();
-			logger.log("Existing Windows are :");
-			Stream.of(JWindow.getWindows()).map(Window::toString).forEach(logger::log);
-			logger.newLine();
-		}
-		
+
+		logger.logVerbose("");
+		logger.logVerbose("Existing Windows are :");
+		Stream.of(JWindow.getWindows()).map(Window::toString).forEach(logger::logVerbose);
+		logger.logVerbose("");
+
 		Stream.of(JWindow.getWindows()).forEach(Window::dispose);
 		disposeLoadingFrame();
 		if (mainFrame != null) mainFrame.dispose();
