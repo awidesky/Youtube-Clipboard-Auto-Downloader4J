@@ -53,8 +53,8 @@ public class Main {
 	
 	private static GUI gui = new GUI();
 	private static LoggerThread loggerThread;
-	private static Logger logger;
-	private static Function<String, TaskLogger> logGetter;
+	private static TaskLogger logger;
+	private static Function<String, TaskLogger> taskLogGetter;
 	
 	private static volatile int taskNum = 0;
 	
@@ -63,9 +63,31 @@ public class Main {
 	public static void main(String[] args) {
 		
 		boolean setup = false;
+		
+		boolean verbose = false, datePrefix = false, logbyTask = false;
+		for (String arg : args) {
+			if ("--help".equals(arg)) {
+				System.out.println("usage : java -jar YoutubeAudioAutoDownloader " + version + ".jar [options]");
+				System.out.println();
+				System.out.println("options :");
+				System.out.println("\t--logbyTask : Log lines from a task is gathered till the task is done/terminated.");
+				System.out.println("\t              Useful when you don't want to see dirty log file when multiple tasks running.");
+				System.out.println("\t--logTime : Every log line will printed with time");
+				System.out.println("\t--verbose : Print verbose logs(like GUI Frmaes info, etc.)");
+			} else if ("--verbose".equals(arg)) {
+				verbose = true;
+			} else if ("--logTime".equals(arg)) {
+				datePrefix = true;
+			} else if ("--logbyTask".equals(arg)) {
+				logbyTask = true;
+			} else {
+				System.err.println("Unknown option : \"" + arg + "\"");
+			}
+				
+		}
+		
 		try {
-			prepareLogFile(Arrays.stream(args).anyMatch("--verbose"::equals), Arrays.stream(args).anyMatch("--logTime"::equals));
-			logGetter = (Arrays.stream(args).anyMatch("--logbyTask"::equals)) ? loggerThread::getBufferedLogger : loggerThread::getLogger;
+			prepareLogFile(verbose, datePrefix, logbyTask);
 			setup = setup(args);
 		} catch (Exception e) {
 			setup = false;
@@ -76,17 +98,6 @@ public class Main {
 		
 		if(args.length == 0) return;
 		
-		for (String arg : args) {
-			if ("--help".equals(arg)) {
-				System.out.println("usage : java -jar YoutubeAudioAutoDownloader " + version + ".jar [options]");
-				System.out.println();
-				System.out.println("options :");
-				System.out.println("\t--logbyTask : Log lines from a task is gathered till the task is done/terminated.");
-				System.out.println("\t              Useful when you don't want to see dirty log file when multiple tasks running.");
-				System.out.println("\t--logTime : Every log line will printed with time");
-				System.out.println("\t--verbose : Print verbose logs(like GUI Frmaes info, etc.)");
-			}
-		}
 	}
 	
 	/**
@@ -198,9 +209,9 @@ public class Main {
 				Arrays.stream(data.split(Pattern.quote("\n"))).forEach(Main::submitDownload);
 
 			} catch (InterruptedException | HeadlessException | UnsupportedFlavorException | IOException e1) {
-
 				SwingDialogs.error("Error when checking clipboard!", "%e%", e1, true);
-
+			} catch (Exception ee) {
+				SwingDialogs.error("Unexpected clipboard error!", "%e%", ee, true);
 			}
 
 		});
@@ -229,7 +240,7 @@ public class Main {
 	private static void submitDownload(String data) {
 
 		int num = taskNum++;
-		Logger logTask = loggerThread.getLogger("[Task" + num + "] ");
+		TaskLogger logTask = getTaskLogger("[Task" + num + "] ");
 		logTask.log("Received a link from your clipboard : " + data);
 
 		TaskData t = new TaskData(num, logTask);
@@ -285,7 +296,7 @@ public class Main {
 		}));
 	}
 	
-	private static void prepareLogFile(boolean verbose, boolean datePrefix) {
+	private static void prepareLogFile(boolean verbose, boolean datePrefix, boolean logbyTask) {
 		
 		try {
 			
@@ -300,16 +311,20 @@ public class Main {
 			loggerThread = new LoggerThread(System.out, true);
 			SwingDialogs.error("Error when creating log flie", "%e%", e, false);
 		} finally {
+			taskLogGetter = logbyTask ? loggerThread::getBufferedLogger : loggerThread::getLogger;
 			loggerThread.setVerbose(verbose);
-			if (datePrefix) loggerThread.setDatePrefix(new SimpleDateFormat("[kk-mm-ss]"));
+			if (datePrefix) loggerThread.setDatePrefix(new SimpleDateFormat("[kk:mm:ss]"));
 			SwingDialogs.setLogger(loggerThread.getLogger());
 			logger = loggerThread.getLogger("[Main] ");
 		}
 		
 	}
 	
-	public static Logger getLogger(String prefix) {
-		return logGetter.apply(prefix);
+	public static TaskLogger getTaskLogger(String prefix) {
+		return taskLogGetter.apply(prefix);
+	}
+	public static TaskLogger getLogger(String prefix) {
+		return loggerThread.getLogger(prefix);
 	}
 	
 	/**
@@ -453,7 +468,8 @@ public class Main {
 		TaskThreadPool.kill();
 
 		writeProperties();
-			
+		
+		logger.close();
 		loggerThread.kill(2500);
 		
 		System.exit(exitcode);

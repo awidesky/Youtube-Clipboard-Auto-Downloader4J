@@ -2,25 +2,28 @@ package com.awidesky.YoutubeClipboardAutoDownloader;
 
 import java.util.Objects;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.SwingUtilities;
 
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
-import com.awidesky.YoutubeClipboardAutoDownloader.util.Logger;
+import com.awidesky.YoutubeClipboardAutoDownloader.util.TaskLogger;
 
 public class TaskData {
 	
-	public final Logger logger;
+	public final TaskLogger logger;
 	
-	private String videoName = "null"; 
-	private String url = "null"; 
-	private String status = "";
-	private int progress = 0;
-	private String dest = "";
-	private boolean checked = false;
-	private int taskNum;
-	private int totalNumOfVideo = 1;
-	private int videoNum = 1;
+	private AtomicReference<String> videoName = new AtomicReference<String>("null"); 
+	private AtomicReference<String> url = new AtomicReference<String>("null");
+	private AtomicReference<String> status = new AtomicReference<String>("");
+	private AtomicInteger progress = new AtomicInteger(0);
+	private AtomicReference<String> dest = new AtomicReference<String>("");
+	private AtomicBoolean checked = new AtomicBoolean(false);
+	private AtomicInteger taskNum = new AtomicInteger();
+	private AtomicInteger totalNumOfVideo = new AtomicInteger(1);
+	private AtomicInteger videoNum = new AtomicInteger(1);
 	
 	/** Is this task finished or failed? */
 	private boolean isDone = false;
@@ -28,71 +31,71 @@ public class TaskData {
 	private Future<?> fu;
 	private Process p;
 	
-	public TaskData(int num, Logger logger) {
-		this.taskNum = num;
+	public TaskData(int num, TaskLogger logger) {
+		this.taskNum.set(num);
 		this.logger = logger;
 	}
 	
 
 	public String getUrl() {
-		return url;
+		return url.get();
 	}
 
 	public void setUrl(String url) {
-		this.url = url;
+		this.url.set(url);
 	}
 
 	public String getVideoName() {
-		return videoName;
+		return videoName.get();
 	}
 	
 	public void setVideoName(String videoName) {
-		this.videoName = videoName;
+		this.videoName.set(videoName);
 		SwingUtilities.invokeLater(() -> TaskStatusModel.getinstance().updated(this));
 	}
 	
 	public String getStatus() {
-		return status;
+		return status.get();
 	}
 	
 	public void setStatus(String status) {
-		if(this.status.equals(status)) return;
+		if(this.status.get().equals(status)) return;
 		
-		this.status = status;
+		this.status.set(status);
 		SwingUtilities.invokeLater(() -> TaskStatusModel.getinstance().updated(this));
 	}
 	
 	public int getProgress() {
-		return progress;
+		return progress.get();
 	}
 	
 	public void setProgress(int progress) {
-		this.progress = progress;
+		this.progress.set(progress);
 		SwingUtilities.invokeLater(() -> TaskStatusModel.getinstance().updated(this));
 	}
 	
 	public String getDest() {
-		return dest;
+		return dest.get();
 	}
 	
 	public void setDest(String dest) {
-		this.dest = dest;
+		this.dest.set(dest);
 		SwingUtilities.invokeLater(() -> TaskStatusModel.getinstance().updated(this));
 	}
 
 	public boolean isChecked() {
-		return checked;
+		return checked.get();
 	}
 
 
 	public void setChecked(boolean checked) {
-		this.checked = checked;
+		this.checked.set(checked);
 		SwingUtilities.invokeLater(() -> TaskStatusModel.getinstance().updated(this));
 	}
 
 
 	public int getTaskNum() {
-		return taskNum;
+		return taskNum.get();
 	}
 
 	public void finished() {
@@ -101,6 +104,7 @@ public class TaskData {
 		setProgress(100);
 		fu = null;
 		p = null;
+		logger.close();
 	}
 	
 	public void failed() {
@@ -110,6 +114,7 @@ public class TaskData {
 		setProgress(-1);
 		fu = null;
 		p = null;
+		logger.close();
 	}
 
 	public boolean isNotDone() {
@@ -117,20 +122,20 @@ public class TaskData {
 	}
 
 	public void setTotalNumVideo(int vdnum) {
-		totalNumOfVideo = vdnum;
+		totalNumOfVideo.set(vdnum);
 	}
 
 	public int getTotalNumVideo() {
-		return totalNumOfVideo;
+		return totalNumOfVideo.get();
 	}
 	
 	public void setNowVideoNum(int now) {
-	  videoNum = now;
+	  videoNum.set(now);
 	}
 	
 	
 	public int getNowVideoNum() {
-		return videoNum;
+		return videoNum.get();
 	}
 
 	public void kill() {
@@ -142,7 +147,7 @@ public class TaskData {
 	}
 
 	public String getProgressToolTip() {
-		return progress + "%" + ( (totalNumOfVideo > 1) ? " (" + videoNum + "/" + totalNumOfVideo + ")" : "" );
+		return progress + "%" + ( (totalNumOfVideo.get() > 1) ? " (" + videoNum.get() + "/" + totalNumOfVideo.get() + ")" : "" );
 	}
 
 

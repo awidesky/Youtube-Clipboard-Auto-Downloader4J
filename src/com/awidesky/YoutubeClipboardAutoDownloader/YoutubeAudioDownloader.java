@@ -375,18 +375,18 @@ public class YoutubeAudioDownloader {
 			Duration diff = Duration.between(startTime, Instant.now());
 			
 			if(errorCode != 0) { 
-				task.failed();
 				SwingDialogs.error("Error in youtube-dl", "[Task" + task.getTaskNum() + "|downloading] youtube-dl has ended with error code : " + errorCode, null, true);
 				task.logger.log("[downloading] elapsed time in downloading(failed) : " + String.format("%d min %d sec", 
 		                diff.toMinutes(),
 		                diff.toSecondsPart()));
+				task.failed();
 				return;
 			} else {
-				task.finished();
-				task.logger.log("[downloaded] elapsed time in working(sucessed) : " + String.format("%d min %d sec", 
+				task.logger.log("[downloaded] elapsed time in working(succeed) : " + String.format("%d min %d sec", 
 		                diff.toMinutes(),
 		                diff.toSecondsPart()));
 				task.logger.log("[finished] Finished!\n");
+				task.finished();
 			}
 			
 		} catch (InterruptedException e) {
