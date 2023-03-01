@@ -64,8 +64,8 @@ public class Main {
 		
 		boolean setup = false;
 		try {
-			logGetter = (Arrays.stream(args).anyMatch("--logbyTask"::equals)) ? loggerThread::getBufferedLogger : loggerThread::getLogger;
 			prepareLogFile(Arrays.stream(args).anyMatch("--verbose"::equals), Arrays.stream(args).anyMatch("--logTime"::equals));
+			logGetter = (Arrays.stream(args).anyMatch("--logbyTask"::equals)) ? loggerThread::getBufferedLogger : loggerThread::getLogger;
 			setup = setup(args);
 		} catch (Exception e) {
 			setup = false;
