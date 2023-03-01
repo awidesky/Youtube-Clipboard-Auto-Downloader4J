@@ -1,6 +1,8 @@
 package com.awidesky.YoutubeClipboardAutoDownloader.util;
 
+import java.io.Closeable;
 import java.text.DateFormat;
+import java.util.Date;
 
 
 
@@ -9,15 +11,15 @@ import java.text.DateFormat;
  * 
  * @author Eugene Hong
  * */
-public interface Logger {
+public interface Logger extends Closeable, AutoCloseable {
 
 
 	/**
 	 * a Simple logger stub that just prints to console 
 	 * */
-	public static final Logger nullLogger = new AbstractLogger() {
+	public static final Logger consoleLogger = new AbstractLogger() {
 		{
-			setPrefix("[nullLoger] ");
+			setPrefix("[consoleLogger] ");
 		}
 		
 		@Override
@@ -27,8 +29,18 @@ public interface Logger {
 		
 		@Override
 		public void log(String data) {
+			printPrefix();
 			System.out.println(data);
 		}
+
+		private void printPrefix() {
+			if(datePrefix != null) System.out.print("[" + datePrefix.format(new Date()) + "]");
+			if(prefix != null) System.out.print(prefix);
+		}
+		
+		@Override
+		public void close() {}
+
 	}; 
 
 	

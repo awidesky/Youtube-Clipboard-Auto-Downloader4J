@@ -1,11 +1,12 @@
 package com.awidesky.YoutubeClipboardAutoDownloader.util;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
@@ -14,17 +15,13 @@ public class LoggerThread extends Thread {
 
 	private PrintWriter logTo;
 	private	LinkedBlockingQueue<Consumer<PrintWriter>> loggerQueue = new LinkedBlockingQueue<>();
-	private LinkedList<TaskLogger> children = new LinkedList<>();
+	private HashSet<TaskLogger> children = new HashSet<>();
 	
 	public volatile boolean isStop = false;
 	private boolean verbose;
 	
 	
-	public static final String version = "v1.2.0";
-	
-	public LoggerThread() { 
-		this(System.out, true, Charset.defaultCharset());
-	}
+	public static final String version = "v1.5.0";
 	
 	public LoggerThread(OutputStream os) {
 		this(os, true, Charset.defaultCharset());
@@ -62,6 +59,11 @@ public class LoggerThread extends Thread {
 			public boolean runLogTask(Consumer<PrintWriter> logTask) {
 				return loggerQueue.offer(logTask);
 			}
+
+			@Override
+			public void close() throws IOException {
+				children.remove(this);
+			}
 			
 		};
 		newLogger.setPrefix(prefix);
@@ -76,13 +78,15 @@ public class LoggerThread extends Thread {
 				try {
 					loggerQueue.put(logTask);
 				} catch (InterruptedException e) {
+					loggerQueue.offer(logTask);
 					if (!isStop) log(e);
 				}
 			}
 
 			@Override
-			public boolean runLogTask(Consumer<PrintWriter> logTask) {
-				return loggerQueue.offer(logTask);
+			public void close() throws IOException {
+				flush();
+				children.remove(this);
 			}
 			
 		};
@@ -129,6 +133,7 @@ public class LoggerThread extends Thread {
 		
 		isStop = true;
 		
+		children.parallelStream().filter(l -> l instanceof TaskBufferedLogger).forEach(l -> ((TaskBufferedLogger)l).flush());
 		try {
 			this.join(timeOut);
 		} catch (InterruptedException e) {

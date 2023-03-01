@@ -71,7 +71,7 @@ public abstract class TaskLogger extends AbstractLogger {
 	}
 	
 	
-	private void printPrefix(PrintWriter logTo) { //TODO : no space in prefix. change LoggerUtil too
+	private void printPrefix(PrintWriter logTo) {
 		if(datePrefix != null) logTo.print("[" + datePrefix.format(new Date()) + "]");
 		if(prefix != null) logTo.print(prefix);
 	}

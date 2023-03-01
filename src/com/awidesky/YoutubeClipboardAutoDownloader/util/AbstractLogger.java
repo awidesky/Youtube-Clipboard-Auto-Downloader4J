@@ -11,7 +11,7 @@ import java.util.Arrays;
  * 
  * @author Eugene Hong
  * */
-public abstract class AbstractLogger implements Logger{
+public abstract class AbstractLogger implements Logger {
 
 	protected boolean verbose = false;
 	protected DateFormat datePrefix = null;

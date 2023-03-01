@@ -13,7 +13,7 @@ import javax.swing.SwingUtilities;
 public class SwingDialogs {
 
 
-	private static Logger logger = Logger.nullLogger;
+	private static Logger logger = Logger.consoleLogger;
 
 	
 	public static void setLogger(AbstractLogger newLogger) {
