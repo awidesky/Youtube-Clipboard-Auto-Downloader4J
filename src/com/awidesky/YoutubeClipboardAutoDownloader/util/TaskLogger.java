@@ -2,19 +2,16 @@ package com.awidesky.YoutubeClipboardAutoDownloader.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.DateFormat;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.function.Consumer;
 
 public abstract class TaskLogger extends AbstractLogger {
 
-	private DateFormat datePrefix = null;
-	
 	public volatile boolean isStop = false;
 	
-	public TaskLogger(boolean verbose) {
+	public TaskLogger(boolean verbose, String prefix) {
 		this.verbose = verbose;
+		this.prefix = prefix;
 	}
 	
 
@@ -63,17 +60,8 @@ public abstract class TaskLogger extends AbstractLogger {
 	
 	protected Consumer<PrintWriter> getLogTask(String data) {
 		return (logTo) -> {
-			for(String line : data.split("\\R")) {
-				printPrefix(logTo);
-				logTo.println(line);
-			}
+			logTo.println(getPrefix() + data);
 		};
 	}
 	
-	
-	private void printPrefix(PrintWriter logTo) {
-		if(datePrefix != null) logTo.print("[" + datePrefix.format(new Date()) + "]");
-		if(prefix != null) logTo.print(prefix);
-	}
-
 }

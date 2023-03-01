@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
-import java.util.Date;
 
 /**
  * An Simple Logger class that prints log to a <code>PrintWriter</code>.
@@ -45,15 +44,7 @@ public class SimpleLogger extends AbstractLogger {
 	 * */
 	@Override
 	public void log(String data) {
-		for(String line : data.split("\\R")) {
-			printPrefix();
-			logTo.println(line);
-		}
-	}
-
-	private void printPrefix() {
-		if(datePrefix != null) logTo.print("[" + datePrefix.format(new Date()) + "]");
-		if(prefix != null) logTo.print(prefix);
+		logTo.println(getPrefix() + data);
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 
 /**
@@ -29,11 +30,21 @@ public abstract class AbstractLogger implements Logger {
 
 	/**
 	 * Set additional prefix for this <code>Logger</code> instance.
-	 * if argument is <code>null</code>, no date information prefix is appended,
+	 * if argument is <code>null</code>, no prefix is appended,
 	 * */
 	@Override
 	public void setPrefix(String prefix) {
 		this.prefix = prefix;
+	}
+	
+	/**
+	 * Generates prefix String
+	 * */
+	protected String getPrefix() {
+		StringBuilder sb = new StringBuilder("");
+		if(datePrefix != null) sb.append("[" + datePrefix.format(new Date()) + "]");
+		if(prefix != null) sb.append(prefix);
+		return sb.toString();
 	}
 	
 	/**

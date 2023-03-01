@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -18,10 +19,10 @@ public class LoggerThread extends Thread {
 	private HashSet<TaskLogger> children = new HashSet<>();
 	
 	public volatile boolean isStop = false;
-	private boolean verbose;
-	
-	
-	public static final String version = "v1.5.0";
+	private boolean verbose = false;
+	private DateFormat datePrefix = null;
+
+	public static final String version = "v1.7.0";
 	
 	public LoggerThread(OutputStream os) {
 		this(os, true, Charset.defaultCharset());
@@ -40,11 +41,14 @@ public class LoggerThread extends Thread {
 	}
 	
 	public TaskLogger getLogger() {
-		return getLogger(null);
+		return getLogger(verbose, null);
 	} 
 	
 	public TaskLogger getLogger(String prefix) {
-		TaskLogger newLogger = new TaskLogger(verbose) {
+		return getLogger(verbose, prefix);
+	}
+	public TaskLogger getLogger(boolean verbose, String prefix) {
+		TaskLogger newLogger = new TaskLogger(verbose, prefix) {
 
 			@Override
 			public void queueLogTask(Consumer<PrintWriter> logTask) {
@@ -66,12 +70,16 @@ public class LoggerThread extends Thread {
 			}
 			
 		};
-		newLogger.setPrefix(prefix);
+		newLogger.setDatePrefix(datePrefix);
 		children.add(newLogger);
 		return newLogger;
 	}
+	
 	public TaskBufferedLogger getBufferedLogger(String prefix) {
-		TaskBufferedLogger newLogger = new TaskBufferedLogger(verbose) {
+		return getBufferedLogger(verbose, prefix);
+	}
+	public TaskBufferedLogger getBufferedLogger(boolean verbose, String prefix) {
+		TaskBufferedLogger newLogger = new TaskBufferedLogger(verbose, prefix) {
 
 			@Override
 			public void queueLogTask(Consumer<PrintWriter> logTask) {
@@ -90,7 +98,7 @@ public class LoggerThread extends Thread {
 			}
 			
 		};
-		newLogger.setPrefix(prefix);
+		newLogger.setDatePrefix(datePrefix);
 		children.add(newLogger);
 		return newLogger;
 	}
@@ -120,11 +128,20 @@ public class LoggerThread extends Thread {
 	}
 	
 	
+	public void setVerbose(boolean verbose) {
+		this.verbose = verbose;
+	}
 	public void setVerboseAllChildren(boolean verbose) {
 		this.verbose = verbose;
 		children.parallelStream().forEach(l -> l.setVerbose(verbose));
 	}
-	
+	public void setDatePrefix(DateFormat datePrefix) {
+		this.datePrefix = datePrefix;
+	}
+	public void setDatePrefixAllChildren(DateFormat datePrefix) {
+		this.datePrefix = datePrefix;
+		children.parallelStream().forEach(l -> l.setDatePrefix(datePrefix));
+	}
 	
 	/**
 	 * Kill LoggerThread in <code>timeOut</code> ms.

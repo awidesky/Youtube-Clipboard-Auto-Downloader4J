@@ -13,8 +13,8 @@ public abstract class TaskBufferedLogger extends TaskLogger implements Flushable
 
 	private StringWriter buffer = new StringWriter();
 
-	public TaskBufferedLogger(boolean verbose) {
-		super(verbose);
+	public TaskBufferedLogger(boolean verbose, String prefix) {
+		super(verbose, prefix);
 	}
 
 	/**

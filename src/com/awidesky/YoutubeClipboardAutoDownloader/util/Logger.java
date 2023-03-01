@@ -2,7 +2,6 @@ package com.awidesky.YoutubeClipboardAutoDownloader.util;
 
 import java.io.Closeable;
 import java.text.DateFormat;
-import java.util.Date;
 
 
 
@@ -29,15 +28,9 @@ public interface Logger extends Closeable, AutoCloseable {
 		
 		@Override
 		public void log(String data) {
-			printPrefix();
-			System.out.println(data);
+			System.out.println(getPrefix() + data);
 		}
 
-		private void printPrefix() {
-			if(datePrefix != null) System.out.print("[" + datePrefix.format(new Date()) + "]");
-			if(prefix != null) System.out.print(prefix);
-		}
-		
 		@Override
 		public void close() {}
 
@@ -85,5 +78,5 @@ public interface Logger extends Closeable, AutoCloseable {
 	 * If <code>this.verbose</code> is <code>true</code>, argument <code>data</code> is logged, otherwise it doesn't 
 	 * */
 	public void logVerbose(String data);
-	
+
 }
