@@ -198,7 +198,25 @@ public class GUI {
 		pathField = new JTextField(Config.getSaveto());
 		nameFormatField =  new JTextField(Config.getFileNameFormat());
 		
-		nameFormatField.addActionListener((e) -> { Config.setFileNameFormat(nameFormatField.getText()); });
+		pathField.getDocument().addDocumentListener(new DocumentListener() {
+			public void changedUpdate(DocumentEvent e) { changed(); }
+			public void removeUpdate(DocumentEvent e) {	changed(); }
+			public void insertUpdate(DocumentEvent e) { changed(); }
+			public void changed() {
+				String str = pathField.getText();
+				File f = new File(str);
+				if (f.isDirectory() && f.exists())
+					Config.setSaveto(str);
+			}
+		});
+		nameFormatField.getDocument().addDocumentListener(new DocumentListener() {
+			public void changedUpdate(DocumentEvent e) { changed(); }
+			public void removeUpdate(DocumentEvent e) {	changed(); }
+			public void insertUpdate(DocumentEvent e) { changed(); }
+			public void changed() {
+				Config.setFileNameFormat(nameFormatField.getText());
+			}
+		});
 		
 		pathField.setBounds(65, 65, 456, 22); 
 		nameFormatField.setBounds(115, 122, 172, 22);
@@ -227,7 +245,9 @@ public class GUI {
 
 			String path = jfc.getSelectedFile().getAbsolutePath();
 			pathField.setText(path);
-			jfc.setCurrentDirectory(new File(path));
+			File f = new File(path);
+			if(f.isDirectory() && f.exists()) Config.setSaveto(path);
+			jfc.setCurrentDirectory(f);
 
 		});
 		cleanCompleted.addActionListener((e) -> { TaskStatusModel.getinstance().clearDone(); });
