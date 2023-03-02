@@ -19,7 +19,6 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -222,8 +221,7 @@ public class GUI {
 		browse.addActionListener((e) -> {
 
 			if (jfc.showDialog(new JFrame(), null) != JFileChooser.APPROVE_OPTION) {
-				JOptionPane.showMessageDialog(this.mainFrame, "Please choose a directory!", "ERROR!",
-						JOptionPane.WARNING_MESSAGE);
+				SwingDialogs.error("ERROR!", "Please choose a directory!", null, false);
 				return;
 			}
 
