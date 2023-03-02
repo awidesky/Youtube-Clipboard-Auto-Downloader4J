@@ -362,7 +362,7 @@ public class Main {
 			
 			String s;
 			while((s = br.readLine()) != null) {
-				if(s.equals("") || s.startsWith("#") || s.equals("https://www.youtu")) continue;
+				if(s.equals("") || s.startsWith("#") || Config.isLinkAcceptable(s)) continue;
 				Config.addAcceptableList(s);
 			}
 			
