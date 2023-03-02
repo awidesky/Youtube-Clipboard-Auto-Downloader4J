@@ -14,7 +14,7 @@ public class TaskThreadPool {
 	private static Logger log = Main.getLogger("[ClipBoardChecker] ");
 	
 	public static void setup() {
-		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+		executorService = Executors.newCachedThreadPool();
 	}
 	public static Future<?> submit(Runnable task) {
 		return executorService.submit(task);
