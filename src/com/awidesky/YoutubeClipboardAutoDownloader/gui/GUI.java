@@ -403,7 +403,8 @@ public class GUI {
 		if(selectedMode) {
 			removeSwitch.setText("remove selected");
 			Arrays.stream(removeSwitch.getActionListeners()).forEach(removeSwitch::removeActionListener);
-			removeSwitch.addActionListener((e) -> { switchRemoveSwitch(!TaskStatusModel.getinstance().removeSelected(table.getSelectedRows()));	});
+			removeSwitch.addActionListener((e) -> { 
+				switchRemoveSwitch(!TaskStatusModel.getinstance().removeSelected());	});
 		} else {
 			removeSwitch.setText("clear All");
 			Arrays.stream(removeSwitch.getActionListeners()).forEach(removeSwitch::removeActionListener);

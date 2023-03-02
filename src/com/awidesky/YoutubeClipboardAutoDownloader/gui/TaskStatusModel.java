@@ -1,7 +1,6 @@
 package com.awidesky.YoutubeClipboardAutoDownloader.gui;
 
 import java.awt.EventQueue;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicReference;
@@ -114,14 +113,16 @@ public class TaskStatusModel extends AbstractTableModel {
 	/**
 	 * @return <code>true</code> if user didn't cancel the removing.
 	 * */
-	public boolean removeSelected(int[] selected) {
+	public boolean removeSelected() {
 		
-		if (Arrays.stream(selected).mapToObj(rows::get).anyMatch(TaskData::isNotDone)) 
+		List<TaskData> selected = rows.stream().filter(TaskData::isChecked).toList();
+		
+		if (selected.stream().anyMatch(TaskData::isNotDone)) 
 			if (!SwingDialogs.confirm("Before removing!", "Some task(s) you chose are not done!\nCancel those task(s)?"))
 				return false;
 		
-		Arrays.stream(selected).mapToObj(rows::get).filter(TaskData::isNotDone).forEach(TaskData::kill);
-		Arrays.stream(selected).forEach(rows::remove);
+		selected.stream().filter(TaskData::isNotDone).forEach(TaskData::kill);
+		rows.removeAll(selected);
 		if(rows.isEmpty()) checkBoxSelectedCalback.accept(false);
 		fireTableDataChanged();
 		return true;
