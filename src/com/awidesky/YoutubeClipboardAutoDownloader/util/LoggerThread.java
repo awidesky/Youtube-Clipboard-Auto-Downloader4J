@@ -5,10 +5,9 @@ import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
@@ -17,7 +16,7 @@ public class LoggerThread extends Thread {
 
 	private PrintWriter logTo;
 	private	LinkedBlockingQueue<Consumer<PrintWriter>> loggerQueue = new LinkedBlockingQueue<>();
-	private Set<TaskLogger> children = Collections.synchronizedSet(new HashSet<TaskLogger>());
+	private Set<TaskLogger> children = ConcurrentHashMap.newKeySet();
 	
 	public volatile boolean isStop = false;
 	private boolean verbose = false;
