@@ -39,9 +39,8 @@ public abstract class TaskBufferedLogger extends TaskLogger implements Flushable
 	
 	@Override
 	public void log(String data) {
-		Consumer<PrintWriter> task = getLogTask(data);
-		PrintWriter pw = new PrintWriter(buffer);
-		task.accept(pw);
+		buffer.append(data);
+		newLine();
 	}
 	
 	@Override
