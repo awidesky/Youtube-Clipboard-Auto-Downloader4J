@@ -405,8 +405,8 @@ public class Main {
 			bw.write("#If you know a type of link that youtube-dl accepts (listed in https://github.com/ytdl-org/youtube-dl/blob/master/docs/supportedsites.md),"); bw.newLine();
 			bw.write("#and wish YoutubeAudioDownloader detact & download it, you can write how does the link starts(e.g. in youtube, \"https://www.youtu\")"); bw.newLine();
 			bw.write("#Every line starting with # will be ignored, but DO NOT CHANGE lines before these comments."); bw.newLine();
-			bw.write("#If you want to modify those, please do it in YoutubeAudioDownloader GUI,"); bw.newLine();
-			bw.write("#and let my spaghetti handle that hardcoded shit. :)"); bw.newLine();
+			bw.write("#If you want to modify those configurations, please do it in YoutubeAudioDownloader app."); bw.newLine();
+			bw.write("#And let my hardcoded spaghetti shit handle that. :)"); bw.newLine();
 			bw.newLine();
 			
 			bw.write(Config.getAcceptedLinkStr());
