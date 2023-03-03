@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE xml>
 <project default="deploy" name="Create Runnable Jar for Project YoutubeAudioAutoDownloader">
 	<!--ANT 1.7 is required-->
 	<property name="dir.buildfile" value="."/>
 
-	<property name="version_num" value="1.7.0"/>
+	<property name="version_num" value="2.0.0"/>
 	<property name="version" value="v${version_num}"/>
-	<property name="target" value="1.8"/>
-	<property name="source" value="1.8"/>
+	<property name="target" value="1.17"/>
+	<property name="source" value="1.17"/>
 	<property name="debuglevel" value="source,lines,vars"/>
 	<property name="launch4j.dir" location="C:\Program Files (x86)\Launch4j" />
 	<property name="jarApp.dir" location="${dir.buildfile}/build/YoutubeAudioAutoDownloader_${version}" />
