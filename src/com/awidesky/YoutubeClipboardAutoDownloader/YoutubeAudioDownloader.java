@@ -57,7 +57,7 @@ public class YoutubeAudioDownloader {
 			log.log("Executing ffmpeg -version ended with exit code : " + ProcessExecutor.runNow(log, null, youtubedlpath + "ffmpeg", "-version"));
 		} catch (Exception e) {
 			SwingDialogs.error("Error!", "%e%", e, true);
-	 		if (SwingDialogs.confirm("ffmpeg does not exist!", "Install ffmpeg inside the app?")) {
+	 		if (SwingDialogs.confirm("ffmpeg does not exist!", "Install ffmpeg in app resource folder?")) {
 	 			try {
 					BinaryInstaller.getFFmpeg();
 					log.log("ffmpeg installation success. re-checking ffmpeg...");
@@ -94,7 +94,7 @@ public class YoutubeAudioDownloader {
 			if (!checkYoutubedlPath(youtubedlpath + "youtube-dl", log)) {
 				
 				SwingDialogs.error("Error!", "youtube-dl does not exist in\n" + youtubedlpath + "\nor system %PATH%", null, true);
-				if (SwingDialogs.confirm("youtube-dl does not exist!", "Install youtube-dl inside the app?")) {
+				if (SwingDialogs.confirm("youtube-dl does not exist!", "Install youtube-dl in app resource folder?")) {
 					try {
 						BinaryInstaller.getYtdlp();
 						log.log("youtube-dl installation success. re-checking youtube-dl...");

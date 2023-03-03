@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -13,12 +14,14 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -51,10 +54,10 @@ public class BinaryInstaller {
 		deleteDirectoryRecursion(Paths.get(root, "ffmpeg"));
 		
 		log.log("Installing ffmpeg...");
+		showProgress("Downloading ffmpeg");
 		long filesize = getFileSize(new URL(FFMPEG_URL));
 		if(filesize <= 0) throw new IOException("Unable to reach " + FFMPEG_URL);
-		showProgress("Downloading ffmpeg...", filesize);
-		
+		setLoadingFrameContent("Downloading ffmpeg version " + getContent(new URL("https://www.gyan.dev/ffmpeg/builds/release-version")), filesize);
 		download(new URL(FFMPEG_URL), new File(root + File.separator + "ffmpeg.zip"));
 		
 		unzipFolder(Paths.get(root, "ffmpeg.zip"), Paths.get(root));
@@ -74,10 +77,11 @@ public class BinaryInstaller {
 	
 	public static void getYtdlp() throws MalformedURLException, IOException {
 		log.log("Installing yt-dlp...");
+		showProgress("Downloading yt-dlp");
 		long filesize = getFileSize(new URL(YTDLP_URL));
 		if(filesize <= 0) throw new IOException("Unable to reach " + YTDLP_URL);
-		showProgress("Downloading yt-dlp...", filesize);
-		
+		String releaseURL = getRedirectedURL(new URL("https://github.com/yt-dlp/yt-dlp/releases/latest"));
+		setLoadingFrameContent("Downloading yt-dlp version " + releaseURL.substring(releaseURL.lastIndexOf('/') + 1), filesize);
 		download(new URL(YTDLP_URL), new File(root + File.separator + "ffmpeg" + File.separator + "bin"  + File.separator + "youtube-dl.exe"));
 		hideProgress();
 		log.log("yt-dlp installed!!");
@@ -137,7 +141,33 @@ public class BinaryInstaller {
 		}
 	}
 
-	private static void showProgress(String title, long totalsize) {
+	private static String getContent(URL url) {
+		try (Scanner scanner = new Scanner(url.openStream(), StandardCharsets.UTF_8.toString())) {
+			scanner.useDelimiter("\\A");
+			return scanner.hasNext() ? scanner.next() : "";
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	private static String getRedirectedURL(URL url) {
+		HttpURLConnection conn = null;
+		try {
+			conn = (HttpURLConnection) url.openConnection();
+			InputStream is = conn.getInputStream();
+			String ret = conn.getURL().toExternalForm();
+			is.close();
+			return ret;
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} finally {
+			if (conn != null) {
+				conn.disconnect();
+			}
+		}
+	}
+
+	private static void showProgress(String title) {
 
 		SwingUtilities.invokeLater(() -> {
 			Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -151,7 +181,7 @@ public class BinaryInstaller {
 			loadingFrame.setLayout(null);
 			loadingFrame.setResizable(false);
 
-			loadingStatus = new JLabel("0.00byte / " + formatFileSize(totalsize));
+			loadingStatus = new JLabel("0.00byte / -");
 			loadingStatus.setBounds(14, 8, 370, 18);
 
 			progress = new JProgressBar();
@@ -163,6 +193,12 @@ public class BinaryInstaller {
 			loadingFrame.setVisible(true);
 		});
 		
+	}
+	private static void setLoadingFrameContent(String title, long totalSize) {
+		SwingUtilities.invokeLater(() -> {
+			loadingFrame.setTitle(title);
+			loadingStatus.setText("0.00byte / " + formatFileSize(totalSize));
+		});
 	}
 	private static void updateUI(long now, long total) {
 		log.log("Progress : " + formatFileSize(now) + " / " + formatFileSize(total) + " (" + ((int)(100.0 * now / total)) + "%)");
