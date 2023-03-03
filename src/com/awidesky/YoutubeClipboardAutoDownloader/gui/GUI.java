@@ -238,7 +238,7 @@ public class GUI {
 		
 		browse.addActionListener((e) -> {
 
-			if (jfc.showDialog(new JFrame(), null) != JFileChooser.APPROVE_OPTION) {
+			if (jfc.showDialog(mainFrame, null) != JFileChooser.APPROVE_OPTION) {
 				SwingDialogs.error("ERROR!", "Please choose a directory!", null, false);
 				return;
 			}
