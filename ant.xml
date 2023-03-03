@@ -115,6 +115,7 @@
 		<move file="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}.exe" tofile="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}_setup_resourceBundled.exe"/>
 
 		<delete dir="${jarApp.dir}/YoutubeAudioAutoDownloader-resources"/>
+		<copy file="${dir.buildfile}/YoutubeAudioAutoDownloader-resources/icon.jpg" tofile="${jarApp.dir}/YoutubeAudioAutoDownloader-resources/icon.jpg"/>
 
 		<jpackage.exec/>
 		<move file="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}.exe" tofile="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}_setup.exe"/>
