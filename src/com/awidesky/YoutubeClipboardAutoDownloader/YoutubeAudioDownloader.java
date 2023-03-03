@@ -58,7 +58,7 @@ public class YoutubeAudioDownloader {
 			ret = ProcessExecutor.runNow(log, null, youtubedlpath + "ffmpeg", "-version");
 			log.log("Executing ffmpeg -version ended with exit code : " + ret);
 		} catch (Exception e) {
-			SwingDialogs.error("Error!", "%e%", e, true);
+			SwingDialogs.error("ffmpeg Error!", "%e%", e, true);
 	 		if (SwingDialogs.confirm("ffmpeg does not exist!", "Install ffmpeg in app resource folder?")) {
 	 			try {
 					BinaryInstaller.getFFmpeg();
@@ -75,6 +75,7 @@ public class YoutubeAudioDownloader {
 		}
 		
 		log.newLine();
+		if(ret != 0) SwingDialogs.error("ffmpeg Error!", "exit code : " + ret, null, true);
 		return ret == 0;
 		
 	}
@@ -128,7 +129,7 @@ public class YoutubeAudioDownloader {
 		List<String> args = Arrays.asList(ydlfile, "--version");
 		log.log("Checking youtube-dl by \"" + args.stream().collect(Collectors.joining(" ")).trim() + "\"");
 
-		StringBuffer stderr = new StringBuffer("");
+		StringBuffer stderr = new StringBuffer();
 		
 		// start process
 		try {
@@ -171,7 +172,7 @@ public class YoutubeAudioDownloader {
 			})).waitFor();
 			
 			log.log("Executing " + args.stream().collect(Collectors.joining(" ")).trim() + " ended with exit code : " + ret);
-			SwingDialogs.error("youtube-dl Error!", stderr.toString(), null, false);
+			if(!stderr.isEmpty()) SwingDialogs.error("youtube-dl Error! code : " + ret, stderr.toString(), null, false);
 			return ret == 0;
 		} catch (InterruptedException | IOException e) {
 			log.log("Error when checking youtube-dl\n\t" + e.getMessage());
