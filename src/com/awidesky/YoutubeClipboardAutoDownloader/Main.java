@@ -227,7 +227,7 @@ public class Main {
 		TaskLogger logTask = getTaskLogger("[Task" + num + "] ");
 		logTask.log("Received a link from your clipboard : " + data);
 
-		TaskData t = new TaskData(num, logTask);
+		TaskData t = new TaskData(num, logTask, Main.audioMode);
 		
 		t.setUrl(data); 
 		t.setVideoName(data); // temporarily set video name as url

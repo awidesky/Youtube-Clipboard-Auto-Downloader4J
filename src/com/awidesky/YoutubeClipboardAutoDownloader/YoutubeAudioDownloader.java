@@ -264,7 +264,7 @@ public class YoutubeAudioDownloader {
 		LinkedList<String> arguments = new LinkedList<>(Arrays.asList(
 				youtubedlpath + "youtube-dl", "--newline", "--force-overwrites", playListOption.toCommandArgm(), "--output", "\"" + Config.getFileNameFormat() + "\""));
 		
-		if(Main.audioMode) {
+		if(task.isAudioMode()) {
 			arguments.add("--extract-audio");
 			arguments.add("--audio-format");
 			arguments.add(Config.getFormat());
@@ -293,7 +293,7 @@ public class YoutubeAudioDownloader {
 					
 					while ((line = br.readLine()) != null) {
 						
-						if(!Main.audioMode && line.matches("[\\s|\\S]+Downloading [\\d]+ format\\(s\\)\\:[\\s|\\S]+")) {
+						if(!task.isAudioMode() && line.matches("[\\s|\\S]+Downloading [\\d]+ format\\(s\\)\\:[\\s|\\S]+")) {
 							downloadVideoAndAudioSeparately = line.contains("+");
 						}
 						
@@ -309,6 +309,8 @@ public class YoutubeAudioDownloader {
 						
 						if(line.startsWith("[ExtractAudio]")) {
 							task.setStatus("Extracting Audio (" + task.getNowVideoNum() + "/" + task.getTotalNumVideo() + ")");
+						} else if(line.startsWith("[Merger]")) {
+							task.setStatus("Merging Video and Audio (" + task.getNowVideoNum() + "/" + task.getTotalNumVideo() + ")");
 						}
 						
 						Matcher m = percentPtn.matcher(line);
@@ -320,7 +322,7 @@ public class YoutubeAudioDownloader {
 							} else {
 								task.setProgress(num);
 							}
-							if(num == 100) videoDownloadDone = !videoDownloadDone; 
+							if(num == 100) videoDownloadDone = true;
 						}
 						task.logger.log("[downloading] youtube-dl stdout : " + line);
 					}

@@ -24,6 +24,7 @@ public class TaskData {
 	private AtomicInteger taskNum = new AtomicInteger();
 	private AtomicInteger totalNumOfVideo = new AtomicInteger(1);
 	private AtomicInteger videoNum = new AtomicInteger(1);
+	private AtomicBoolean audioMode = new AtomicBoolean(true);
 	
 	/** Is this task finished or failed? */
 	private boolean isDone = false;
@@ -31,9 +32,10 @@ public class TaskData {
 	private Future<?> fu;
 	private Process p;
 	
-	public TaskData(int num, TaskLogger logger) {
+	public TaskData(int num, TaskLogger logger, boolean audioMode) {
 		this.taskNum.set(num);
 		this.logger = logger;
+		this.audioMode.set(audioMode);
 	}
 	
 
@@ -137,6 +139,11 @@ public class TaskData {
 	public int getNowVideoNum() {
 		return videoNum.get();
 	}
+
+	public boolean isAudioMode() {
+		return audioMode.get();
+	}
+
 
 	public void kill() {
 		if(isNotDone()) {
