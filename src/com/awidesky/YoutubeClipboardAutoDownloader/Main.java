@@ -58,7 +58,7 @@ public class Main {
 	
 	private static volatile int taskNum = 0;
 	
-	public static final String version = "v1.7.0";
+	public static final String version = "v2.0.0";
 
 	public static void main(String[] args) {
 		
