@@ -5,6 +5,7 @@ import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -44,7 +45,6 @@ import com.awidesky.YoutubeClipboardAutoDownloader.util.workers.TaskThreadPool;
 public class Main { 
 
 	private static String clipboardBefore = "";
-	private static boolean isSecondtime = false;
 	private static ClipBoardCheckerThread clipChecker;
 	
 	public static final Charset NATIVECHARSET = Charset.forName(System.getProperty("native.encoding"));
@@ -155,7 +155,6 @@ public class Main {
 			logger.log("[debug] clipboard ignored due to ClipboardListenOption == \"" + ClipBoardOption.NOLISTEN.getString() + "\"");
 			return;
 		}
-
 		clipChecker.submit(() -> { // To avoid overhead in EDT, put task in clipCheckerThread.
 
 			try {
@@ -178,11 +177,15 @@ public class Main {
 					return;
 				}
 				final String data = (String)cb.getData(DataFlavor.stringFlavor);
-
+				cb.setContents(new StringSelection(data), null);
+				
 				logger.log("[debug] clipboard : " + data);
 				
-				if (isRedundant(data)) return;
-				
+				if (clipboardBefore.equals(data)) {
+					logger.logVerbose("[debug] Duplicate input, ignore this input.");
+					clipboardBefore = "";
+					return;
+				}
 				clipboardBefore = data;
 
 				if (!Config.isLinkAcceptable(data)) {
@@ -218,25 +221,6 @@ public class Main {
 
 	}
 	
-	private static boolean isRedundant(String data) throws InterruptedException {
-		
-		if (clipboardBefore.equals(data)) {
-
-			if (isSecondtime) { //second time finding same data
-				Thread.sleep(50);
-				clipboardBefore = ""; 
-			} else {
-				isSecondtime = true; 
-			}
-			
-			return true;
-
-		} else {
-			return false; 
-		}
-		
-	}
-
 	private static void submitDownload(String data) {
 
 		int num = taskNum++;
