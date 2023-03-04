@@ -42,7 +42,9 @@ import com.awidesky.YoutubeClipboardAutoDownloader.util.workers.ClipBoardChecker
 import com.awidesky.YoutubeClipboardAutoDownloader.util.workers.TaskThreadPool;
 
 /** Main class */
-public class Main { 
+public class Main {
+	
+	private static LoggerThread loggerThread = new LoggerThread();
 
 	private static String clipboardBefore = "";
 	private static ClipBoardCheckerThread clipChecker;
@@ -52,7 +54,6 @@ public class Main {
 	public static volatile boolean audioMode = true;
 	
 	private static GUI gui = new GUI();
-	private static LoggerThread loggerThread;
 	private static TaskLogger logger;
 	private static Function<String, TaskLogger> taskLogGetter;
 	
@@ -289,10 +290,10 @@ public class Main {
 			logFolder.mkdirs();
 			logFile.createNewFile();
 			
-			loggerThread = new LoggerThread(new FileOutputStream(logFile), true);
+			loggerThread.setLogDestination(new FileOutputStream(logFile), true);
 			
 		} catch (IOException e) {
-			loggerThread = new LoggerThread(System.out, true);
+			loggerThread.setLogDestination(System.out, true);
 			SwingDialogs.error("Error when creating log flie", "%e%", e, false);
 		} finally {
 			taskLogGetter = logbyTask ? loggerThread::getBufferedLogger : loggerThread::getLogger;

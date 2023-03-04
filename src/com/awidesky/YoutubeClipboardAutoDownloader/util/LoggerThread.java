@@ -5,18 +5,19 @@ import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
 
 public class LoggerThread extends Thread {
 
-	private PrintWriter logTo;
+	private PrintWriter logTo = null;
 	private	LinkedBlockingQueue<Consumer<PrintWriter>> loggerQueue = new LinkedBlockingQueue<>();
-	private Set<TaskLogger> children = ConcurrentHashMap.newKeySet();
+	private Set<TaskLogger> children = Collections.synchronizedSet(new HashSet<TaskLogger>());
 	
 	public volatile boolean isStop = false;
 	private boolean verbose = false;
@@ -24,19 +25,21 @@ public class LoggerThread extends Thread {
 
 	public static final String version = "v1.7.0";
 	
-	public LoggerThread(OutputStream os) {
-		this(os, true, Charset.defaultCharset());
-	}
+	public LoggerThread() {}
 	
-	public LoggerThread(OutputStream os, Charset cs) {
-		this(os, true, cs);
+	public void setLogDestination(OutputStream os) throws IllegalArgumentException {
+		setLogDestination(os, true, Charset.defaultCharset());
 	}
-	
-	public LoggerThread(OutputStream os, boolean autoFlush) {
-		this(os, autoFlush, Charset.defaultCharset());
+	public void setLogDestination(OutputStream os, Charset cs) throws IllegalArgumentException {
+		setLogDestination(os, true, cs);
 	}
-	
-	public LoggerThread(OutputStream os, boolean autoFlush, Charset cs) {
+	public void setLogDestination(OutputStream os, boolean autoFlush) throws IllegalArgumentException {
+		setLogDestination(os, autoFlush, Charset.defaultCharset());
+	}
+	public void setLogDestination(OutputStream os, boolean autoFlush, Charset cs) throws IllegalArgumentException {
+		if(logTo != null) {
+			throw new IllegalArgumentException("log output stream is already set, cannot modify!");
+		}
 		logTo = new PrintWriter(os, autoFlush, cs);
 	}
 	

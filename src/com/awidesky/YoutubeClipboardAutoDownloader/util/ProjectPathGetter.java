@@ -17,7 +17,7 @@ import com.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
  * */
 public class ProjectPathGetter {
 
-	//private static TaskLogger logger //TODO 
+	private static TaskLogger logger = Main.getLogger("[ProjectPathGetter] "); 
 	private static PathFindCandidates[] projectpathCandidates = new PathFindCandidates[]
 			{ new PathFindCandidates(ProjectPathGetter::classLocationBased, "YoutubeAudioDownloader.class location"),
 					new PathFindCandidates(ProjectPathGetter::propertyBased, "System property java.class.path"),
@@ -32,7 +32,7 @@ public class ProjectPathGetter {
 			if (System.getProperty("jpackage.app-path") != null) {
 				ret += File.separator + "app";
 			}
-			System.out.println("Project path candidate (method : " + candidate.name + ") : " + ret);
+			logger.log("Project path candidate (method : " + candidate.name + ") : " + ret);
 			return ret + File.separator + "YoutubeAudioAutoDownloader-resources";
 		}).map(s -> new File(s)).filter(File::exists).map(File::getParentFile).map(File::getAbsolutePath).toList();
 		
@@ -41,7 +41,8 @@ public class ProjectPathGetter {
 			Main.kill(-100);
 			return null; //Unreachable
 		} else {
-			list.stream().forEach(s -> System.out.println("Selected project path : " + s));
+			list.stream().forEach(s -> logger.log("Selected project path : " + s));
+			logger.newLine();
 			return list.get(0);
 		}
 
