@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import com.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.Logger;
+import com.awidesky.YoutubeClipboardAutoDownloader.util.ProjectPathGetter;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.SwingDialogs;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.exec.BinaryInstaller;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.exec.ProcessExecutor;
@@ -25,21 +26,10 @@ import com.awidesky.YoutubeClipboardAutoDownloader.util.exec.YTDLPFallbacks;
 public class YoutubeAudioDownloader {
 
 
-	private static String projectpath = getProjectRootPath();
+	private static String projectpath = ProjectPathGetter.getProjectPath();
 	private static String youtubedlpath = projectpath + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "ffmpeg" + File.separator + "bin" + File.separator;
 	private static Pattern percentPtn = Pattern.compile("[0-9]+\\.*[0-9]+%");
 	private static Pattern versionPtn = Pattern.compile("\\d{4}\\.\\d{2}\\.\\d{2}");
-	
-	/**
-	 * returns String represents the path to the running jar.
-	 * */
-	private static String getProjectRootPath() {
-		String ret = new File("").getAbsolutePath();
-		if (System.getProperty("jpackage.app-path") != null) {
-			ret += File.separator + "app";
-		}
-		return ret;
-	}
 	
 	/**
 	 * @return Whether the procedure went fine
