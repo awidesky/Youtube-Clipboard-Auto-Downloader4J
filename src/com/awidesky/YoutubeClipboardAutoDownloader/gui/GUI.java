@@ -66,16 +66,7 @@ public class GUI {
 	
 	private Logger logger = null;
 	
-	public GUI() {
-		
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-				| UnsupportedLookAndFeelException e) {
-			SwingDialogs.error("Error while setting window look&feel", "%e%", e, false);
-		}
-		
-	}
+	public GUI() {}
 	
 	
 	/**

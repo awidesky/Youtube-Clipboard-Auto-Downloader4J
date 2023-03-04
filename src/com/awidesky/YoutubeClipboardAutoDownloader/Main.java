@@ -28,6 +28,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import com.awidesky.YoutubeClipboardAutoDownloader.enums.ClipBoardOption;
 import com.awidesky.YoutubeClipboardAutoDownloader.enums.LoadingStatus;
@@ -86,6 +88,15 @@ public class Main {
 			}
 				
 		}
+		
+		SwingUtilities.invokeLater(() -> {
+			try {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+					| UnsupportedLookAndFeelException e) {
+				SwingDialogs.error("Error while setting window look&feel", "%e%", e, false);
+			}
+		});
 		
 		try {
 			prepareLogFile(verbose, datePrefix, logbyTask);
