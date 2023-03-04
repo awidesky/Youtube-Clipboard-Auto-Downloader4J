@@ -25,8 +25,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
@@ -35,6 +33,7 @@ import com.awidesky.YoutubeClipboardAutoDownloader.Config;
 import com.awidesky.YoutubeClipboardAutoDownloader.Main;
 import com.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
 import com.awidesky.YoutubeClipboardAutoDownloader.enums.ClipBoardOption;
+import com.awidesky.YoutubeClipboardAutoDownloader.enums.ExitCodes;
 import com.awidesky.YoutubeClipboardAutoDownloader.enums.LoadingStatus;
 import com.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
 import com.awidesky.YoutubeClipboardAutoDownloader.enums.TableColumnEnum;
@@ -97,7 +96,7 @@ public class GUI {
 				
 				e.getWindow().dispose();
 				logger.log("LoadingFrame was closed");
-				Main.kill(0);
+				Main.kill(ExitCodes.SUCCESSFUL);
 
 			}
 
@@ -135,7 +134,7 @@ public class GUI {
 				if(TaskStatusModel.getinstance().getRowCount() != 0) { return; }
 				disposeAll();
 				e.getWindow().dispose();
-				Main.kill(0);
+				Main.kill(ExitCodes.SUCCESSFUL);
 
 			}
 

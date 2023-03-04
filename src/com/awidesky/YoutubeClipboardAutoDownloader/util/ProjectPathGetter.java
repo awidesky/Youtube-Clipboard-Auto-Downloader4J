@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 
 import com.awidesky.YoutubeClipboardAutoDownloader.Main;
 import com.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
+import com.awidesky.YoutubeClipboardAutoDownloader.enums.ExitCodes;
 
 /**
  * https://stackoverflow.com/a/12733172
@@ -38,7 +39,7 @@ public class ProjectPathGetter {
 		
 		if(list.isEmpty()) {
 			SwingDialogs.error("Unable to get executing jar directory!", "Cannot find YoutubeAudioAutoDownloader-resources directory! please reinstall th app!", null, true);
-			Main.kill(-100);
+			Main.kill(ExitCodes.PROJECTPATHNOTFOUND);
 			return null; //Unreachable
 		} else {
 			list.stream().forEach(s -> logger.log("Selected project path : " + s));

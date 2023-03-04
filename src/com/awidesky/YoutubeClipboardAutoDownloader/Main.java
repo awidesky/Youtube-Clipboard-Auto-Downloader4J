@@ -32,6 +32,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import com.awidesky.YoutubeClipboardAutoDownloader.enums.ClipBoardOption;
+import com.awidesky.YoutubeClipboardAutoDownloader.enums.ExitCodes;
 import com.awidesky.YoutubeClipboardAutoDownloader.enums.LoadingStatus;
 import com.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
@@ -47,6 +48,7 @@ import com.awidesky.YoutubeClipboardAutoDownloader.util.workers.TaskThreadPool;
 public class Main {
 	
 	private static LoggerThread loggerThread = new LoggerThread();
+	private static TaskLogger logger = loggerThread.getLogger("[Main] ");
 
 	private static String clipboardBefore = "";
 	private static ClipBoardCheckerThread clipChecker;
@@ -56,7 +58,6 @@ public class Main {
 	public static volatile boolean audioMode = true;
 	
 	private static GUI gui = new GUI();
-	private static TaskLogger logger;
 	private static Function<String, TaskLogger> taskLogGetter;
 	
 	private static volatile int taskNum = 0;
@@ -64,8 +65,6 @@ public class Main {
 	public static final String version = "v2.0.0";
 
 	public static void main(String[] args) {
-		
-		boolean setup = false;
 		
 		boolean verbose = false, datePrefix = false, logbyTask = false;
 		for (String arg : args) {
@@ -77,6 +76,12 @@ public class Main {
 				System.out.println("\t              Useful when you don't want to see dirty log file when multiple tasks running.");
 				System.out.println("\t--logTime : Every log line will printed with time");
 				System.out.println("\t--verbose : Print verbose logs(like GUI Frmaes info, etc.)");
+				System.out.println(); System.out.println();
+				System.out.println("exit codes :");
+				Arrays.stream(ExitCodes.values()).forEach(code -> {
+					System.out.println("\t" + code.getCode() + " : " + code.getMsg());
+				});
+				Main.kill(ExitCodes.SUCCESSFUL);
 			} else if ("--verbose".equals(arg)) {
 				verbose = true;
 			} else if ("--logTime".equals(arg)) {
@@ -98,15 +103,8 @@ public class Main {
 			}
 		});
 		
-		try {
-			prepareLogFile(verbose, datePrefix, logbyTask);
-			setup = setup(args);
-		} catch (Exception e) {
-			setup = false;
-			SwingDialogs.error("Failed to initiate!", "Application Failed to initiate!\n%e%", e, true);
-		}
-		
-		if(!setup) System.exit(1);
+		prepareLogFile(verbose, datePrefix, logbyTask);
+		setup(args);
 		
 		if(args.length == 0) return;
 		
@@ -115,17 +113,16 @@ public class Main {
 	/**
 	 * @return Whether the procedure went fine
 	 * */
-	private static boolean setup(String[] args) {
+	private static void setup(String[] args) {
 
 		try {
 			SwingUtilities.invokeAndWait(() -> {
 				gui.initLoadingFrame();
 			});
 		} catch (InvocationTargetException | InterruptedException e2) {
-
 			logger.log("[init] failed wating EDT!");
 			logger.log(e2);
-			return false;
+			Main.kill(ExitCodes.INITLOADINGFRAMEFAILED);
 		}
 		
 		
@@ -136,9 +133,9 @@ public class Main {
 		clipChecker.start(); //A daemon thread that will check clipboard
 
 		gui.setLoadingStat(LoadingStatus.CHECKING_FFMPEG);
-		if (!YoutubeAudioDownloader.checkFfmpeg()) return false;
+		if (!YoutubeAudioDownloader.checkFfmpeg()) Main.kill(ExitCodes.FFMPEGNOTEXISTS);
 		gui.setLoadingStat(LoadingStatus.CHECKING_YDL);
-		if (!YoutubeAudioDownloader.checkYoutubedl()) return false;
+		if (!YoutubeAudioDownloader.checkYoutubedl()) Main.kill(ExitCodes.YOUTUBEDNOTEXISTS);
 		
 		gui.setLoadingStat(LoadingStatus.READING_PROPERTIES);
 		readProperties();
@@ -147,17 +144,11 @@ public class Main {
 
 		gui.setLoadingStat(LoadingStatus.LOADING_WINDOW);
 		SwingUtilities.invokeLater(() -> {
-			try {
-				gui.initMainFrame();
-			} catch (Exception e) {
-				SwingDialogs.error("Failed to initiate!", "Application Failed to initiate!\n" + e.getClass().getName() + " : %e%", e, true);
-				Main.kill(1);
-			}
+			gui.initMainFrame();
 		});
 		
 		logger.newLine();
 		logger.log("Listening clipboard...\n");
-		return true;
 		
 	}
 	
@@ -305,13 +296,12 @@ public class Main {
 			
 		} catch (IOException e) {
 			loggerThread.setLogDestination(System.out, true);
-			SwingDialogs.error("Error when creating log flie", "%e%", e, false);
+			SwingDialogs.error("Error when creating log flie, log in console instead...", "%e%", e, false);
 		} finally {
 			taskLogGetter = logbyTask ? loggerThread::getBufferedLogger : loggerThread::getLogger;
-			loggerThread.setVerbose(verbose);
-			if (datePrefix) loggerThread.setDatePrefix(new SimpleDateFormat("[kk:mm:ss]"));
+			loggerThread.setVerboseAllChildren(verbose);
+			if (datePrefix) loggerThread.setDatePrefixAllChildren(new SimpleDateFormat("[kk:mm:ss]"));
 			SwingDialogs.setLogger(loggerThread.getLogger());
-			logger = loggerThread.getLogger("[Main] ");
 		}
 		
 	}
@@ -457,18 +447,20 @@ public class Main {
 	 * This method can wait up to 5seconds for <code>LoggerThread</code> and <code>executorService</code>(2.5seconds each) to terminated.
 	 * 
 	 * */
-	public static void kill(int exitcode) {
-		
-		logger.log("YoutubeAudioAutoDownloader exit code : " + exitcode);
+	public static void kill(ExitCodes exitCode) {
 		
 		TaskThreadPool.kill();
 
 		writeProperties();
+
+		if(logger != null) {
+			logger.log("YoutubeAudioAutoDownloader exit code : " + exitCode.getCode());
+			logger.close();
+		}
 		
-		logger.close();
 		loggerThread.kill(2500);
 		
-		System.exit(exitcode);
+		System.exit(exitCode.getCode());
 		
 	}
 
