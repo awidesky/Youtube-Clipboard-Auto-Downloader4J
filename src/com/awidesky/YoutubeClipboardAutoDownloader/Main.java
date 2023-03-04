@@ -318,33 +318,22 @@ public class Main {
 	 * */
 	private static void readProperties() {
 
-		String p = YoutubeAudioDownloader.getProjectpath(); //Default path for save is project root path
-		String f = "mp3";
-		String q = "0";
-		String l = "--no-playlist";
-		String n = "%(title)s.%(ext)s"; 
-		String c = "Download link automatically"; 
-		
-		Config.addAcceptableList("https://www.youtu");
-		Config.addAcceptableList("youtube.com");
+		String p = Config.getSaveto();
+		String f = Config.getFormat();
+		String q = Config.getSaveto();
+		String l = Config.getPlaylistOption().toCommandArgm();
+		String n = Config.getFileNameFormat(); 
+		String c = Config.getClipboardListenOption().getString(); 
 		
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
 				YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt")))) {
 
-			String p1 = Optional.ofNullable(br.readLine()).orElse("SavePath=" + p)				.split(Pattern.quote("="))[1];
-			String f1 = Optional.ofNullable(br.readLine()).orElse("Format=" + f)				.split(Pattern.quote("="))[1];
-			String q1 = Optional.ofNullable(br.readLine()).orElse("Quality=" + q)				.split(Pattern.quote("="))[1];
-			String l1 = Optional.ofNullable(br.readLine()).orElse("Playlist=" + l)				.split(Pattern.quote("="))[1];
-			String n1 = Optional.ofNullable(br.readLine()).orElse("FileNameFormat=" + n)		.split(Pattern.quote("="))[1];
-			String c1 = Optional.ofNullable(br.readLine()).orElse("ClipboardListenOption=" + c)	.split(Pattern.quote("="))[1];
-
-			p = p1.equals("null") ?  p : p1;
-			f = f1.equals("null") ?  f : f1;
-			q = q1.equals("null") ?  q : q1;
-			l = l1.equals("null") ?  l : l1;
-			n = n1.equals("null") ?  n : n1;
-			c = c1.equals("null") ?  c : c1;
-			
+			p = Optional.ofNullable(br.readLine()).orElse("SavePath=" + p)				.split(Pattern.quote("="))[1];
+			f = Optional.ofNullable(br.readLine()).orElse("Format=" + f)				.split(Pattern.quote("="))[1];
+			q = Optional.ofNullable(br.readLine()).orElse("Quality=" + q)				.split(Pattern.quote("="))[1];
+			l = Optional.ofNullable(br.readLine()).orElse("Playlist=" + l)				.split(Pattern.quote("="))[1];
+			n = Optional.ofNullable(br.readLine()).orElse("FileNameFormat=" + n)		.split(Pattern.quote("="))[1];
+			c = Optional.ofNullable(br.readLine()).orElse("ClipboardListenOption=" + c)	.split(Pattern.quote("="))[1];
 			
 			String s;
 			while((s = br.readLine()) != null) {

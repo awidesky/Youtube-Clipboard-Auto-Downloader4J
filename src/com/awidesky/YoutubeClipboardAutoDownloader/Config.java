@@ -9,14 +9,18 @@ import com.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
 
 public class Config { 
 	
-	private static String saveto = null;
-	private static String format = null;
-	private static String quality = null;
-	private static PlayListOption playlistOption;
-	private static String fileNameFormat = null;
-	private static ClipBoardOption clipboardListenOption = null;
+	private static String saveto = YoutubeAudioDownloader.getProjectpath();
+	private static String format = "mp3";
+	private static String quality = "0";
+	private static PlayListOption playlistOption = PlayListOption.NO;
+	private static String fileNameFormat = "%(title)s.%(ext)s";
+	private static ClipBoardOption clipboardListenOption = ClipBoardOption.AUTOMATIC;
 	private static List<String> acceptableLinks = new ArrayList<>();
 	
+	static {
+		addAcceptableList("https://www.youtu");
+		addAcceptableList("youtube.com");
+	}
 	
 	public static String getSaveto() {
 		
