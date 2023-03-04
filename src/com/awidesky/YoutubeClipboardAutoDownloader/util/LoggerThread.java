@@ -23,7 +23,7 @@ public class LoggerThread extends Thread {
 	private boolean verbose = false;
 	private DateFormat datePrefix = null;
 
-	public static final String version = "v1.7.0";
+	public static final String version = "v1.8.0";
 	
 	public LoggerThread() {}
 	
@@ -136,14 +136,14 @@ public class LoggerThread extends Thread {
 	}
 	public void setVerboseAllChildren(boolean verbose) {
 		this.verbose = verbose;
-		children.parallelStream().forEach(l -> l.setVerbose(verbose));
+		children.stream().forEach(l -> l.setVerbose(verbose));
 	}
 	public void setDatePrefix(DateFormat datePrefix) {
 		this.datePrefix = datePrefix;
 	}
 	public void setDatePrefixAllChildren(DateFormat datePrefix) {
 		this.datePrefix = datePrefix;
-		children.parallelStream().forEach(l -> l.setDatePrefix(datePrefix));
+		children.stream().forEach(l -> l.setDatePrefix(datePrefix));
 	}
 	
 	/**
@@ -153,7 +153,8 @@ public class LoggerThread extends Thread {
 		
 		isStop = true;
 		
-		children.parallelStream().forEach(TaskLogger::close);
+		new HashSet<>(children).stream().forEach(TaskLogger::close);
+		
 		try {
 			this.join(timeOut);
 		} catch (InterruptedException e) {
