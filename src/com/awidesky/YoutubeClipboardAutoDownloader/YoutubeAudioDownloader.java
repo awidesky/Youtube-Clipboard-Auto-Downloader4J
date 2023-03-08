@@ -39,6 +39,8 @@ public class YoutubeAudioDownloader {
 		/* check ffmpeg */
 		Logger log = Main.getLogger("[ffmepg check] ");
 
+		//TODO : system PATH check
+		
 		// retrieve command line argument
 		log.log("Checking ffmpeg installation by \"" + youtubedlpath + "ffmpeg -version" + "\"");
 
