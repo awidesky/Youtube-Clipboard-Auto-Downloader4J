@@ -20,9 +20,9 @@
 				<arg value="--input" />
 				<arg value="${jarApp.dir}" />
 				<arg value="--dest" />
-				<arg value="${dir.buildfile}/build/win_standalone/jpackage" />
+				<arg value="${dir.buildfile}/build/win_standalone" />
 				<arg value="--main-jar" />
-				<arg value="YoutubeAudioAutoDownloader ${version}.jar" />
+				<arg value="YoutubeAudioAutoDownloader_${version}.jar" />
 				<arg value="--main-class" />
 				<arg value="com.awidesky.YoutubeClipboardAutoDownloader.Main" />
 				<arg value="--name" />
@@ -58,7 +58,7 @@
 	</target>
 
 	<target depends="compile" name="create_run_jar">
-		<jar destfile="${jarApp.dir}/YoutubeAudioAutoDownloader ${version}.jar" filesetmanifest="mergewithoutmain">
+		<jar destfile="${jarApp.dir}/YoutubeAudioAutoDownloader_${version}.jar" filesetmanifest="mergewithoutmain">
 			<manifest>
 				<attribute name="Main-Class" value="com.awidesky.YoutubeClipboardAutoDownloader.Main"/>
 				<attribute name="Class-Path" value="."/>
@@ -83,22 +83,33 @@
 	
 	<target depends="create_run_jar, make_custom_jre" name="deploy_launch4j">
 
-		<copy todir="${dir.buildfile}/build/win_standalone/launch4j">
+		<copy todir="${dir.buildfile}/build/win_standalone/YoutubeAudioAutoDownloader_${version}_launch4j">
+			<fileset dir="${dir.buildfile}">
+				<include name="jre/**"/>
+			</fileset>
+		</copy>
+		<copy todir="${dir.buildfile}/build/win_standalone/YoutubeAudioAutoDownloader_${version}_launch4j_resourceBundled">
 			<fileset dir="${dir.buildfile}">
 				<include name="jre/**"/>
 			</fileset>
 		</copy>
 
-		<copy todir="${dir.buildfile}/build/win_standalone/launch4j">
+		<copy file="${dir.buildfile}/config.txt" tofile="${dir.buildfile}/build/win_standalone/YoutubeAudioAutoDownloader_${version}_launch4j/config.txt"/>
+		<copy file="${dir.buildfile}/config.txt" tofile="${dir.buildfile}/build/win_standalone/YoutubeAudioAutoDownloader_${version}_launch4j_resourceBundled/config.txt"/>
+
+		<copy todir="${dir.buildfile}/build/win_standalone/YoutubeAudioAutoDownloader_${version}_launch4j_resourceBundled">
 			<fileset dir="${dir.buildfile}">
 				<include name="YoutubeAudioAutoDownloader-resources/**"/>
 				<exclude name="YoutubeAudioAutoDownloader-resources/icon.ico"/>
 			</fileset>
 		</copy>
+		<mkdir dir="${dir.buildfile}/build/win_standalone/YoutubeAudioAutoDownloader_${version}_launch4j/YoutubeAudioAutoDownloader-resources"/>		
+		<copy file="${dir.buildfile}/YoutubeAudioAutoDownloader-resources/icon.jpg" tofile="${dir.buildfile}/build/win_standalone/YoutubeAudioAutoDownloader_${version}_launch4j/YoutubeAudioAutoDownloader-resources/icon.jpg"/>
 
-		<copy file="${dir.buildfile}/config.txt" tofile="${dir.buildfile}/build/win_standalone/launch4j/config.txt"/>
+		
 
-		<launch4j configFile="${dir.buildfile}/Launch4J.xml" jar="${jarApp.dir}\YoutubeAudioAutoDownloader ${version}.jar" outfile="${dir.buildfile}\build\win_standalone\launch4j\YoutubeAudioAutoDownloader ${version}.exe"/>
+		<launch4j configFile="${dir.buildfile}/Launch4J.xml" jar="${jarApp.dir}\YoutubeAudioAutoDownloader_${version}.jar" outfile="${dir.buildfile}\build\win_standalone\YoutubeAudioAutoDownloader_${version}_launch4j\YoutubeAudioAutoDownloader ${version}.exe"/>
+		<launch4j configFile="${dir.buildfile}/Launch4J.xml" jar="${jarApp.dir}\YoutubeAudioAutoDownloader_${version}.jar" outfile="${dir.buildfile}\build\win_standalone\YoutubeAudioAutoDownloader_${version}_launch4j_resourceBundled\YoutubeAudioAutoDownloader ${version}.exe"/>
 
 	</target>
 
@@ -112,13 +123,13 @@
 		</copy>
 
 		<jpackage.exec/>
-		<move file="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}.exe" tofile="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}_setup_resourceBundled.exe"/>
+		<move file="${dir.buildfile}/build/win_standalone/YoutubeAudioAutoDownloader-${version_num}.exe" tofile="${dir.buildfile}/build/win_standalone/YoutubeAudioAutoDownloader-${version_num}_setup_resourceBundled.exe"/>
 
 		<delete dir="${jarApp.dir}/YoutubeAudioAutoDownloader-resources"/>
 		<copy file="${dir.buildfile}/YoutubeAudioAutoDownloader-resources/icon.jpg" tofile="${jarApp.dir}/YoutubeAudioAutoDownloader-resources/icon.jpg"/>
 
 		<jpackage.exec/>
-		<move file="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}.exe" tofile="${dir.buildfile}/build/win_standalone/jpackage/YoutubeAudioAutoDownloader-${version_num}_setup.exe"/>
+		<move file="${dir.buildfile}/build/win_standalone/YoutubeAudioAutoDownloader-${version_num}.exe" tofile="${dir.buildfile}/build/win_standalone/YoutubeAudioAutoDownloader-${version_num}_setup.exe"/>
 
 	</target>
 
