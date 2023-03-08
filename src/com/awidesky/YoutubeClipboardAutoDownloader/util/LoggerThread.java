@@ -163,7 +163,7 @@ public class LoggerThread extends Thread {
 		}
 		
 		this.interrupt();
-		logTo.close();
+		if(logTo!= null) logTo.close();
 		
 	}
 	
