@@ -69,9 +69,11 @@ public class Main {
 		boolean verbose = false, datePrefix = false, logbyTask = false;
 		for (String arg : args) {
 			if ("--help".equals(arg)) {
-				System.out.println("usage : java -jar YoutubeAudioAutoDownloader " + version + ".jar [options]");
+				System.out.println("YoutubeAudioAutoDownloader " + version + "Copyright (c) 2020-2023 Eugene Hong");
 				System.out.println();
-				System.out.println("options :");
+				System.out.println("Usage : java -jar YoutubeAudioAutoDownloader " + version + ".jar [options]");
+				System.out.println();
+				System.out.println("Options :");
 				System.out.println("\t--logbyTask : Log lines from a task is gathered till the task is done/terminated.");
 				System.out.println("\t              Useful when you don't want to see dirty log file when multiple tasks running.");
 				System.out.println("\t--logTime : Every log line will printed with time");
@@ -132,10 +134,10 @@ public class Main {
 		clipChecker = new ClipBoardCheckerThread();
 		clipChecker.start(); //A daemon thread that will check clipboard
 
-		gui.setLoadingStat(LoadingStatus.CHECKING_FFMPEG);
-		if (!YoutubeAudioDownloader.checkFfmpeg()) Main.kill(ExitCodes.FFMPEGNOTEXISTS);
 		gui.setLoadingStat(LoadingStatus.CHECKING_YDL);
 		if (!YoutubeAudioDownloader.checkYoutubedl()) Main.kill(ExitCodes.YOUTUBEDNOTEXISTS);
+		gui.setLoadingStat(LoadingStatus.CHECKING_FFMPEG);
+		if (!YoutubeAudioDownloader.checkFfmpeg()) Main.kill(ExitCodes.FFMPEGNOTEXISTS);
 		
 		gui.setLoadingStat(LoadingStatus.READING_PROPERTIES);
 		readProperties();
