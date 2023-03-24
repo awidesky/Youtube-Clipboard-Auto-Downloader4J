@@ -32,7 +32,7 @@ public class YoutubeAudioDownloader {
 	private static Pattern versionPtn = Pattern.compile("\\d{4}\\.\\d{2}\\.\\d{2}");
 	
 	/**
-	 * @return Whether the procedure went fine
+	 * @return <code>true</code> if ffmpeg is found
 	 * */
 	public static boolean checkFfmpeg() {
 		
@@ -133,7 +133,7 @@ public class YoutubeAudioDownloader {
 
 						if ((Integer.parseInt(new SimpleDateFormat("yyyyMM").format(new Date()))
 								- Integer.parseInt(line.substring(0, 7).replace(".", ""))) > 1) {
-							// update if yputube-dl version isolder than a month
+							// update if yt-dlp version is older than a month
 							try {
 								int e;
 								if ((e = ProcessExecutor.runNow(log, null, ydlfile, "--update")) != 0)
@@ -229,9 +229,8 @@ public class YoutubeAudioDownloader {
 			Duration diff = Duration.between(startTime, Instant.now());
 			task.logger.log("[validating] Video name : " + task.getVideoName());
 			task.logger.log("[validating] Ended with exit code : " + exit);
-			task.logger.log("[validating] elapsed time in validating link and downloading video name : " + String.format("%d min %d sec", 
-                    diff.toMinutes(),
-                    diff.toSecondsPart()));
+			task.logger.log("[validating] elapsed time in validating link and downloading video name : " + String.format("%d min %d.%03d sec",
+					diff.toMinutes(), diff.toSecondsPart(), diff.toMillisPart()));
 			if (exit != 0) {
 				task.failed();
 				return false;
@@ -368,6 +367,7 @@ public class YoutubeAudioDownloader {
 		}
 		
 		task.setProcess(p);
+		
 		task.setStatus("initiating download");
 		task.setProgress(0);
 
@@ -378,15 +378,13 @@ public class YoutubeAudioDownloader {
 			
 			if(errorCode != 0) { 
 				SwingDialogs.error("Error in youtube-dl", "[Task" + task.getTaskNum() + "|downloading] youtube-dl has ended with error code : " + errorCode, null, true);
-				task.logger.log("[downloading] elapsed time in downloading(failed) : " + String.format("%d min %d sec", 
-		                diff.toMinutes(),
-		                diff.toSecondsPart()));
+				task.logger.log("[downloading] elapsed time in downloading(failed) : " + String.format("%d min %d.%03d sec",
+						diff.toMinutes(), diff.toSecondsPart(), diff.toMillisPart()));
 				task.failed();
 				return;
 			} else {
-				task.logger.log("[downloaded] elapsed time in working(succeed) : " + String.format("%d min %d sec", 
-		                diff.toMinutes(),
-		                diff.toSecondsPart()));
+				task.logger.log("[downloaded] elapsed time in working(succeed) : " + String.format("%d min %d.%03d sec",
+						diff.toMinutes(), diff.toSecondsPart(), diff.toMillisPart()));
 				task.logger.log("[finished] Finished!\n");
 				task.finished();
 			}
