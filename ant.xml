@@ -19,6 +19,8 @@
 			<exec executable="jpackage.exe">
 				<arg value="--input" />
 				<arg value="${jarApp.dir}" />
+				<arg value="--runtime-image" />
+				<arg value="${dir.buildfile}/jre" />
 				<arg value="--dest" />
 				<arg value="${dir.buildfile}/build/win_standalone" />
 				<arg value="--main-jar" />
@@ -33,6 +35,8 @@
 				<arg value="${version_num}" />
 				<arg value="--license-file" />
 				<arg value="${dir.buildfile}/LICENSE" />
+				<arg value="--copyright" />
+				<arg value="Copyright (c) 2020-2023 Eugene Hong" />
 				<arg value="--win-dir-chooser" />
 				<arg value="--win-menu" />
 				<arg value="--win-shortcut" />
