@@ -48,7 +48,7 @@ public class GUI {
 	private JLabel loadingStatus;
 	private JProgressBar initProgress;
 	
-	public static final Image ICON = new ImageIcon(YoutubeAudioDownloader.getProjectpath().replace(File.separator, "/") + "/YoutubeAudioAutoDownloader-resources/icon.jpg").getImage();
+	public static final Image ICON = new ImageIcon(YoutubeAudioDownloader.getResourcePath().replace(File.separator, "/") + "/icon.jpg").getImage();
 
 	private JFrame mainFrame;
 	private JButton browse, cleanCompleted, removeSwitch, nameFormatHelp, openConfig, modeSwitch, openSaveDir;
@@ -90,16 +90,12 @@ public class GUI {
 		loadingFrame.setLayout(null);
 		loadingFrame.setResizable(false);
 		loadingFrame.addWindowListener(new WindowAdapter() {
-
 			@Override
 			public void windowClosing(WindowEvent e) {
-				
 				e.getWindow().dispose();
 				logger.log("LoadingFrame was closed");
 				Main.kill(ExitCodes.SUCCESSFUL);
-
 			}
-
 		});
 		
 		loadingStatus = new JLabel("");
@@ -126,18 +122,14 @@ public class GUI {
 		mainFrame.setLayout(null);
 		mainFrame.setResizable(false);
 		mainFrame.addWindowListener(new WindowAdapter() {
-
 			@Override
 			public void windowClosing(WindowEvent e) {
-
 				Main.clearTasks();
 				if(TaskStatusModel.getinstance().getRowCount() != 0) { return; }
 				disposeAll();
 				e.getWindow().dispose();
 				Main.kill(ExitCodes.SUCCESSFUL);
-
 			}
-
 		});
 
 		addFileChooser();
@@ -155,7 +147,6 @@ public class GUI {
 	
 
 	private void addFileChooser() {
-		
 		jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		jfc.setDialogTitle("Choose directory to save music!");
 		jfc.setCurrentDirectory(new File(Config.getSaveto()));
@@ -195,17 +186,14 @@ public class GUI {
 			public void changed() {
 				String str = pathField.getText();
 				File f = new File(str);
-				if (f.isDirectory() && f.exists())
-					Config.setSaveto(str);
+				if (f.isDirectory() && f.exists()) Config.setSaveto(str);
 			}
 		});
 		nameFormatField.getDocument().addDocumentListener(new DocumentListener() {
 			public void changedUpdate(DocumentEvent e) { changed(); }
 			public void removeUpdate(DocumentEvent e) {	changed(); }
 			public void insertUpdate(DocumentEvent e) { changed(); }
-			public void changed() {
-				Config.setFileNameFormat(nameFormatField.getText());
-			}
+			public void changed() { Config.setFileNameFormat(nameFormatField.getText()); }
 		});
 		
 		pathField.setBounds(65, 65, 456, 22); 
@@ -218,7 +206,7 @@ public class GUI {
 	
 	private void addButtons() { 
 		
-		browse = new JButton("Browse...");
+		browse = new JButton("browse...");
 		cleanCompleted = new JButton("clean completed");
 		removeSwitch = new JButton("remove selected");
 		nameFormatHelp = new JButton("<= help?");
@@ -227,7 +215,6 @@ public class GUI {
 		openSaveDir = new JButton("open folder");
 		
 		browse.addActionListener((e) -> {
-
 			if (jfc.showDialog(mainFrame, null) != JFileChooser.APPROVE_OPTION) {
 				SwingDialogs.error("ERROR!", "Please choose a directory!", null, false);
 				return;
@@ -238,10 +225,9 @@ public class GUI {
 			File f = new File(path);
 			if(f.isDirectory() && f.exists()) Config.setSaveto(path);
 			jfc.setCurrentDirectory(f);
-
 		});
 		cleanCompleted.addActionListener((e) -> { TaskStatusModel.getinstance().clearDone(); });
-		nameFormatHelp.addActionListener((e) -> { Main.webBrowse("https://github.com/ytdl-org/youtube-dl#output-template"); });
+		nameFormatHelp.addActionListener((e) -> { Main.webBrowse("https://github.com/yt-dlp/yt-dlp#output-template"); });
 		openConfig.addActionListener((e) -> { Main.openConfig(); });
 		modeSwitch.addActionListener((e) -> { swapMode(); });
 		openSaveDir.addActionListener((e) -> { Main.openSaveFolder(); });
@@ -254,7 +240,7 @@ public class GUI {
 		modeSwitch.setBounds(440, 19, modeSwitch.getPreferredSize().width, modeSwitch.getPreferredSize().height);
 		openSaveDir.setBounds(515, 90, openSaveDir.getPreferredSize().width, openSaveDir.getPreferredSize().height);
 		
-		switchRemoveSwitch(false);
+		removeSwitch(false);
 		
 		mainFrame.add(browse);
 		mainFrame.add(cleanCompleted);
@@ -291,7 +277,7 @@ public class GUI {
 		cb_format = new JComboBox<>(audioFormatCBoxModel);
 		cb_quality = new JComboBox<>(audioQualityCBoxModel);
 		cb_playList = new JComboBox<>(PlayListOption.getComboBoxList());
-		cb_clipboardOption = new JComboBox<>(ClipBoardOption.getComboBoxList());
+		cb_clipboardOption = new JComboBox<>(ClipBoardOption.getComboBoxStrings());
 		cb_format.setEditable(true);
 		
 		if(videoQualityCBoxModel.getIndexOf(Config.getQuality()) == -1) { //It was audio mode
@@ -308,22 +294,12 @@ public class GUI {
 		
 		((JTextComponent) cb_format.getEditor().getEditorComponent()).getDocument()
 		.addDocumentListener(new DocumentListener() {
-
 			@Override
-			public void removeUpdate(DocumentEvent e) { 
-				Config.setFormat(cb_format.getEditor().getItem().toString());
-			}
-
+			public void removeUpdate(DocumentEvent e) {  Config.setFormat(cb_format.getEditor().getItem().toString()); }
 			@Override
-			public void insertUpdate(DocumentEvent e) {
-				Config.setFormat(cb_format.getEditor().getItem().toString());
-			}
-
+			public void insertUpdate(DocumentEvent e) { Config.setFormat(cb_format.getEditor().getItem().toString()); }
 			@Override
-			public void changedUpdate(DocumentEvent e) {
-				Config.setFormat(cb_format.getEditor().getItem().toString());
-			}
-
+			public void changedUpdate(DocumentEvent e) { Config.setFormat(cb_format.getEditor().getItem().toString()); }
 		});
  
 		cb_format.addActionListener((e) -> { 
@@ -352,12 +328,8 @@ public class GUI {
 	private void addTable() {
 		
 		table = new JTable() {
-			
-			/**
-			 * serialVersionUID
-			 */
+			/** serialVersionUID */
 			private static final long serialVersionUID = 6021131657635813356L;
-
 			@Override
 			public String getToolTipText(MouseEvent e) { 
 				int row = rowAtPoint(e.getPoint());
@@ -367,7 +339,6 @@ public class GUI {
 				if (column == TableColumnEnum.CHECKBOX.getIndex()) return "click to select this task";
 				return String.valueOf(TaskStatusModel.getinstance().getValueAt(row, column));
 			}
-			
 		};
 		
 		table.setModel(TaskStatusModel.getinstance());
@@ -380,7 +351,7 @@ public class GUI {
 		table.getColumnModel().getColumn(TableColumnEnum.PROGRESS.getIndex()).setPreferredWidth(73);
 		table.getColumnModel().getColumn(TableColumnEnum.STATUS.getIndex()).setPreferredWidth(82);
 		
-		TaskStatusModel.getinstance().setCheckBoxSelectedCallback(this::switchRemoveSwitch);
+		TaskStatusModel.getinstance().setCheckBoxSelectedCallback(this::removeSwitch);
 		
 		scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBounds(8, 168, 600, 240);
@@ -389,12 +360,12 @@ public class GUI {
 
 	}
 
-	private void switchRemoveSwitch(boolean selectedMode) {
+	private void removeSwitch(boolean selectedMode) {
 		if(selectedMode) {
 			removeSwitch.setText("remove selected");
 			Arrays.stream(removeSwitch.getActionListeners()).forEach(removeSwitch::removeActionListener);
 			removeSwitch.addActionListener((e) -> { 
-				switchRemoveSwitch(!TaskStatusModel.getinstance().removeSelected());	});
+				removeSwitch(!TaskStatusModel.getinstance().removeSelected());	});
 		} else {
 			removeSwitch.setText("clear All");
 			Arrays.stream(removeSwitch.getActionListeners()).forEach(removeSwitch::removeActionListener);
@@ -412,29 +383,23 @@ public class GUI {
 		Stream.of(JWindow.getWindows()).forEach(Window::dispose);
 		disposeLoadingFrame();
 		if (mainFrame != null) mainFrame.dispose();
-		
 		mainFrame = null;
 		
 	}
 	
 	private void disposeLoadingFrame() {
-
 		if (loadingFrame != null) {
 			loadingFrame.setVisible(false);
 			loadingFrame.dispose();
 		}
-		
 		loadingFrame = null;
 		loadingStatus = null;
 		initProgress = null;
-		
 	}
 	
 	public void setLoadingStat(LoadingStatus stat) {
-		
 		loadingStatus.setText(stat.getStatus());
 		initProgress.setValue(stat.getProgress());
-
 	}
 	
 

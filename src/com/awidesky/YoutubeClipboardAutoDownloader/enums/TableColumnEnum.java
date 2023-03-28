@@ -13,7 +13,6 @@ public enum TableColumnEnum {
 	
 	private final int index;
 	private final String name;
-	
     private static final Map<Integer, TableColumnEnum> BY_INDEX = new HashMap<>();
     private static final Map<String, TableColumnEnum> BY_NAME = new HashMap<>();
     
@@ -24,24 +23,15 @@ public enum TableColumnEnum {
         }
     }
 
-	
 	private TableColumnEnum(int index, String name) {
 		this.index = index;
 		this.name = name;
 	}
 	
-	public int getIndex() {
-		return index;
-	}
-	public String getName() {
-		return name;
-	}
+	public int getIndex() { return index; }
+	public String getName() { return name; }
 	
-	public static TableColumnEnum valueOfIndex(int index) {
-		return BY_INDEX.get(index);
-	}
-	public static TableColumnEnum valueOfName(String name) {
-		return BY_NAME.get(name);
-	}
+	public static TableColumnEnum valueOfIndex(int index) { return BY_INDEX.get(index); }
+	public static TableColumnEnum valueOfName(String name) { return BY_NAME.get(name); }
 	
 }

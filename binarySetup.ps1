@@ -32,8 +32,8 @@ Remove-Item -Path ".\YoutubeAudioAutoDownloader-resources\ffmpeg.zip"
 Remove-Item -Path '.\YoutubeAudioAutoDownloader-resources\ffmpeg\doc' -Recurse
 
 
-Write-output "  Downloading youtube-dl..."
-Invoke-WebRequest -Uri "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe" -OutFile  '.\YoutubeAudioAutoDownloader-resources\ffmpeg\bin\youtube-dl.exe'
+Write-output "  Downloading yt-dlp..."
+Invoke-WebRequest -Uri "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe" -OutFile  '.\YoutubeAudioAutoDownloader-resources\ffmpeg\bin\yt-dlp.exe'
 
 
 if (Test-Path -Path '.\YoutubeAudioAutoDownloader-resources\ydlver.txt') {
@@ -41,11 +41,11 @@ if (Test-Path -Path '.\YoutubeAudioAutoDownloader-resources\ydlver.txt') {
     Remove-Item -Path '.\YoutubeAudioAutoDownloader-resources\ydlver.txt'
 }
 
-$youtubedl_version = (.\YoutubeAudioAutoDownloader-resources\ffmpeg\bin\youtube-dl.exe --version) -join "`n"
+$youtubedl_version = (.\YoutubeAudioAutoDownloader-resources\ffmpeg\bin\yt-dlp.exe --version) -join "`n"
 
 Set-content  -NoNewline -Path '.\YoutubeAudioAutoDownloader-resources\ydlver.txt' -Value "$youtubedl_version" -Encoding UTF8
 
-Write-output "  youtube-dl version : $youtubedl_version"
+Write-output " yt-dlp version : $youtubedl_version"
 
 
 Write-output "  Generating custom Java Runtime for Launch4j..."

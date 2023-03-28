@@ -35,7 +35,7 @@ import com.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.Logger;
 
-public class BinaryInstaller {
+public class ResourceInstaller {
 
 	public static final String FFMPEG_URL = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"; 
 	public static final String YTDLP_URL = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe"; 
@@ -47,10 +47,9 @@ public class BinaryInstaller {
 	
 	private static final int BUFFER_SIZE = 1024 * 1024;
 	
-	private static final Logger log = Main.getLogger("[util.BinaryInstaller] ");
+	private static final Logger log = Main.getLogger("[util.ResourceInstaller] ");
 	
 	public static void getFFmpeg() throws MalformedURLException, IOException {
-		
 		deleteDirectoryRecursion(Paths.get(root, "ffmpeg"));
 		
 		log.log("Installing ffmpeg...");
@@ -67,7 +66,6 @@ public class BinaryInstaller {
 				ff.renameTo(new File(ff.getParentFile().getAbsolutePath() + File.separator + "ffmpeg"));
 			}
 		}
-		
 		Files.delete(Paths.get(root, "ffmpeg.zip"));
 		deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "doc"));
 		
@@ -82,16 +80,14 @@ public class BinaryInstaller {
 		if(filesize <= 0) throw new IOException("Unable to reach " + YTDLP_URL);
 		String releaseURL = getRedirectedURL(new URL("https://github.com/yt-dlp/yt-dlp/releases/latest"));
 		setLoadingFrameContent("Downloading yt-dlp version " + releaseURL.substring(releaseURL.lastIndexOf('/') + 1), filesize);
-		download(new URL(YTDLP_URL), new File(root + File.separator + "ffmpeg" + File.separator + "bin"  + File.separator + "youtube-dl.exe"));
+		download(new URL(YTDLP_URL), new File(root + File.separator + "ffmpeg" + File.separator + "bin"  + File.separator + "yt-dlp.exe"));
 		hideProgress();
 		log.log("yt-dlp installed!!");
 	}
 
 	private static void download(URL url, File dest) throws IOException {
 		IOException ee = null;
-		if(dest.exists()) {
-			dest.delete();
-		}
+		if(dest.exists()) { dest.delete(); }
 		dest.getParentFile().mkdirs();
 		dest.createNewFile();
 		
@@ -110,16 +106,14 @@ public class BinaryInstaller {
   				while(bytebuf.hasRemaining() && !eof) {
   					eof = in.read(bytebuf) == -1;
   				}
-				// flip the buffer which set the limit to current position, and position to 0.
+				// flip the buffer, set the limit to current position, and position to 0.
 				bytebuf.flip();
-				while(bytebuf.hasRemaining()) written += out.write(bytebuf); // Write data from ByteBuffer to file
+				while(bytebuf.hasRemaining()) written += out.write(bytebuf); // write data from ByteBuffer to file
 				bytebuf.clear();
 				updateUI(written, total);
 				if(eof) break;
 			}
-		} catch (IOException e) {
-			 ee = e;
-		}
+		} catch (IOException e) { ee = e; }
 		
 		if(ee != null) throw ee;
 		
@@ -135,9 +129,7 @@ public class BinaryInstaller {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} finally {
-			if (conn != null) {
-				conn.disconnect();
-			}
+			if(conn != null) conn.disconnect();
 		}
 	}
 
@@ -161,14 +153,11 @@ public class BinaryInstaller {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} finally {
-			if (conn != null) {
-				conn.disconnect();
-			}
+			if (conn != null) conn.disconnect();
 		}
 	}
 
 	private static void showProgress(String title) {
-
 		SwingUtilities.invokeLater(() -> {
 			Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 			loadingFrame = new JFrame();
@@ -192,7 +181,6 @@ public class BinaryInstaller {
 			loadingFrame.add(progress);
 			loadingFrame.setVisible(true);
 		});
-		
 	}
 	private static void setLoadingFrameContent(String title, long totalSize) {
 		SwingUtilities.invokeLater(() -> {
@@ -249,7 +237,7 @@ public class BinaryInstaller {
 	/**
 	 * Code from https://mkyong.com/java/how-to-decompress-files-from-a-zip-file/
 	 * I don't know much about <code>ZipInputStream</code>, <code>ZipEntry</code> and stuff.
-	 * So I'll just trust this code for now.
+	 * So I'll just trust this code for now. It works anyway! :D
 	 * */
     private static void unzipFolder(Path source, Path target) throws IOException {
 

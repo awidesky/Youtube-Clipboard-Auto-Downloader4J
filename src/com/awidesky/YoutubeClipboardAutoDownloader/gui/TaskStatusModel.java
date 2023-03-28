@@ -17,10 +17,7 @@ import com.awidesky.YoutubeClipboardAutoDownloader.util.SwingDialogs;
 
 public class TaskStatusModel extends AbstractTableModel {
 
-	/**
-	 * Default serialVersionUID
-	 */
-	private static final long serialVersionUID = -7803447765391487650L;
+	private static final long serialVersionUID = 8199693587883074204L;
 
 	private static TaskStatusModel instance = new TaskStatusModel();
 	private static Logger log = Main.getLogger("[TaskStatusModel] ");
@@ -28,26 +25,15 @@ public class TaskStatusModel extends AbstractTableModel {
 
 	private Consumer<Boolean> checkBoxSelectedCalback = null;
 	
-	private TaskStatusModel() {
-	}
+	private TaskStatusModel() {}
+	public static TaskStatusModel getinstance() { return instance; }
 
-	public static TaskStatusModel getinstance() {
-		return instance;
-	}
-
-	public void setCheckBoxSelectedCallback(Consumer<Boolean> checkBoxSelectedCalback) {
-		this.checkBoxSelectedCalback = checkBoxSelectedCalback;
-	}
+	public void setCheckBoxSelectedCallback(Consumer<Boolean> checkBoxSelectedCalback) { this.checkBoxSelectedCalback = checkBoxSelectedCalback; }
 	
 	@Override
-	public int getRowCount() {
-		return rows.size();
-	}
-
+	public int getRowCount() { return rows.size(); }
 	@Override
-	public int getColumnCount() {
-		return 5;
-	}
+	public int getColumnCount() { return 5; }
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
@@ -70,13 +56,10 @@ public class TaskStatusModel extends AbstractTableModel {
 	}
 
 	@Override
-	public Class<?> getColumnClass(int column) {
-        return (column == TableColumnEnum.CHECKBOX.getIndex()) ? Boolean.class : (getValueAt(0, column).getClass());
-    }
+	public Class<?> getColumnClass(int column) {  return (column == TableColumnEnum.CHECKBOX.getIndex()) ? Boolean.class : (getValueAt(0, column).getClass()); }
 	
 	@Override
 	public String getColumnName(int column) {
-
 		TableColumnEnum result = TableColumnEnum.valueOfIndex(column);
 		if(result == null) {
 			SwingDialogs.error("Invalid column index!", "Invalid column index : " + column, null, false);
@@ -104,21 +87,18 @@ public class TaskStatusModel extends AbstractTableModel {
 	}
 	
 	public void clearDone() {
-
 		rows.removeIf((t) -> t.getStatus().equals("Done!"));
 		fireTableDataChanged();
-
 	}
 
 	/**
 	 * @return <code>true</code> if user didn't cancel the removing.
 	 * */
 	public boolean removeSelected() {
-		
 		List<TaskData> selected = rows.stream().filter(TaskData::isChecked).toList();
 		
 		if (selected.stream().anyMatch(TaskData::isNotDone)) 
-			if (!SwingDialogs.confirm("Before removing!", "Some task(s) you chose are not done!\nCancel those task(s)?"))
+			if (!SwingDialogs.confirm("Before removing!", "Some task(s) you chose are not done yet!\nCancel those task(s)?"))
 				return false;
 		
 		selected.stream().filter(TaskData::isNotDone).forEach(TaskData::kill);
@@ -129,96 +109,56 @@ public class TaskStatusModel extends AbstractTableModel {
 	}
 	
 	public void clearAll() {
-
 		if (rows.stream().anyMatch(TaskData::isNotDone)) 
-			if (!SwingDialogs.confirm("Before clearing!", "Some task(s) are not done!\nCancel all task(s) and clear list?"))
+			if (!SwingDialogs.confirm("Before clearing!", "Some task(s) are not done yet!\nCancel all task(s) and clear all?"))
 				return;
 		
 		rows.stream().filter(TaskData::isNotDone).forEach(TaskData::kill);
 		rows.clear();
 		fireTableDataChanged();
-
 	}
 
-	public void updated(TaskData t) {
-
-		fireTableRowsUpdated(rows.indexOf(t), rows.indexOf(t));
-
-	}
+	public void updated(TaskData t) { fireTableRowsUpdated(rows.indexOf(t), rows.indexOf(t)); }
 
 	public void addTask(TaskData t) {
-
 		SwingUtilities.invokeLater(() -> {
 			rows.add(t);
 			fireTableRowsInserted(rows.size() - 1, rows.size() - 1);
 		});
-
 	}
 
-	public String getProgressToolTip(int row) {
-		return rows.get(row).getProgressToolTip();
-	}
+	public String getProgressToolTip(int row) { return rows.get(row).getProgressToolTip(); }
 
 	public boolean isTaskExists(TaskData t) {
-		
 		if (EventQueue.isDispatchThread()) {
-
 			return rows.contains(t);
-			
 		} else {
-			
 			final AtomicReference<Boolean> result = new AtomicReference<>();
-
 			try {
-
-				SwingUtilities.invokeAndWait(() -> {
-					result.set(rows.contains(t));
-				});
+				SwingUtilities.invokeAndWait(() -> { result.set(rows.contains(t)); });
 				return result.get();
-
 			} catch (Exception e) {
-				
 				log.log("Exception when checking existing Task(s)");
 				log.log(e);
-				
 			}
-			
 			return false;
-
 		}
-		
 	}
 	
 	public boolean isTaskDone(TaskData t) {
-		
-		if(!isTaskExists(t)) {
-			return false;
-		}
-		
+		if(!isTaskExists(t)) { return false; }
 		if (EventQueue.isDispatchThread()) {
-
 			return !rows.get(rows.indexOf(t)).isNotDone();
-			
 		} else {
-			
 			final AtomicReference<Boolean> result = new AtomicReference<>();
-
 			try {
-
-				SwingUtilities.invokeAndWait(() -> {
-					result.set(!rows.get(rows.indexOf(t)).isNotDone());
-				});
+				SwingUtilities.invokeAndWait(() -> { result.set(!rows.get(rows.indexOf(t)).isNotDone()); });
 				return result.get();
-
 			} catch (Exception e) {
-				
 				log.log("Exception when checking existing Task(s) is done");
 				log.log(e);
-				
 			}
-			
 			return false;
-
 		}
 	}
 

@@ -28,7 +28,6 @@ public class ProcessExecutor {
 	public static Process run(List<String> command, File dir, Consumer<BufferedReader> stdout, Consumer<BufferedReader> stderr) throws IOException {
 		
 		ProcessBuilder pb = new ProcessBuilder(command);
-		
 		// start process
 		Process p = pb.directory(dir).start();
 		
@@ -48,7 +47,6 @@ public class ProcessExecutor {
 						+ "\n%e%", e, false);
 			}
 		});
-
 		return p; 
 	}
 }

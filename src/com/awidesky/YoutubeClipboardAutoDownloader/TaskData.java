@@ -89,12 +89,10 @@ public class TaskData {
 		return checked.get();
 	}
 
-
 	public void setChecked(boolean checked) {
 		this.checked.set(checked);
 		SwingUtilities.invokeLater(() -> TaskStatusModel.getinstance().updated(this));
 	}
-
 
 	public int getTaskNum() {
 		return taskNum.get();
@@ -157,7 +155,6 @@ public class TaskData {
 		return progress + "%" + ( (totalNumOfVideo.get() > 1) ? " (" + videoNum.get() + "/" + totalNumOfVideo.get() + ")" : "" );
 	}
 
-
 	public void setFuture(Future<?> submit) {
 		fu = submit;
 	}
@@ -167,12 +164,10 @@ public class TaskData {
 		this.p = p;
 	}
 
-
 	@Override
 	public String toString() {
-		return "Task : " + taskNum + " dest : " + dest + "video url) : " + url;
+		return "Task : " + taskNum + ", dest : " + dest + ", video url : " + url;
 	}
-
 
 	@Override
 	public boolean equals(Object obj) {

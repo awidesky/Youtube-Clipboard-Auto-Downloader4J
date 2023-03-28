@@ -1,42 +1,23 @@
 package com.awidesky.YoutubeClipboardAutoDownloader.enums;
 
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 public enum ClipBoardOption {
 
-	AUTOMATIC("Download link automatically"),
-	ASK("Ask when a link is found"),
-	NOLISTEN("Stop listening clipboard");
+	AUTOMATIC("download link automatically"),
+	ASK("ask when a link is found"),
+	NOLISTEN("stop listening clipboard");
 	
-	private String str;
+	private String description;
 
-	private ClipBoardOption(String str) {
-		this.str = str;
-	}
+	private ClipBoardOption(String description) { this.description = description; }
 
-	public String getString() {
-		return str;
-	}
-
-	
-	public static String[] getComboBoxList() {
-		return Stream.of(values()).map(ClipBoardOption::getString).toArray(String[]::new);
-	}
+	public String getString() { return description; }
+	public static String[] getComboBoxStrings() { return Stream.of(values()).map(ClipBoardOption::getString).toArray(String[]::new); }
 
 	public static ClipBoardOption get(String clipboardListenOption) {
-		switch(clipboardListenOption) {
-		
-		case "Download link automatically":
-			return AUTOMATIC;
-		
-		case "Ask when a link is found":
-			return ASK;
-			
-		case "Stop listening clipboard":
-			return NOLISTEN;
-		
-		default:
-			throw new RuntimeException("Invalid parameter : ClipBoardOption.get(" + clipboardListenOption + ")");
-		}
+		return Arrays.stream(ClipBoardOption.values()).filter(op -> op.description.equals(clipboardListenOption)).findAny()
+				.orElseThrow(() -> new RuntimeException("Invalid parameter : ClipBoardOption.get(" + clipboardListenOption + ")"));
 	}
 }

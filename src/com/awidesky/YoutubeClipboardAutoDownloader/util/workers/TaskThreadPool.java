@@ -11,26 +11,19 @@ import com.awidesky.YoutubeClipboardAutoDownloader.util.Logger;
 public class TaskThreadPool {
 
 	private static ExecutorService executorService; 
-	private static Logger log = Main.getLogger("[ClipBoardChecker] ");
+	private static Logger log = Main.getLogger("[TaskThreadPool] ");
 	
-	public static void setup() {
-		executorService = Executors.newCachedThreadPool();
-	}
-	public static Future<?> submit(Runnable task) {
-		return executorService.submit(task);
-	}
-
-	public static void kill() {
-		
+	public static void setup() { executorService = Executors.newCachedThreadPool(); }
+	public static Future<?> submit(Runnable task) { return executorService.submit(task); }
+	public static void kill(long timeout) {
 		if (executorService != null && !executorService.isShutdown()) {
 			executorService.shutdownNow();
 			try {
-				executorService.awaitTermination(2500, TimeUnit.MILLISECONDS);
+				executorService.awaitTermination(timeout, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
 				log.log("Failed to wait worker Thread to shutdown!");
 				log.log(e);
 			}
 		}
-		
 	}
 }

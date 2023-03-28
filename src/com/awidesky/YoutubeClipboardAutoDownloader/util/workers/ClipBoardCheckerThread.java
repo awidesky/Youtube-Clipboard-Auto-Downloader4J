@@ -11,11 +11,8 @@ public class ClipBoardCheckerThread extends Thread {
 	private static Logger log = Main.getLogger("[ClipBoardChecker] ");
 	
 	public ClipBoardCheckerThread() {
-
 		super(() -> {
-
 			while(true) {
-				
 				 try {
 				 	 queue.take().run();
 				} catch (InterruptedException e) {
@@ -23,18 +20,10 @@ public class ClipBoardCheckerThread extends Thread {
 					 log.log(e);
 				}
 			}
-
 		});
-		
 		this.setDaemon(true);
-
 	}
 	
-	public void submit(Runnable r) {
-		
-		queue.offer(r);
-		
-	}
-
+	public void submit(Runnable r) { queue.offer(r); }
 
 }

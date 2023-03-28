@@ -13,11 +13,10 @@ public class YTDLPFallbacks {
 
 	private static Logger log = Main.getLogger("[runFixCommand] ");
 	private static FixCommand[] fixArr = new FixCommand[] {
-		new FixCommand("ERROR: unable to download video data: HTTP Error 403: Forbidden", YoutubeAudioDownloader.getYoutubedlPath() + "youtube-dl", "--rm-cache-dir")
+		new FixCommand("ERROR: unable to download video data: HTTP Error 403: Forbidden", YoutubeAudioDownloader.getYtdlpPath() + "yt-dlp", "--rm-cache-dir")
 	};
 	
 	public static boolean runFixCommand(String err) {
-		
 		List<FixCommand> list = Arrays.stream(fixArr).filter(f -> err.startsWith(f.error)).toList();
 
 		if(list.isEmpty()) {
@@ -43,7 +42,6 @@ public class YTDLPFallbacks {
 		}
 		
 		public boolean runFixCommand() {
-			
 			log.newLine();
 			log.log("Found known error : \"" + error + "\"");
 			log.log("Trying to fix error automatically by executing \"" + Arrays.stream(command).collect(Collectors.joining(" ")) + "\"");
@@ -52,7 +50,7 @@ public class YTDLPFallbacks {
 			try {
 				log.log("Executing ended with exit code : " + ProcessExecutor.runNow(log, null, command));
 			} catch (Exception e) {
-				SwingDialogs.error("Error!", "Error when fixing youtube-dl problem!\n%e%", e, false);
+				SwingDialogs.error("Error!", "Error when fixing yt-dlp problem!\n%e%", e, false);
 				return false;
 			}
 			return true;

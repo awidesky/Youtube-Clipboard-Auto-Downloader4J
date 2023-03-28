@@ -63,6 +63,7 @@ public class ProjectPathGetter {
 	/**
 	 * Get project path by find Class path as an URL and decode as string
 	 * 
+	 * Code from https://stackoverflow.com/a/12733172
 	 * doesn't work in IDE(points bin folder of project root)
 	 * */
 	private static String classLocationBased() {
@@ -115,10 +116,12 @@ public class ProjectPathGetter {
 	        if (codeSourceLocation != null) return codeSourceLocation;
 	    }
 	    catch (final SecurityException e) {
-	        // NB: Cannot access protection domain.
+	    	logger.log("classLocationBased() failed : Cannot access protection domain.");
+	    	logger.log(e);
 	    }
 	    catch (final NullPointerException e) {
-	        // NB: Protection domain or code source is null.
+	    	logger.log("classLocationBased() failed : Protection domain or code source is null.");
+	    	logger.log(e);
 	    }
 
 	    // NB: The easy way failed, so we try the hard way. We ask for the class
@@ -145,7 +148,8 @@ public class ProjectPathGetter {
 	        return new URL(path);
 	    }
 	    catch (final MalformedURLException e) {
-	        e.printStackTrace();
+	    	logger.log("classLocationBased() failed : url " + path + " is malformed.");
+	    	logger.log(e);
 	        return null;
 	    }
 	} 
@@ -185,17 +189,16 @@ public class ProjectPathGetter {
 	        }
 	        return new File(new URL(path).toURI());
 	    }
-	    catch (final MalformedURLException e) {
-	        // NB: URL is not completely well-formed.
-	    }
-	    catch (final URISyntaxException e) {
-	        // NB: URL is not completely well-formed.
+	    catch (final MalformedURLException | URISyntaxException e) {
+	    	logger.log("classLocationBased() failed : URL is not completely well-formed.");
+	    	logger.log(e);
 	    }
 	    if (path.startsWith("file:")) {
 	        // pass through the URL as-is, minus "file:" prefix
 	        path = path.substring(5);
 	        return new File(path);
 	    }
-	    throw new IllegalArgumentException("Invalid URL: " + url);
+	    logger.log("classLocationBased() failed : url " + url + " is not a vaild url.");
+	    return null;
 	}
 }

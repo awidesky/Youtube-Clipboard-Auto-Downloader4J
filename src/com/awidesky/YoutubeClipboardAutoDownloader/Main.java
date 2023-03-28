@@ -22,6 +22,7 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -69,19 +70,20 @@ public class Main {
 		boolean verbose = false, datePrefix = false, logbyTask = false;
 		for (String arg : args) {
 			if ("--help".equals(arg)) {
-				System.out.println("YoutubeAudioAutoDownloader " + version + "Copyright (c) 2020-2023 Eugene Hong");
+				System.out.println("YoutubeAudioAutoDownloader " + version);
+				System.out.println("Copyright 2020-2023. Eugene Hong all rights reserved.");
 				System.out.println();
 				System.out.println("Usage : java -jar YoutubeAudioAutoDownloader " + version + ".jar [options]");
 				System.out.println();
 				System.out.println("Options :");
-				System.out.println("\t--logbyTask : Log lines from a task is gathered till the task is done/terminated.");
+				System.out.println("\t--logbyTask : Logs from a task is gathered till the task is done/terminated.");
 				System.out.println("\t              Useful when you don't want to see dirty log file when multiple tasks running.");
-				System.out.println("\t--logTime : Every log line will printed with time");
-				System.out.println("\t--verbose : Print verbose logs(like GUI Frmaes info, etc.)");
+				System.out.println("\t--logTime : Log with TimeStamps");
+				System.out.println("\t--verbose : Print verbose logs(like GUI Windows or extra debug info, etc.)");
 				System.out.println(); System.out.println();
 				System.out.println("exit codes :");
 				Arrays.stream(ExitCodes.values()).forEach(code -> {
-					System.out.println("\t" + code.getCode() + " : " + code.getMsg());
+					System.out.printf("\t%3d : %s\n", code.getCode(), code.getMsg());
 				});
 				Main.kill(ExitCodes.SUCCESSFUL);
 			} else if ("--verbose".equals(arg)) {
@@ -101,40 +103,37 @@ public class Main {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
 					| UnsupportedLookAndFeelException e) {
-				SwingDialogs.error("Error while setting window look&feel", "%e%", e, false);
+				SwingDialogs.error("Cannot use native system look&feel", "%e%", e, false);
 			}
 		});
 		
 		prepareLogFile(verbose, datePrefix, logbyTask);
-		setup(args);
+		setup();
 		
 		if(args.length == 0) return;
 		
 	}
 	
-	/**
-	 * @return Whether the procedure went fine
-	 * */
-	private static void setup(String[] args) {
+	private static void setup() {
 
 		try {
-			SwingUtilities.invokeAndWait(() -> {
-				gui.initLoadingFrame();
-			});
+			SwingUtilities.invokeAndWait(gui::initLoadingFrame);
 		} catch (InvocationTargetException | InterruptedException e2) {
-			logger.log("[init] failed wating EDT!");
+			logger.log("[init] failed wating EDT whele initiating LoadingFrame!");
 			logger.log(e2);
-			Main.kill(ExitCodes.INITLOADINGFRAMEFAILED);
+			Main.kill(ExitCodes.EDTFAILED);
 		}
-		
 		
 		gui.setLoadingStat(LoadingStatus.PREPARING_THREADS);
 		loggerThread.start();
 		TaskThreadPool.setup();
-		clipChecker = new ClipBoardCheckerThread();
-		clipChecker.start(); //A daemon thread that will check clipboard
+		clipChecker = new ClipBoardCheckerThread(); //A daemon thread that will keep checking clipboard
+		clipChecker.start();
+		Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener((e) -> { checkClipBoard(); }); 
+		logger.newLine();
+		logger.log("Listening clipboard...\n");
 
-		gui.setLoadingStat(LoadingStatus.CHECKING_YDL);
+		gui.setLoadingStat(LoadingStatus.CHECKING_YTDLP);
 		if (!YoutubeAudioDownloader.checkYoutubedl()) Main.kill(ExitCodes.YOUTUBEDNOTEXISTS);
 		gui.setLoadingStat(LoadingStatus.CHECKING_FFMPEG);
 		if (!YoutubeAudioDownloader.checkFfmpeg()) Main.kill(ExitCodes.FFMPEGNOTEXISTS);
@@ -142,35 +141,28 @@ public class Main {
 		gui.setLoadingStat(LoadingStatus.READING_PROPERTIES);
 		readProperties();
 
-		Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener((e) -> { checkClipBoard(); }); 
-
 		gui.setLoadingStat(LoadingStatus.LOADING_WINDOW);
 		SwingUtilities.invokeLater(() -> {
 			gui.initMainFrame();
 		});
-		
-		logger.newLine();
-		logger.log("Listening clipboard...\n");
 		
 	}
 	
 	private static void checkClipBoard() {
 
 		if (Config.getClipboardListenOption() == ClipBoardOption.NOLISTEN) {
-			logger.log("[debug] clipboard ignored due to ClipboardListenOption == \"" + ClipBoardOption.NOLISTEN.getString() + "\"");
+			logger.logVerbose("[debug] clipboard ignored due to ClipboardListenOption == \"" + ClipBoardOption.NOLISTEN.getString() + "\"");
 			return;
 		}
 		clipChecker.submit(() -> { // To avoid overhead in EDT, put task in clipCheckerThread.
-
 			try {
-
 				Thread.sleep(50);
 
 				Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
 				if (!cb.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
-					logger.log("[debug] Non-String Clipboard input!");
-					logger.log("[debug] clipboard data Flavor(s) : " + Arrays.stream(cb.getAvailableDataFlavors()).map(DataFlavor::getHumanPresentableName).collect(Collectors.joining(", ")));
-					logger.log("[debug] These can be represented as :");
+					logger.logVerbose("[debug] Non-String Clipboard input!");
+					logger.logVerbose("[debug] clipboard data Flavor(s) : " + Arrays.stream(cb.getAvailableDataFlavors()).map(DataFlavor::getHumanPresentableName).collect(Collectors.joining(", ")));
+					logger.logVerbose("[debug] These can be represented as :");
 					Arrays.stream(cb.getAvailableDataFlavors()).map(t -> {
 						try {
 							return cb.getData(t);
@@ -178,13 +170,13 @@ public class Main {
 							logger.log(e);
 							return null;
 						}
-					}).filter(o -> o != null).forEach(o -> logger.log("[debug] \t" + o));
+					}).filter(Objects::nonNull).forEach(o -> logger.logVerbose("[debug] \t" + o));
 					return;
 				}
 				final String data = (String)cb.getData(DataFlavor.stringFlavor);
-				cb.setContents(new StringSelection(data), null);
+				cb.setContents(new StringSelection(data), null); //reset clipboard ownership so that we won't miss another clipboard event
 				
-				logger.log("[debug] clipboard : " + data);
+				logger.logVerbose("[debug] clipboard : " + data);
 				
 				if (clipboardBefore.equals(data)) {
 					logger.logVerbose("[debug] Duplicate input, ignore this input.");
@@ -194,34 +186,21 @@ public class Main {
 				clipboardBefore = data;
 
 				if (!Config.isLinkAcceptable(data)) {
-					logger.log("[debug] " + data + " is not acceptable!");
+					logger.logVerbose("[debug] " + data + " is not acceptable!");
 					return;
 				}
 				
 				if (Config.getClipboardListenOption() == ClipBoardOption.ASK) {
-
-					if (!SwingDialogs.confirm("Download link from clipboard?", "Link : " + data)) {
-
-						logger.log("[GUI.linkAcceptChoose] Download link " + data + "? : " + false + "\n");
-
-					} else {
-
-						logger.log("[GUI.linkAcceptChoose] Download link " + data + "? : " + true + "\n");
-						Arrays.stream(data.split(Pattern.quote("\n"))).forEach(Main::submitDownload);
-
-					}
-
-					return;
+					boolean d = SwingDialogs.confirm("Download link from clipboard?", "Link : " + data);
+					logger.logVerbose("[GUI.linkAcceptChoose] " + (d ? "Accepted" : "Declined") + " download link " + data);
+					if(!d) return;
 				}
 
 				Arrays.stream(data.split(Pattern.quote("\n"))).forEach(Main::submitDownload);
 
 			} catch (InterruptedException | HeadlessException | UnsupportedFlavorException | IOException e1) {
 				SwingDialogs.error("Error when checking clipboard!", "%e%", e1, true);
-			} catch (Exception ee) {
-				SwingDialogs.error("Unexpected clipboard error!", "%e%", ee, true);
 			}
-
 		});
 
 	}
@@ -244,13 +223,12 @@ public class Main {
 				return;
 			}
 			if(!SwingDialogs.confirm("Download same file in same directory?", data + "\nis already downloaded (by another Task) in\n" + Config.getSaveto() + "\ndownload anyway?")) {
-				logTask.log("is cancelled because same download exists.");
+				logTask.log(data + " is cancelled because same download exists.");
 				return;
 			}
 		}
 
 		TaskStatusModel.getinstance().addTask(t);
-		
 		
 		t.setFuture(TaskThreadPool.submit(() -> {
 
@@ -263,7 +241,6 @@ public class Main {
 			}
 					
 			if (YoutubeAudioDownloader.validateAndSetName(url, t, p)) {
-
 				t.setStatus("Preparing...");
 				String save = t.getDest();
 				File file = new File(save);
@@ -275,10 +252,9 @@ public class Main {
 					return;
 				}
 				YoutubeAudioDownloader.download(url, t, p);
-
 			} else {
 				t.failed();
-				SwingDialogs.error("[Task" + num + "|validating] Not a valid url!",	data + "\nis unvalid or unsupported url!", null, true);
+				SwingDialogs.error("[Task" + num + "|validating] Not a valid url!",	data + "\nis invalid or unsupported url!", null, true);
 				return;
 			}
 
@@ -288,21 +264,18 @@ public class Main {
 	private static void prepareLogFile(boolean verbose, boolean datePrefix, boolean logbyTask) {
 		
 		try {
-			
 			File logFolder = new File(YoutubeAudioDownloader.getProjectpath() + File.separator + "logs");
 			File logFile = new File(logFolder.getAbsolutePath() + File.separator + "log-" + new SimpleDateFormat("yyyy-MM-dd-kk-mm-ss").format(new Date()) + ".txt");
 			logFolder.mkdirs();
 			logFile.createNewFile();
-			
 			loggerThread.setLogDestination(new FileOutputStream(logFile), true);
-			
 		} catch (IOException e) {
 			loggerThread.setLogDestination(System.out, true);
 			SwingDialogs.error("Error when creating log flie, log in console instead...", "%e%", e, false);
 		} finally {
 			taskLogGetter = logbyTask ? loggerThread::getBufferedLogger : loggerThread::getLogger;
 			loggerThread.setVerboseAllChildren(verbose);
-			if (datePrefix) loggerThread.setDatePrefixAllChildren(new SimpleDateFormat("[kk:mm:ss]"));
+			if (datePrefix) loggerThread.setDatePrefixAllChildren(new SimpleDateFormat("[kk:mm:ss.SSS]"));
 			SwingDialogs.setLogger(loggerThread.getLogger());
 		}
 		
@@ -344,19 +317,12 @@ public class Main {
 			}
 			
 		} catch (FileNotFoundException e1) {
-
 			SwingDialogs.warning("config.txt not exists!","%e%\nDon't worry! I'll make one later...", e1, false);
-
 		} catch (NullPointerException e2) {
-			
 			SwingDialogs.warning("config.txt has no or invalid data!", "NullPointerException : %e%\nI'll initiate config.txt with default...", e2, false);
-
 		} catch (Exception e) {
-
 			SwingDialogs.warning("Exception occurred when reading config.txt", "%e%\nI'll initiate config.txt with default...", e, false);
-
 		} finally {
-			
 			Config.setSaveto(p);
 			Config.setFormat(f);
 			Config.setQuality(q);
@@ -366,14 +332,13 @@ public class Main {
 			
 			logger.newLine();
 			logProperties(logger, "Initial properties :");
-			
 		}
 
 	}
 
 	
 	/**
-	 * Writes properties to file.
+	 * Writes properties to log file.
 	 * This method should only invoked just before the termination of the program.
 	 * */
 	public static void writeProperties() {
@@ -382,9 +347,7 @@ public class Main {
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
 				YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt"), false))) {
 
-			File cfg = new File(
-					YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt");
-			
+			File cfg = new File(YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt");
 			if (!cfg.exists()) cfg.createNewFile();
 
 			bw.write("SavePath=" + 				Optional.ofNullable(Config.getSaveto())						.orElse(YoutubeAudioDownloader.getProjectpath())); 	bw.newLine();
@@ -395,23 +358,21 @@ public class Main {
 			bw.write("ClipboardListenOption=" + Optional.ofNullable(Config.getClipboardListenOption())		.orElse(ClipBoardOption.AUTOMATIC).getString());	bw.newLine();
 			
 			bw.newLine();
-			bw.write("#If you know a type of link that youtube-dl accepts (listed in https://github.com/ytdl-org/youtube-dl/blob/master/docs/supportedsites.md),"); bw.newLine();
-			bw.write("#and wish YoutubeAudioDownloader detact & download it, you can write how does the link starts(e.g. in youtube, \"https://www.youtu\")"); bw.newLine();
+			bw.write("#If you know a type of link that yt-dlp accepts (listed in https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md),"); bw.newLine();
+			bw.write("#and wish YoutubeAudioDownloader detect & download it, you can write how does the link starts(e.g. in youtube, \"https://www.youtu\")"); bw.newLine();
 			bw.write("#Every line starting with # will be ignored, but DO NOT CHANGE lines before these comments."); bw.newLine();
 			bw.write("#If you want to modify those configurations, please do it in YoutubeAudioDownloader app."); bw.newLine();
 			bw.write("#And let my hardcoded spaghetti shit handle that. :)"); bw.newLine();
 			bw.newLine();
 			
-			bw.write(Config.getAcceptedLinkStr());
+			bw.write(Config.getAcceptedLinkStr(System.lineSeparator()));
 			bw.flush();
 			
 			logger.newLine();
 			logProperties(logger, "Final properties :");
 			
 		} catch (IOException e) {
-
 			SwingDialogs.error("Error when writing config.txt file", "%e%", e,  true);
-
 		} 
 
 	}
@@ -435,29 +396,21 @@ public class Main {
 	
 	/**
 	 * Kills the application.
-	 * This method can wait up to 5seconds for <code>LoggerThread</code> and <code>executorService</code>(2.5seconds each) to terminated.
-	 * 
+	 * This method can wait up to 5 seconds for <code>LoggerThread</code> and <code>executorService</code>(2.5seconds each) to terminated.
 	 * */
 	public static void kill(ExitCodes exitCode) {
-		
-		TaskThreadPool.kill();
-
+		TaskThreadPool.kill(2500);
 		writeProperties();
-
 		if(logger != null) {
 			logger.log("YoutubeAudioAutoDownloader exit code : " + exitCode.getCode());
 			logger.close();
 		}
-		
 		loggerThread.kill(2500);
-		
 		System.exit(exitCode.getCode());
-		
 	}
 
 
 	public static void webBrowse(String link) {
-
 		try {
 			if(Desktop.isDesktopSupported()) {
 				Desktop.getDesktop().browse(new URI(link));
@@ -468,38 +421,30 @@ public class Main {
                		throw new IOException("Desktop.isDesktopSupported() is false and xdg-open doesn't work");
             	}
 			}
-
 		} catch (IOException e) {
-			SwingDialogs.warning("Cannot open default web browser!", "Please visit" + link + "\n%e%", e, false);
+			SwingDialogs.warning("Cannot open default web browser!", "Please visit manually " + link + "\n%e%", e, false);
 		} catch (URISyntaxException e) {
 			SwingDialogs.error("Invalid url!", link + "\n%e%", e, false);
 		}
-
 	}
 	
 
 	public static void openConfig() {
-
 		File f = new File(YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt");
 		try {
 			Desktop.getDesktop().open(f);
 		} catch (IOException e) {
-			SwingDialogs.warning("Cannot open default text file editor!", "Please open" + f.getAbsolutePath() + "\n%e%", e, true);
+			SwingDialogs.warning("Cannot open default text file editor!", "Please open manullay " + f.getAbsolutePath() + "\n%e%", e, true);
 		}
-		
 	}
 	
 	public static void openSaveFolder() {
-		
 		File f = new File(Config.getSaveto());
 		try {
 			Desktop.getDesktop().open(f);
 		} catch (IOException e) {
-			SwingDialogs.warning("Cannot open directory explorer!", "Please open" + f.getAbsolutePath() + "\n%e%", e, true);
+			SwingDialogs.warning("Cannot open directory explorer!", "Please open manullay " + f.getAbsolutePath() + "\n%e%", e, true);
 		}
-		
 	}
 
 }
-
-
