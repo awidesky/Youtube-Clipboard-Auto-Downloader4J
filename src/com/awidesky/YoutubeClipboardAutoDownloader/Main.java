@@ -314,7 +314,7 @@ public class Main {
 				}
 			};
 			
-			p = read.apply(p);
+			p = read.apply(p); p = "%HOME%".equalsIgnoreCase(p) ? System.getProperty("user.home") : p;
 			f = read.apply(f);
 			q = read.apply(q);
 			l = read.apply(l);
