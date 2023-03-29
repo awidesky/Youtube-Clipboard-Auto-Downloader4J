@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -293,35 +294,43 @@ public class Main {
 	 * */
 	private static void readProperties() {
 
-		String p = Config.getSaveto();
-		String f = Config.getFormat();
-		String q = Config.getSaveto();
-		String l = Config.getPlaylistOption().toCommandArgm();
-		String n = Config.getFileNameFormat(); 
-		String c = Config.getClipboardListenOption().getString(); 
+		String p = Config.getDefaultSaveto();
+		String f = Config.getDefaultFormat();
+		String q = Config.getDefaultQuality();
+		String l = Config.getDefaultPlaylistOption().toCommandArgm();
+		String n = Config.getDefaultFileNameFormat(); 
+		String c = Config.getDefaultClipboardListenOption().getString(); 
+		
 		
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
 				YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt")))) {
 
-			p = Optional.ofNullable(br.readLine()).orElse("SavePath=" + p)				.split(Pattern.quote("="))[1];
-			f = Optional.ofNullable(br.readLine()).orElse("Format=" + f)				.split(Pattern.quote("="))[1];
-			q = Optional.ofNullable(br.readLine()).orElse("Quality=" + q)				.split(Pattern.quote("="))[1];
-			l = Optional.ofNullable(br.readLine()).orElse("Playlist=" + l)				.split(Pattern.quote("="))[1];
-			n = Optional.ofNullable(br.readLine()).orElse("FileNameFormat=" + n)		.split(Pattern.quote("="))[1];
-			c = Optional.ofNullable(br.readLine()).orElse("ClipboardListenOption=" + c)	.split(Pattern.quote("="))[1];
+			UnaryOperator<String> read = str -> {
+				try {
+					return br.readLine().split(Pattern.quote("="))[1];
+				} catch(Exception e) {
+					SwingDialogs.warning("Exception occurred when reading config.txt", "%e%\nInitiate as default value : " + str, e, false);
+					return str;
+				}
+			};
+			
+			p = read.apply(p);
+			f = read.apply(f);
+			q = read.apply(q);
+			l = read.apply(l);
+			n = read.apply(n);
+			c = read.apply(c);
 			
 			String s;
 			while((s = br.readLine()) != null) {
-				if(s.equals("") || s.startsWith("#") || Config.isLinkAcceptable(s)) continue;
+				if(s.equals("") || s.startsWith("#") || Config.isLinkAcceptable(s)) continue; //ignore if a line is empty, a comment or already registered
 				Config.addAcceptableList(s);
 			}
 			
 		} catch (FileNotFoundException e1) {
-			SwingDialogs.warning("config.txt not exists!","%e%\nDon't worry! I'll make one later...", e1, false);
-		} catch (NullPointerException e2) {
-			SwingDialogs.warning("config.txt has no or invalid data!", "NullPointerException : %e%\nI'll initiate config.txt with default...", e2, false);
+			SwingDialogs.warning("config.txt not exists!","%e%\nWill make one with default values later...", e1, false);
 		} catch (Exception e) {
-			SwingDialogs.warning("Exception occurred when reading config.txt", "%e%\nI'll initiate config.txt with default...", e, false);
+			SwingDialogs.error("Exception occurred when reading config.txt", "%e%\nInitiate as default values..", e, false);
 		} finally {
 			Config.setSaveto(p);
 			Config.setFormat(f);
@@ -350,18 +359,18 @@ public class Main {
 			File cfg = new File(YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt");
 			if (!cfg.exists()) cfg.createNewFile();
 
-			bw.write("SavePath=" + 				Optional.ofNullable(Config.getSaveto())						.orElse(YoutubeAudioDownloader.getProjectpath())); 	bw.newLine();
-			bw.write("Format=" + 				Optional.ofNullable(Config.getFormat())						.orElse("mp3"));									bw.newLine();
-			bw.write("Quality=" +				Optional.ofNullable(Config.getQuality())					.orElse("0"));										bw.newLine();
-			bw.write("Playlist=" + 				Optional.ofNullable(Config.getPlaylistOption())				.orElse(PlayListOption.NO).toComboBox());			bw.newLine();
-			bw.write("FileNameFormat=" + 		Optional.ofNullable(Config.getFileNameFormat())				.orElse("%(title)s.%(ext)s"));						bw.newLine();
-			bw.write("ClipboardListenOption=" + Optional.ofNullable(Config.getClipboardListenOption())		.orElse(ClipBoardOption.AUTOMATIC).getString());	bw.newLine();
+			bw.write("SavePath=" + 				Optional.ofNullable(Config.getSaveto())					.orElse(Config.getDefaultSaveto())); 							bw.newLine();
+			bw.write("Format=" + 				Optional.ofNullable(Config.getFormat())					.orElse(Config.getDefaultFormat()));							bw.newLine();
+			bw.write("Quality=" +				Optional.ofNullable(Config.getQuality())				.orElse(Config.getDefaultQuality()));							bw.newLine();
+			bw.write("Playlist=" + 				Optional.ofNullable(Config.getPlaylistOption())			.orElse(Config.getDefaultPlaylistOption()).toComboBox());		bw.newLine();
+			bw.write("FileNameFormat=" + 		Optional.ofNullable(Config.getFileNameFormat())			.orElse(Config.getDefaultFileNameFormat()));					bw.newLine();
+			bw.write("ClipboardListenOption=" + Optional.ofNullable(Config.getClipboardListenOption())	.orElse(Config.getDefaultClipboardListenOption()).getString());	bw.newLine();
 			
 			bw.newLine();
 			bw.write("#If you know a type of link that yt-dlp accepts (listed in https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md),"); bw.newLine();
 			bw.write("#and wish YoutubeAudioDownloader detect & download it, you can write how does the link starts(e.g. in youtube, \"https://www.youtu\")"); bw.newLine();
 			bw.write("#Every line starting with # will be ignored, but DO NOT CHANGE lines before these comments."); bw.newLine();
-			bw.write("#If you want to modify those configurations, please do it in YoutubeAudioDownloader app."); bw.newLine();
+			bw.write("#If you want to modify those configurations, please do it via the application."); bw.newLine();
 			bw.write("#And let my hardcoded spaghetti shit handle that. :)"); bw.newLine();
 			bw.newLine();
 			

@@ -3,6 +3,9 @@ package com.awidesky.YoutubeClipboardAutoDownloader.enums;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
+import com.awidesky.YoutubeClipboardAutoDownloader.Config;
+import com.awidesky.YoutubeClipboardAutoDownloader.util.SwingDialogs;
+
 public enum ClipBoardOption {
 
 	AUTOMATIC("download link automatically"),
@@ -18,6 +21,9 @@ public enum ClipBoardOption {
 
 	public static ClipBoardOption get(String clipboardListenOption) {
 		return Arrays.stream(ClipBoardOption.values()).filter(op -> op.description.equals(clipboardListenOption)).findAny()
-				.orElseThrow(() -> new RuntimeException("Invalid parameter : ClipBoardOption.get(" + clipboardListenOption + ")"));
+				.orElseGet(() -> {
+					SwingDialogs.warning("Invalid ClipBoardOption!", "Invalid ClipBoardOption : " + clipboardListenOption + "\nUse default ClipBoardOption instead...", null, false);
+					return Config.getDefaultClipboardListenOption();
+				});
 	}
 }
