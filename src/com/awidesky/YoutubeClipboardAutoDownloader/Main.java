@@ -63,6 +63,7 @@ public class Main {
 	private static Function<String, TaskLogger> taskLogGetter;
 	
 	private static volatile int taskNum = 0;
+	private static String[] ytdlpAdditionalOptions = new String[0];
 	
 	public static final String version = "v2.0.0";
 
@@ -83,6 +84,10 @@ public class Main {
 				System.out.println("\t              Useful when you don't want to see dirty log file when multiple tasks running.");
 				System.out.println("\t--logTime : Log with TimeStamps");
 				System.out.println("\t--verbose : Print verbose logs(like GUI Windows or extra debug info, etc.)");
+				System.out.println("\t--ytdlpArgs=<options...> : Add additional yt-dlp options(listed at https://github.com/yt-dlp/yt-dlp#usage-and-options)");
+				System.out.println("\t                           that will be appended at the end(but before the url) of yt-dlp execution.");
+				System.out.println("\t                           If your options contains space, wrap them with \"\"");
+				System.out.println("\t                           If you need multiple options, wrap them with \"\"");
 				System.out.println(); System.out.println();
 				System.out.println("exit codes :");
 				Arrays.stream(ExitCodes.values()).forEach(code -> {
@@ -102,8 +107,10 @@ public class Main {
 				datePrefix = true;
 			} else if ("--logbyTask".equals(arg)) {
 				logbyTask = true;
+			} else if (arg.startsWith("--ytdlpArgs")) {
+				ytdlpAdditionalOptions = arg.split("=")[1].split(" ");
 			} else {
-				System.err.println("Unknown option : \"" + arg + "\"");
+				System.err.println("Invaild option : \"" + arg + "\"");
 				System.err.println("If you want to find usage, please use --help flag");
 				Main.kill(ExitCodes.INVALIDCOMMANDARGS);
 			}
@@ -263,7 +270,7 @@ public class Main {
 					SwingDialogs.error("Download Path is invalid!", "Invalid path : " + save, null, false);
 					return;
 				}
-				YoutubeAudioDownloader.download(url, t, p);
+				YoutubeAudioDownloader.download(url, t, p, ytdlpAdditionalOptions);
 			} else {
 				t.failed();
 				SwingDialogs.error("[Task" + num + "|validating] Not a valid url!",	data + "\nis invalid or unsupported url!", null, true);

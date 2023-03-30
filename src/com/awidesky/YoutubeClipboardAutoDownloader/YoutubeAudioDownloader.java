@@ -263,7 +263,7 @@ public class YoutubeAudioDownloader {
 		}
 		arguments.add(url);
 		
-		if(additianalOptions.length != 0) arguments.addAll(1, Arrays.asList(additianalOptions));
+		if(additianalOptions.length != 0) arguments.addAll(arguments.size() - 1, Arrays.asList(additianalOptions));
 
 		
 		// retrieve command line argument
