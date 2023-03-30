@@ -314,7 +314,7 @@ public class Main {
 				}
 			};
 			
-			p = read.apply(p); p = "%HOME%".equalsIgnoreCase(p) ? System.getProperty("user.home") : p;
+			p = read.apply(p); p = "%user.home%".equalsIgnoreCase(p) ? Config.getDefaultSaveto() : p;
 			f = read.apply(f);
 			q = read.apply(q);
 			l = read.apply(l);
@@ -359,7 +359,9 @@ public class Main {
 			File cfg = new File(YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt");
 			if (!cfg.exists()) cfg.createNewFile();
 
-			bw.write("SavePath=" + 				Optional.ofNullable(Config.getSaveto())					.orElse(Config.getDefaultSaveto())); 							bw.newLine();
+			UnaryOperator<String> savP = s -> Config.getDefaultSaveto().equalsIgnoreCase(s) ? "%user.home%" : s;
+			
+			bw.write("SavePath=" +	 savP.apply(Optional.ofNullable(Config.getSaveto())					.orElse(Config.getDefaultSaveto()))); 							bw.newLine();
 			bw.write("Format=" + 				Optional.ofNullable(Config.getFormat())					.orElse(Config.getDefaultFormat()));							bw.newLine();
 			bw.write("Quality=" +				Optional.ofNullable(Config.getQuality())				.orElse(Config.getDefaultQuality()));							bw.newLine();
 			bw.write("Playlist=" + 				Optional.ofNullable(Config.getPlaylistOption())			.orElse(Config.getDefaultPlaylistOption()).toComboBox());		bw.newLine();

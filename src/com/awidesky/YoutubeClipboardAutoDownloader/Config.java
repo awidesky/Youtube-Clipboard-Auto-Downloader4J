@@ -51,7 +51,7 @@ public class Config {
 	
 	
 	// Default config values
-	public static String getDefaultSaveto() { return "%HOME%"; }
+	public static String getDefaultSaveto() { return System.getProperty("user.home"); }
 	public static String getDefaultFormat() { return "mp3"; }
 	public static String getDefaultQuality() { return "0"; }
 	public static PlayListOption getDefaultPlaylistOption() { return PlayListOption.NO; }
