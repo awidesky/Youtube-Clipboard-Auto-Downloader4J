@@ -104,6 +104,8 @@ public class Main {
 				logbyTask = true;
 			} else {
 				System.err.println("Unknown option : \"" + arg + "\"");
+				System.err.println("If you want to find usage, please use --help flag");
+				Main.kill(ExitCodes.INVALIDCOMMANDARGS);
 			}
 				
 		}
