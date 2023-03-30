@@ -72,11 +72,13 @@ public class Main {
 		for (String arg : args) {
 			if ("--help".equals(arg)) {
 				System.out.println("YoutubeAudioAutoDownloader " + version);
-				System.out.println("Copyright 2020-2023. Eugene Hong all rights reserved.");
+				System.out.println("Copyright (c) 2020-2023. Eugene Hong. All Rights Reserved.");
 				System.out.println();
 				System.out.println("Usage : java -jar YoutubeAudioAutoDownloader " + version + ".jar [options]");
 				System.out.println();
 				System.out.println("Options :");
+				System.out.println("\t--help : show this help info.");
+				System.out.println("\t--version : show version info.");
 				System.out.println("\t--logbyTask : Logs from a task is gathered till the task is done/terminated.");
 				System.out.println("\t              Useful when you don't want to see dirty log file when multiple tasks running.");
 				System.out.println("\t--logTime : Log with TimeStamps");
@@ -86,6 +88,13 @@ public class Main {
 				Arrays.stream(ExitCodes.values()).forEach(code -> {
 					System.out.printf("\t%3d : %s\n", code.getCode(), code.getMsg());
 				});
+				Main.kill(ExitCodes.SUCCESSFUL);
+			} else if ("--version".equals(arg)) {
+				System.out.println("YoutubeAudioAutoDownloader " + version);
+				System.out.println("Copyright (c) 2020-2023 Eugene Hong. All Rights Reserved.");
+				System.out.println();
+				System.out.println("This software is distributed under MIT licence.");
+				System.out.println("Please refer to : https://github.com/awidesky/Youtube-Audio-Auto-Downloader4J/blob/master/LICENSE");
 				Main.kill(ExitCodes.SUCCESSFUL);
 			} else if ("--verbose".equals(arg)) {
 				verbose = true;
