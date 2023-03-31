@@ -55,7 +55,7 @@ public class ResourceInstaller {
 		log.log("Installing ffmpeg...");
 		showProgress("Downloading ffmpeg");
 		long filesize = getFileSize(new URL(FFMPEG_URL));
-		log.log("Content length of " + FFMPEG_URL + " : " + filesize);
+		log.log("Length of " + FFMPEG_URL + " : " + filesize);
 		setLoadingFrameContent("Downloading ffmpeg version " + getContent(new URL("https://www.gyan.dev/ffmpeg/builds/release-version")), filesize);
 		download(new URL(FFMPEG_URL), new File(root + File.separator + "ffmpeg.zip"));
 		
@@ -77,7 +77,7 @@ public class ResourceInstaller {
 		log.log("Installing yt-dlp...");
 		showProgress("Downloading yt-dlp");
 		long filesize = getFileSize(new URL(YTDLP_URL));
-		log.log("Content length of " + YTDLP_URL + " : " + filesize);
+		log.log("Length of " + YTDLP_URL + " : " + filesize);
 		String releaseURL = getRedirectedURL(new URL("https://github.com/yt-dlp/yt-dlp/releases/latest"));
 		setLoadingFrameContent("Downloading yt-dlp version " + releaseURL.substring(releaseURL.lastIndexOf('/') + 1), filesize);
 		download(new URL(YTDLP_URL), new File(root + File.separator + "ffmpeg" + File.separator + "bin"  + File.separator + "yt-dlp.exe"));
@@ -243,7 +243,7 @@ public class ResourceInstaller {
 
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(source.toFile()))) {
 
-        	log.log("Unzip " + source.toAbsolutePath().toString() + " to " + target.toAbsolutePath().toString());
+        	log.logVerbose("Unzip " + source.toAbsolutePath().toString() + " to " + target.toAbsolutePath().toString());
             // list files in zip
             ZipEntry zipEntry = zis.getNextEntry();
 
@@ -275,7 +275,7 @@ public class ResourceInstaller {
                     }
 
                     // copy files, nio
-                    log.log("copy to " + newPath.toAbsolutePath().toString());
+                    log.logVerbose("copy to " + newPath.toAbsolutePath().toString());
                     Files.copy(zis, newPath, StandardCopyOption.REPLACE_EXISTING);
 
                     // copy files, classic
@@ -295,7 +295,7 @@ public class ResourceInstaller {
 
         }
         
-        log.log("Successfully Unzipped " + source.toAbsolutePath().toString());
+        log.logVerbose("Successfully Unzipped " + source.toAbsolutePath().toString());
         
     }
     
