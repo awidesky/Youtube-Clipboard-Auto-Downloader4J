@@ -103,15 +103,16 @@ public class ResourceInstaller {
 			int written = 0;
 			boolean eof = false;
   			while (true) {
-  				while(bytebuf.hasRemaining() && !eof) {
+  				if(bytebuf.hasRemaining() && !eof) {
   					eof = in.read(bytebuf) == -1;
   				}
-				// flip the buffer, set the limit to current position, and position to 0.
-				bytebuf.flip();
-				while(bytebuf.hasRemaining()) written += out.write(bytebuf); // write data from ByteBuffer to file
-				bytebuf.clear();
+  				bytebuf.flip();
+				if(bytebuf.hasRemaining()) {
+					written += out.write(bytebuf); // write data from ByteBuffer to file
+				}
+				bytebuf.compact();
 				updateUI(written, total);
-				if(eof) break;
+				if(eof && (bytebuf.remaining() == bytebuf.capacity())) break;
 			}
 		} catch (IOException e) { ee = e; }
 		
