@@ -55,7 +55,7 @@ public class ResourceInstaller {
 		log.log("Installing ffmpeg...");
 		showProgress("Downloading ffmpeg");
 		long filesize = getFileSize(new URL(FFMPEG_URL));
-		if(filesize <= 0) throw new IOException("Unable to reach " + FFMPEG_URL);
+		log.log("Content length of " + FFMPEG_URL + " : " + filesize);
 		setLoadingFrameContent("Downloading ffmpeg version " + getContent(new URL("https://www.gyan.dev/ffmpeg/builds/release-version")), filesize);
 		download(new URL(FFMPEG_URL), new File(root + File.separator + "ffmpeg.zip"));
 		
@@ -77,7 +77,7 @@ public class ResourceInstaller {
 		log.log("Installing yt-dlp...");
 		showProgress("Downloading yt-dlp");
 		long filesize = getFileSize(new URL(YTDLP_URL));
-		if(filesize <= 0) throw new IOException("Unable to reach " + YTDLP_URL);
+		log.log("Content length of " + YTDLP_URL + " : " + filesize);
 		String releaseURL = getRedirectedURL(new URL("https://github.com/yt-dlp/yt-dlp/releases/latest"));
 		setLoadingFrameContent("Downloading yt-dlp version " + releaseURL.substring(releaseURL.lastIndexOf('/') + 1), filesize);
 		download(new URL(YTDLP_URL), new File(root + File.separator + "ffmpeg" + File.separator + "bin"  + File.separator + "yt-dlp.exe"));
@@ -93,7 +93,7 @@ public class ResourceInstaller {
 		
 		try (ReadableByteChannel in = Channels.newChannel(url.openStream());
 				FileChannel out = new FileOutputStream(dest).getChannel()) {
-			
+
 			log.log("Downloading from " + url.toString() + " to " + dest.getAbsolutePath());
 			log.log("Buffer size : " + formatFileSize(BUFFER_SIZE));
 			
@@ -120,14 +120,12 @@ public class ResourceInstaller {
 		log.log("Successfully downloaded " + url.toString());
 	}
 	
-	private static long getFileSize(URL url) {
+	private static long getFileSize(URL url) throws IOException {
 		HttpURLConnection conn = null;
 		try {
 			conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("HEAD");
 			return conn.getContentLengthLong();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
 		} finally {
 			if(conn != null) conn.disconnect();
 		}
@@ -189,10 +187,10 @@ public class ResourceInstaller {
 		});
 	}
 	private static void updateUI(long now, long total) {
-		log.log("Progress : " + formatFileSize(now) + " / " + formatFileSize(total) + " (" + ((int)(100.0 * now / total)) + "%)");
+		log.log("Progress : " + formatFileSize(now) + " / " + formatFileSize(total) + " (" + (total > -1 ? (int)(100.0 * now / total) : -1) + "%)");
 		SwingUtilities.invokeLater(() -> {
 			loadingStatus.setText(formatFileSize(now) + " / " + formatFileSize(total));
-			progress.setValue((int) (100.0 * now / total));
+			progress.setValue((total > -1 ? (int)(100.0 * now / total) : -1));
 		});
 	}
 	
@@ -217,6 +215,7 @@ public class ResourceInstaller {
 	
 	private static String formatFileSize(long fileSize) {
 		
+		if(fileSize < 0L) return "unknown";
 		if(fileSize == 0L) return "0.00byte";
 		
 		switch ((int)(Math.log(fileSize) / Math.log(1024))) {
