@@ -29,6 +29,8 @@
 				<arg value="com.awidesky.YoutubeClipboardAutoDownloader.Main" />
 				<arg value="--name" />
 				<arg value="YoutubeAudioAutoDownloader" />
+				<arg value="--vendor" />
+				<arg value="Eugene Hong" />
 				<arg value="--icon" />
 				<arg value="${dir.buildfile}/YoutubeAudioAutoDownloader-resources/icon.ico" />
 				<arg value="--app-version" />
