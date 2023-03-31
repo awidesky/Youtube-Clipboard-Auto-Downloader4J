@@ -137,34 +137,39 @@ public class Main {
 
 		try {
 			SwingUtilities.invokeAndWait(gui::initLoadingFrame);
-		} catch (InvocationTargetException | InterruptedException e2) {
-			logger.log("[init] failed wating EDT whele initiating LoadingFrame!");
-			logger.log(e2);
+			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.PREPARING_THREADS));
+			loggerThread.start();
+			TaskThreadPool.setup();
+			clipChecker = new ClipBoardCheckerThread(); // A daemon thread that will keep checking clipboard
+			clipChecker.start();
+			Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener((e) -> { checkClipBoard(); });
+			logger.newLine();
+			logger.log("Listening clipboard...\n");
+
+			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.CHECKING_FFMPEG));
+			if (!YoutubeAudioDownloader.checkFfmpeg())
+				Main.kill(ExitCodes.FFMPEGNOTEXISTS);
+			
+			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.CHECKING_YTDLP));
+			if (!YoutubeAudioDownloader.checkYoutubedl())
+				Main.kill(ExitCodes.YOUTUBEDNOTEXISTS);
+
+			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.READING_PROPERTIES));
+			readProperties();
+
+			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.LOADING_WINDOW));
+			SwingUtilities.invokeAndWait(gui::initMainFrame);
+
+		} catch (InterruptedException e1) {
+			logger.log("[init] EDT failed while loading application!");
+			SwingDialogs.error("EDT Interrupted!", "%e%", e1, true);
+			Main.kill(ExitCodes.EDTFAILED);
+		} catch (InvocationTargetException e2) {
+			logger.log("[init] " + e2.getCause().getClass().getSimpleName() + " thrown while loading application!");
+			SwingDialogs.error("Loading Failed!", "%e%", (Exception)e2.getCause(), true);
 			Main.kill(ExitCodes.EDTFAILED);
 		}
-		
-		gui.setLoadingStat(LoadingStatus.PREPARING_THREADS);
-		loggerThread.start();
-		TaskThreadPool.setup();
-		clipChecker = new ClipBoardCheckerThread(); //A daemon thread that will keep checking clipboard
-		clipChecker.start();
-		Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener((e) -> { checkClipBoard(); }); 
-		logger.newLine();
-		logger.log("Listening clipboard...\n");
 
-		gui.setLoadingStat(LoadingStatus.CHECKING_FFMPEG);
-		if (!YoutubeAudioDownloader.checkFfmpeg()) Main.kill(ExitCodes.FFMPEGNOTEXISTS);
-		gui.setLoadingStat(LoadingStatus.CHECKING_YTDLP);
-		if (!YoutubeAudioDownloader.checkYoutubedl()) Main.kill(ExitCodes.YOUTUBEDNOTEXISTS);
-		
-		gui.setLoadingStat(LoadingStatus.READING_PROPERTIES);
-		readProperties();
-
-		gui.setLoadingStat(LoadingStatus.LOADING_WINDOW);
-		SwingUtilities.invokeLater(() -> {
-			gui.initMainFrame();
-		});
-		
 	}
 	
 	private static void checkClipBoard() {
