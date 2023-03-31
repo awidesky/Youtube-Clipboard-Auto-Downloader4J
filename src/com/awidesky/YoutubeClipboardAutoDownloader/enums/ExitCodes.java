@@ -4,10 +4,11 @@ public enum ExitCodes {
 
 	SUCCESSFUL("Program exited successfully as user intended", 0),
 	PROJECTPATHNOTFOUND("Unable to locate project root library(\"YoutubeAudioAutoDownloader-resources\" folder)", 100),
-	EDTFAILED("Task execution from GUI event dispatch thread has failed", -1),
-	FFMPEGNOTEXISTS("Failed to find ffmpeg installation", -2),
-	YOUTUBEDNOTEXISTS("Failed to find yt-dlp installation", -3),
-	INVALIDCOMMANDARGS("Invalid command line argument(s)", 1);
+	FFMPEGNOTEXISTS("Failed to find ffmpeg installation", 200),
+	YOUTUBEDNOTEXISTS("Failed to find yt-dlp installation", 300),
+	INVALIDCOMMANDARGS("Invalid command line argument(s)", -1),
+	EDTFAILED("Task execution from GUI event dispatch thread has failed", -2),
+	UNKNOWNERROR("Unknown Error(e.g. unhandled Exception/JVM Error)", -100);
 	
 	private String msg;
 	private int code;

@@ -135,6 +135,19 @@ public class Main {
 	
 	private static void setup() {
 
+		/** Set Default Uncaught Exception Handlers */
+		Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+			SwingDialogs.error("Unhandled exception in thread " + t.getName() + " : " + ((Exception)e).getClass().getName(), "%e%", (Exception)e , true);
+			Main.kill(ExitCodes.UNKNOWNERROR);
+		});
+		SwingUtilities.invokeLater(() -> {
+			Thread.currentThread().setUncaughtExceptionHandler((t, e) -> {
+				SwingDialogs.error("Unhandled exception in EDT : " + ((Exception)e).getClass().getName(), "%e%", (Exception)e , true);
+				Main.kill(ExitCodes.EDTFAILED);
+			});
+		});
+		
+		
 		try {
 			SwingUtilities.invokeAndWait(gui::initLoadingFrame);
 			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.PREPARING_THREADS));
