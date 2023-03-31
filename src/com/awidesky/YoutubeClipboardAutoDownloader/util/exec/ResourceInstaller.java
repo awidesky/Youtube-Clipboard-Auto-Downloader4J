@@ -188,7 +188,7 @@ public class ResourceInstaller {
 		});
 	}
 	private static void updateUI(long now, long total) {
-		log.log("Progress : " + formatFileSize(now) + " / " + formatFileSize(total) + " (" + (total > -1 ? (int)(100.0 * now / total) : -1) + "%)");
+		log.logVerbose("Progress : " + formatFileSize(now) + " / " + formatFileSize(total) + " (" + (total > -1 ? (int)(100.0 * now / total) : -1) + "%)");
 		SwingUtilities.invokeLater(() -> {
 			loadingStatus.setText(formatFileSize(now) + " / " + formatFileSize(total));
 			progress.setValue((total > -1 ? (int)(100.0 * now / total) : -1));
