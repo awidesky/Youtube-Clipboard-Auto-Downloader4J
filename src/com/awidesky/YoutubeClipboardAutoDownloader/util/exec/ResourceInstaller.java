@@ -45,7 +45,7 @@ public class ResourceInstaller {
 	private static JProgressBar progress;
 	private static JFrame loadingFrame;
 	
-	private static final int BUFFER_SIZE = 1024 * 1024;
+	private static final int BUFFER_SIZE = 32 * 1024; // It seems URL connection only reads 16KB per one read operation. 32 will be sufficient.
 	
 	private static final Logger log = Main.getLogger("[util.ResourceInstaller] ");
 	
