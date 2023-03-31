@@ -48,7 +48,7 @@ public class GUI {
 	private JLabel loadingStatus;
 	private JProgressBar initProgress;
 	
-	public static final Image ICON = new ImageIcon(YoutubeAudioDownloader.getResourcePath().replace(File.separator, "/") + "/icon.jpg").getImage();
+	public static final Image ICON = new ImageIcon(YoutubeAudioDownloader.getResourcePath().replace(File.separator, "/") + "/icon.png").getImage();
 
 	private JFrame mainFrame;
 	private JButton browse, cleanCompleted, removeSwitch, nameFormatHelp, openConfig, modeSwitch, openSaveDir;
