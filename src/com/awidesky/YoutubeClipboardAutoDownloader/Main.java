@@ -152,10 +152,10 @@ public class Main {
 		logger.newLine();
 		logger.log("Listening clipboard...\n");
 
-		gui.setLoadingStat(LoadingStatus.CHECKING_YTDLP);
-		if (!YoutubeAudioDownloader.checkYoutubedl()) Main.kill(ExitCodes.YOUTUBEDNOTEXISTS);
 		gui.setLoadingStat(LoadingStatus.CHECKING_FFMPEG);
 		if (!YoutubeAudioDownloader.checkFfmpeg()) Main.kill(ExitCodes.FFMPEGNOTEXISTS);
+		gui.setLoadingStat(LoadingStatus.CHECKING_YTDLP);
+		if (!YoutubeAudioDownloader.checkYoutubedl()) Main.kill(ExitCodes.YOUTUBEDNOTEXISTS);
 		
 		gui.setLoadingStat(LoadingStatus.READING_PROPERTIES);
 		readProperties();
