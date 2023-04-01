@@ -19,8 +19,6 @@
 			<exec executable="jpackage.exe">
 				<arg value="--input" />
 				<arg value="${jarApp.dir}" />
-				<arg value="--runtime-image" />
-				<arg value="${dir.buildfile}/jre" />
 				<arg value="--dest" />
 				<arg value="${dir.buildfile}/build" />
 				<arg value="--main-jar" />
