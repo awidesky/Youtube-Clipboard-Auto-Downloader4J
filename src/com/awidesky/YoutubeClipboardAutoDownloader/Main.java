@@ -164,7 +164,7 @@ public class Main {
 				Main.kill(ExitCodes.FFMPEGNOTEXISTS);
 			
 			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.CHECKING_YTDLP));
-			if (!YoutubeAudioDownloader.checkYoutubedl())
+			if (!YoutubeAudioDownloader.checkYtdlp())
 				Main.kill(ExitCodes.YOUTUBEDNOTEXISTS);
 
 			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.READING_PROPERTIES));

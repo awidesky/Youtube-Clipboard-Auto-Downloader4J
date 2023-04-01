@@ -39,18 +39,11 @@ public class YoutubeAudioDownloader {
 		/* check ffmpeg */
 		Logger log = Main.getLogger("[ffmepg check] ");
 
-		// retrieve command line argument
-		log.log("ffmpeg installation check command : \"" + ytdlpPath + "ffmpeg -version" + "\"");
-
 		// start process
-		int ret = -1;
-		try {
-			ret = ProcessExecutor.runNow(log, null, ytdlpPath + "ffmpeg", "-version");
-			log.log("ffmpeg installation check command terminated with exit code : " + ret);
-		} catch (Exception e) {
-			SwingDialogs.error("Executioning Error!", "%e%", e, true);
-	 		if (SwingDialogs.confirm("ffmpeg installation invalid!", "Install ffmpeg in app resource folder?")) {
-	 			try {
+		if (!checkFfmpegPath(ytdlpPath, log) && !checkFfmpegPath("", log)) {
+			SwingDialogs.error("Error!", "no vaild ffmpeg installation in\n" + ytdlpPath + "\nor system %PATH%", null, true);
+			if (SwingDialogs.confirm("ffmpeg installation invalid!", "Install ffmpeg in app resource folder?")) {
+				try {
 					ResourceInstaller.getFFmpeg();
 					log.log("ffmpeg installation success. re-checking ffmpeg...");
 					return checkFfmpeg();
@@ -58,40 +51,47 @@ public class YoutubeAudioDownloader {
 					SwingDialogs.error("Failed to install ffmpeg!", "%e%", e1, true);
 					return false;
 				}
-	 		} else {
-	 			Main.webBrowse("https://ffmpeg.org/download.html");
-	 			return false;
-	 		}
+			} else {
+				Main.webBrowse("https://ffmpeg.org/download.html");
+				return false;
+			}
 		}
 		
 		log.newLine();
-		if(ret != 0) SwingDialogs.error("ffmpeg Error!", "exit code : " + ret, null, true);
-		return ret == 0;
+		return true;
 		
+	}
+	
+	private static boolean checkFfmpegPath(String path, Logger log) {
+		log.log("ffmpeg installation check command : \"" + path + "ffmpeg -version" + "\"");
+		try {
+			int ret = ProcessExecutor.runNow(log, null, ytdlpPath + "ffmpeg", "-version");
+			log.log("ffmpeg installation check command terminated with exit code : " + ret);
+			return ret == 0;
+		} catch (Exception e) {
+			log.log("Error when checking ffmpeg\n\t" + e.getMessage());
+			return false;
+		} finally { log.newLine(); }
 	}
 	
 	/**
 	 * @return Whether the procedure went fine
 	 * */
-	public static boolean checkYoutubedl() {
+	public static boolean checkYtdlp() {
 		
 		Logger log = Main.getLogger("[yt-dlp check] ");
 		
 		/* check yt-dlp */
-		if (checkYoutubedlPath("yt-dlp", log)) {
-			
-			ytdlpPath = "";
-			
-		} else {
-			
-			if (!checkYoutubedlPath(ytdlpPath + "yt-dlp", log)) {
-				
+		if (!checkYtdlpPath(ytdlpPath + "yt-dlp", log)) {
+			if (checkYtdlpPath("yt-dlp", log)) {
+				 ytdlpPath = "";
+			} else {
 				SwingDialogs.error("Error!", "no vaild yt-dlp installation in\n" + ytdlpPath + "\nor system %PATH%", null, true);
 				if (SwingDialogs.confirm("yt-dlp installation invalid!", "Install yt-dlp in app resource folder?")) {
 					try {
 						ResourceInstaller.getYtdlp();
 						log.log("yt-dlp installation success. re-checking yt-dlp...");
-						return checkYoutubedl();
+						return checkYtdlp();
 					} catch (IOException e) {
 						SwingDialogs.error("Failed to install yt-dlp!", "%e%", e, true);
 						return false;
@@ -101,19 +101,16 @@ public class YoutubeAudioDownloader {
 					Main.webBrowse("https://github.com/yt-dlp/yt-dlp#installation");
 					return false;
 				}
-				
 			}
-			
 		}
-		
+			
 		log.log("projectpath = " + projectpath);
 		log.log("ytdlpPath = " + (ytdlpPath.equals("") ? "system %PATH%" : ytdlpPath) + "\n");
-		
 		return true;
 		
 	}
 
-	private static boolean checkYoutubedlPath(String ydlfile, Logger log) {
+	private static boolean checkYtdlpPath(String ydlfile, Logger log) {
 
 		log.log("Check if yt-dlp path is in " + ydlfile);
 		List<String> args = Arrays.asList(ydlfile, "--version");
@@ -128,7 +125,7 @@ public class YoutubeAudioDownloader {
 				try {
 					if (versionPtn.matcher(line = br.readLine()).matches()) { // valid path
 
-						log.log("Found valid command to execute yt-dlp : " + ydlfile);
+						log.log("Found valid command to execute yt-dlp : \"" + ydlfile + "\"");
 						log.log("yt-dlp version : " + line);
 
 						if ((Integer.parseInt(new SimpleDateFormat("yyyyMM").format(new Date()))
@@ -167,7 +164,7 @@ public class YoutubeAudioDownloader {
 		} catch (InterruptedException | IOException e) {
 			log.log("Error when checking yt-dlp\n\t" + e.getMessage());
 			return false;
-		}
+		} finally { log.newLine(); }
 
 	}
 	
