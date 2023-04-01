@@ -255,12 +255,12 @@ public class Main {
 		t.setDest(gui.getSavePath());
 		t.setStatus("Validating...");
 		
-		if(TaskStatusModel.getinstance().isTaskExists(t)) {
-			if(!TaskStatusModel.getinstance().isTaskDone(t)) {
-				return;
-			}
-			if(!SwingDialogs.confirm("Download same file in same directory?", data + "\nis already downloaded (by another Task) in\n" + Config.getSaveto() + "\ndownload anyway?")) {
-				logTask.log(data + " is cancelled because same download exists.");
+		if(TaskStatusModel.getinstance().isTaskExists(t) && !t.isFailed()) {
+			// if duplicate task is also "Validating...", it is very likely that clipboard input was duplicated(e.g. long pressing the ctrl + c)
+			if(TaskStatusModel.getinstance().isTaskExistsSameStatus(t)) return; 
+
+			if(!SwingDialogs.confirm("Download same file in same directory?", data + "\nis already downloading/downloaded(by another Task) in\n" + Config.getSaveto() + "\ndownload anyway?")) {
+				logTask.log(data + " is canceled because same task exists.");
 				return;
 			}
 		}

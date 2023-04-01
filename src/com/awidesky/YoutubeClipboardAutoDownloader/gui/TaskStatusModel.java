@@ -97,11 +97,11 @@ public class TaskStatusModel extends AbstractTableModel {
 	public boolean removeSelected() {
 		List<TaskData> selected = rows.stream().filter(TaskData::isChecked).toList();
 		
-		if (selected.stream().anyMatch(TaskData::isNotDone)) 
+		if (selected.stream().anyMatch(TaskData::isRunning)) 
 			if (!SwingDialogs.confirm("Before removing!", "Some task(s) you chose are not done yet!\nCancel those task(s)?"))
 				return false;
 		
-		selected.stream().filter(TaskData::isNotDone).forEach(TaskData::kill);
+		selected.stream().filter(TaskData::isRunning).forEach(TaskData::kill);
 		rows.removeAll(selected);
 		if(rows.isEmpty()) checkBoxSelectedCalback.accept(false);
 		fireTableDataChanged();
@@ -109,11 +109,11 @@ public class TaskStatusModel extends AbstractTableModel {
 	}
 	
 	public void clearAll() {
-		if (rows.stream().anyMatch(TaskData::isNotDone)) 
+		if (rows.stream().anyMatch(TaskData::isRunning)) 
 			if (!SwingDialogs.confirm("Before clearing!", "Some task(s) are not done yet!\nCancel all task(s) and clear all?"))
 				return;
 		
-		rows.stream().filter(TaskData::isNotDone).forEach(TaskData::kill);
+		rows.stream().filter(TaskData::isRunning).forEach(TaskData::kill);
 		rows.clear();
 		fireTableDataChanged();
 	}
@@ -145,14 +145,17 @@ public class TaskStatusModel extends AbstractTableModel {
 		}
 	}
 	
-	public boolean isTaskDone(TaskData t) {
+	/**
+	 * Is same task exists in the table, and the status Strings are identical?
+	 * */
+	public boolean isTaskExistsSameStatus(TaskData t) {
 		if(!isTaskExists(t)) { return false; }
 		if (EventQueue.isDispatchThread()) {
-			return !rows.get(rows.indexOf(t)).isNotDone();
+			return rows.get(rows.indexOf(t)).getStatus().equals(t.getStatus());
 		} else {
 			final AtomicReference<Boolean> result = new AtomicReference<>();
 			try {
-				SwingUtilities.invokeAndWait(() -> { result.set(!rows.get(rows.indexOf(t)).isNotDone()); });
+				SwingUtilities.invokeAndWait(() -> { result.set(rows.get(rows.indexOf(t)).getStatus().equals(t.getStatus())); });
 				return result.get();
 			} catch (Exception e) {
 				log.log("Exception when checking existing Task(s) is done");

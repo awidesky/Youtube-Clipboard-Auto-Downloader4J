@@ -27,7 +27,7 @@ public class TaskData {
 	private AtomicBoolean audioMode = new AtomicBoolean(true);
 	
 	/** Is this task finished or failed? */
-	private boolean isDone = false;
+	private Status st = Status.RUNNING;
 	
 	private Future<?> fu;
 	private Process p;
@@ -39,67 +39,43 @@ public class TaskData {
 	}
 	
 
-	public String getUrl() {
-		return url.get();
-	}
-
-	public void setUrl(String url) {
-		this.url.set(url);
-	}
-
-	public String getVideoName() {
-		return videoName.get();
-	}
+	public String getUrl() { return url.get(); }
+	public void setUrl(String url) { this.url.set(url); }
 	
+	public String getVideoName() { return videoName.get(); }
 	public void setVideoName(String videoName) {
 		this.videoName.set(videoName);
 		SwingUtilities.invokeLater(() -> TaskStatusModel.getinstance().updated(this));
 	}
-	
-	public String getStatus() {
-		return status.get();
-	}
-	
+	public String getStatus() { return status.get(); }
 	public void setStatus(String status) {
 		if(this.status.get().equals(status)) return;
-		
 		this.status.set(status);
 		SwingUtilities.invokeLater(() -> TaskStatusModel.getinstance().updated(this));
 	}
 	
-	public int getProgress() {
-		return progress.get();
-	}
-	
+	public int getProgress() { return progress.get(); }
 	public void setProgress(int progress) {
 		this.progress.set(progress);
 		SwingUtilities.invokeLater(() -> TaskStatusModel.getinstance().updated(this));
 	}
 	
-	public String getDest() {
-		return dest.get();
-	}
-	
+	public String getDest() { return dest.get(); }
 	public void setDest(String dest) {
 		this.dest.set(dest);
 		SwingUtilities.invokeLater(() -> TaskStatusModel.getinstance().updated(this));
 	}
 
-	public boolean isChecked() {
-		return checked.get();
-	}
-
+	public boolean isChecked() { return checked.get(); }
 	public void setChecked(boolean checked) {
 		this.checked.set(checked);
 		SwingUtilities.invokeLater(() -> TaskStatusModel.getinstance().updated(this));
 	}
 
-	public int getTaskNum() {
-		return taskNum.get();
-	}
+	public int getTaskNum() { return taskNum.get(); }
 
 	public void finished() {
-		isDone = true;
+		st = Status.DONE;
 		setStatus("Done!");
 		setProgress(100);
 		fu = null;
@@ -108,7 +84,7 @@ public class TaskData {
 	}
 	
 	public void failed() {
-		isDone = true;
+		st = Status.FAILED;
 		kill();
 		setStatus("ERROR");
 		setProgress(-1);
@@ -117,34 +93,21 @@ public class TaskData {
 		logger.close();
 	}
 
-	public boolean isNotDone() {
-		return !isDone;
-	}
+	public boolean isFinished() { return st == Status.DONE; }
+	public boolean isRunning() { return st == Status.RUNNING; }
+	public boolean isFailed() { return st == Status.FAILED; }
 
-	public void setTotalNumVideo(int vdnum) {
-		totalNumOfVideo.set(vdnum);
-	}
+	public void setTotalNumVideo(int vdnum) { totalNumOfVideo.set(vdnum); }
+	public int getTotalNumVideo() { return totalNumOfVideo.get(); }
+	
+	public void setNowVideoNum(int now) { videoNum.set(now); }
+	public int getNowVideoNum() { return videoNum.get(); }
 
-	public int getTotalNumVideo() {
-		return totalNumOfVideo.get();
-	}
-	
-	public void setNowVideoNum(int now) {
-	  videoNum.set(now);
-	}
-	
-	
-	public int getNowVideoNum() {
-		return videoNum.get();
-	}
-
-	public boolean isAudioMode() {
-		return audioMode.get();
-	}
+	public boolean isAudioMode() { return audioMode.get(); }
 
 
 	public void kill() {
-		if(isNotDone()) {
+		if(!isFinished()) {
 			if (p != null) p.destroy();
 			if (fu != null) fu.cancel(true);
 			logger.log("[Canceled] Task number " + taskNum + " has killed!");
@@ -155,19 +118,12 @@ public class TaskData {
 		return progress + "%" + ( (totalNumOfVideo.get() > 1) ? " (" + videoNum.get() + "/" + totalNumOfVideo.get() + ")" : "" );
 	}
 
-	public void setFuture(Future<?> submit) {
-		fu = submit;
-	}
+	public void setFuture(Future<?> submit) { fu = submit; }
 
-
-	public void setProcess(Process p) {
-		this.p = p;
-	}
+	public void setProcess(Process p) { this.p = p;	}
 
 	@Override
-	public String toString() {
-		return "Task : " + taskNum + ", dest : " + dest + ", video url : " + url;
-	}
+	public String toString() { return "Task : " + taskNum + ", dest : " + dest + ", video url : " + url; }
 
 	@Override
 	public boolean equals(Object obj) {
@@ -178,7 +134,8 @@ public class TaskData {
 			return false;
 		}
 		TaskData other = (TaskData) obj;
-		return Objects.equals(dest, other.dest)	&& Objects.equals(url, other.url);
+		return Objects.equals(dest.get(), other.dest.get())	&& Objects.equals(url.get(), other.url.get());
 	}
 	
+	private static enum Status { RUNNING, DONE, FAILED; }
 }
