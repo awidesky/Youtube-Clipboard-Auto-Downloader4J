@@ -1,12 +1,7 @@
 package com.awidesky.YoutubeClipboardAutoDownloader;
 
 import java.awt.Desktop;
-import java.awt.HeadlessException;
 import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -22,18 +17,15 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import com.awidesky.YoutubeClipboardAutoDownloader.enums.ClipBoardOption;
 import com.awidesky.YoutubeClipboardAutoDownloader.enums.ExitCodes;
 import com.awidesky.YoutubeClipboardAutoDownloader.enums.LoadingStatus;
 import com.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
@@ -52,7 +44,6 @@ public class Main {
 	private static LoggerThread loggerThread = new LoggerThread();
 	private static TaskLogger logger = loggerThread.getLogger("[Main] ");
 
-	private static String clipboardBefore = "";
 	private static ClipBoardCheckerThread clipChecker;
 	
 	public static final Charset NATIVECHARSET = Charset.forName(System.getProperty("native.encoding"));
@@ -147,7 +138,6 @@ public class Main {
 			});
 		});
 		
-		
 		try {
 			SwingUtilities.invokeAndWait(gui::initLoadingFrame);
 			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.PREPARING_THREADS));
@@ -155,7 +145,7 @@ public class Main {
 			TaskThreadPool.setup();
 			clipChecker = new ClipBoardCheckerThread(); // A daemon thread that will keep checking clipboard
 			clipChecker.start();
-			Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener((e) -> { checkClipBoard(); });
+			Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener(clipChecker::submit);
 			logger.newLine();
 			logger.log("Listening clipboard...\n");
 
@@ -185,64 +175,8 @@ public class Main {
 
 	}
 	
-	private static void checkClipBoard() {
-
-		if (Config.getClipboardListenOption() == ClipBoardOption.NOLISTEN) {
-			logger.logVerbose("[debug] clipboard ignored due to ClipboardListenOption == \"" + ClipBoardOption.NOLISTEN.getString() + "\"");
-			return;
-		}
-		clipChecker.submit(() -> { // To avoid overhead in EDT, put task in clipCheckerThread.
-			try {
-				Thread.sleep(50);
-
-				Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
-				if (!cb.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
-					logger.logVerbose("[debug] Non-String Clipboard input!");
-					logger.logVerbose("[debug] clipboard data Flavor(s) : " + Arrays.stream(cb.getAvailableDataFlavors()).map(DataFlavor::getHumanPresentableName).collect(Collectors.joining(", ")));
-					logger.logVerbose("[debug] These can be represented as :");
-					Arrays.stream(cb.getAvailableDataFlavors()).map(t -> {
-						try {
-							return cb.getData(t);
-						} catch (UnsupportedFlavorException | IOException e) {
-							logger.log(e);
-							return null;
-						}
-					}).filter(Objects::nonNull).forEach(o -> logger.logVerbose("[debug] \t" + o));
-					return;
-				}
-				final String data = (String)cb.getData(DataFlavor.stringFlavor);
-				cb.setContents(new StringSelection(data), null); //reset clipboard ownership so that we won't miss another clipboard event
-				
-				logger.logVerbose("[debug] clipboard : " + data);
-				
-				if (clipboardBefore.equals(data)) {
-					logger.logVerbose("[debug] Duplicate input, ignore this input.");
-					clipboardBefore = "";
-					return;
-				}
-				clipboardBefore = data;
-
-				if (!Config.isLinkAcceptable(data)) {
-					logger.logVerbose("[debug] " + data + " is not acceptable!");
-					return;
-				}
-				
-				if (Config.getClipboardListenOption() == ClipBoardOption.ASK) {
-					boolean d = SwingDialogs.confirm("Download link from clipboard?", "Link : " + data);
-					logger.logVerbose("[GUI.linkAcceptChoose] " + (d ? "Accepted" : "Declined") + " download link " + data);
-					if(!d) return;
-				}
-
-				Arrays.stream(data.split(Pattern.quote("\n"))).forEach(Main::submitDownload);
-
-			} catch (InterruptedException | HeadlessException | UnsupportedFlavorException | IOException e1) {
-				SwingDialogs.error("Error when checking clipboard!", "%e%", e1, true);
-			}
-		});
-
-	}
 	
-	private static void submitDownload(String data) {
+	public static void submitDownload(String data) {
 
 		int num = taskNum++;
 		TaskLogger logTask = getTaskLogger("[Task" + num + "] ");
