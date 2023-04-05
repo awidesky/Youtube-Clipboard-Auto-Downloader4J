@@ -48,17 +48,15 @@ public class ClipBoardCheckerThread extends Thread {
 	}
 	
 	public void submit(FlavorEvent e) {
-		long time = System.currentTimeMillis(); //capture time NOW
-		queue.offer(() -> this.checkClipBoard(time));
+		history.removeIf(h -> System.currentTimeMillis() - h.timeStamp > 1000);
+		queue.offer(this::checkClipBoard);
 	}
 
-	private void checkClipBoard(long time) {
-		
+	private void checkClipBoard() {
 		if (Config.getClipboardListenOption() == ClipBoardOption.NOLISTEN) {
 			logger.logVerbose("[debug] clipboard ignored due to ClipboardListenOption == \"" + ClipBoardOption.NOLISTEN.getString() + "\"");
 			return;
 		}
-		history.removeIf(h -> time - h.timeStamp > 1000);
 		try {
 			Thread.sleep(50);
 
@@ -81,28 +79,28 @@ public class ClipBoardCheckerThread extends Thread {
 			final String data = (String) cb.getData(DataFlavor.stringFlavor);
 			cb.setContents(new StringSelection(data), null); // reset clipboard ownership so that we won't miss another
 															 // clipboard event
-			InputHistory now = new InputHistory(data, time);
-			history.add(now);
-			
-			if (history.stream().anyMatch(h -> h.hash.equals(now.hash) && h.timeStamp != now.timeStamp)) {
-				logger.logVerbose("[debug] Duplicate input, ignore : " + data);
-				return;
-			}
 			
 			logger.logVerbose("[debug] Clipboard : " + data);
 			if (!Config.isLinkAcceptable(data)) {
 				logger.logVerbose("[debug] " + data + " is not acceptable!");
 				return;
 			}
+			
+			if (history.stream().anyMatch(h -> h.sameHash(data))) {
+				logger.logVerbose("[debug] Duplicate input, ignore : " + data);
+				history.add(new InputHistory(data, System.currentTimeMillis()));
+				return;
+			}
 
 			if (Config.getClipboardListenOption() == ClipBoardOption.ASK) {
 				boolean d = SwingDialogs.confirm("Download link from clipboard?", "Link : " + data);
 				logger.logVerbose("[GUI.linkAcceptChoose] " + (d ? "Accepted" : "Declined") + " download link " + data);
-				if (!d)
-					return;
+				history.add(new InputHistory(data, System.currentTimeMillis()));
+				if (!d) return;
 			}
 
 			Arrays.stream(data.split(Pattern.quote("\n"))).forEach(Main::submitDownload);
+			history.add(new InputHistory(data, System.currentTimeMillis()));
 			
 		} catch (InterruptedException | HeadlessException | UnsupportedFlavorException | IOException e1) {
 			SwingDialogs.error("Error when checking clipboard!", "%e%", e1, true);
@@ -131,6 +129,10 @@ public class ClipBoardCheckerThread extends Thread {
 		public InputHistory(String hash, long timeStamp) {
 			this.hash = hash(hash);
 			this.timeStamp = timeStamp;
+		}
+		
+		public boolean sameHash(String plainString) {
+			return hash.equals(InputHistory.hash(plainString));
 		}
 	}
 	
