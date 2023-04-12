@@ -69,6 +69,7 @@
 		</jar>
 
 		<copy file="${dir.buildfile}/config.txt" tofile="${jarApp.dir}/config.txt"/>
+		<copy file="${dir.buildfile}/LICENSE" tofile="${jarApp.dir}/LICENSE"/>
 		<copy file="${dir.buildfile}/YoutubeAudioAutoDownloader-resources/icon.png" tofile="${jarApp.dir}/YoutubeAudioAutoDownloader-resources/icon.png"/>
 
 		<zip destfile="${dir.buildfile}/build/YoutubeAudioAutoDownloader-${version_num}.zip" basedir="${jarApp.dir}"/>
@@ -100,6 +101,8 @@
 
 		<copy file="${dir.buildfile}/config.txt" tofile="${dir.buildfile}/build/YoutubeAudioAutoDownloader-${version_num}_launch4j/config.txt"/>
 		<copy file="${dir.buildfile}/config.txt" tofile="${dir.buildfile}/build/YoutubeAudioAutoDownloader-${version_num}_launch4j_resourceBundled/config.txt"/>
+		<copy file="${dir.buildfile}/LICENSE" tofile="${dir.buildfile}/build/YoutubeAudioAutoDownloader-${version_num}_launch4j/LICENSE"/>
+		<copy file="${dir.buildfile}/LICENSE" tofile="${dir.buildfile}/build/YoutubeAudioAutoDownloader-${version_num}_launch4j_resourceBundled/LICENSE"/>
 
 		<copy todir="${dir.buildfile}/build/YoutubeAudioAutoDownloader-${version_num}_launch4j_resourceBundled">
 			<fileset dir="${dir.buildfile}">
