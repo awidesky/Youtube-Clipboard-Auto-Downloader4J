@@ -128,12 +128,15 @@ public class YoutubeAudioDownloader {
 						log.log("Found valid command to execute yt-dlp : \"" + ydlfile + "\"");
 						log.log("yt-dlp version : " + line);
 
-						if ((Integer.parseInt(new SimpleDateFormat("yyyyMM").format(new Date()))
-								- Integer.parseInt(line.substring(0, 7).replace(".", ""))) > 1) {
-							// update if yt-dlp version is older than a month
-							try {
+						int today = Integer.parseInt(new SimpleDateFormat("yyyyMMdd").format(new Date()));
+						int ytdlpDay = Integer.parseInt(line.substring(0, 10).replace(".", ""));
+						log.log("Today : " + today + ", yt-dlp release day : " + ytdlpDay);
+						
+						if (today - ytdlpDay >= 100) { // update if yt-dlp version is older than a month
+							log.log("yt-dlp is older than a month. update process start...");
+							try { //TODO : any ways for run method to wait until I/O process finished?
 								int e;
-								if ((e = ProcessExecutor.runNow(log, null, ydlfile, "--update")) != 0)
+								if ((e = ProcessExecutor.runNow(Main.getLogger("[yt-dlp update] "), null, ydlfile, "--update")) != 0)
 									throw new Exception("Error code : " + e);
 							} catch (Exception e) {
 								SwingDialogs.warning("Failed to update yt-dlp", "%e%\nCannot update yt-dlp!\nUse version " + line + "instead...",
@@ -141,7 +144,7 @@ public class YoutubeAudioDownloader {
 							}
 							
 						} else {
-							log.log("yt-dlp version is not older than a month. update process skipped...");
+							log.log("yt-dlp is not older than a month. update process skipped...");
 						}
 
 					} else {
