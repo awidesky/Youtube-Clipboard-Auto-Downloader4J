@@ -134,7 +134,7 @@ public class YoutubeAudioDownloader {
 						
 						if (today - ytdlpDay >= 100) { // update if yt-dlp version is older than a month
 							log.log("yt-dlp is older than a month. update process start...");
-							try { //TODO : any ways for run method to wait until I/O process finished?
+							try {
 								int e;
 								if ((e = ProcessExecutor.runNow(Main.getLogger("[yt-dlp update] "), null, ydlfile, "--update")) != 0)
 									throw new Exception("Error code : " + e);
@@ -159,7 +159,7 @@ public class YoutubeAudioDownloader {
 				stderr.append(str);
 				stderr.append('\n');
 				log.log("yt-dlp stderr : " + str);
-			})).waitFor();
+			}), true).waitFor();
 			
 			log.log("yt-dlp installation check command terminated with exit code : " + ret);
 			if(!stderr.isEmpty()) SwingDialogs.error("yt-dlp Error! code : " + ret, stderr.toString(), null, false);
@@ -222,7 +222,7 @@ public class YoutubeAudioDownloader {
 				} catch (IOException e) {
 					SwingDialogs.error("Error when getting video name", "[Task" + task.getTaskNum() + "|validating] %e%", e, true);
 				}
-			});
+			}, false);
 			task.setProcess(p1);
 			int exit = p1.waitFor();
 			Duration diff = Duration.between(startTime, Instant.now());
@@ -346,7 +346,7 @@ public class YoutubeAudioDownloader {
 					SwingDialogs.error("Error [" + task.getVideoName() + "]", "[Task" + task.getTaskNum() + "|downloading] Error when redirecting error output of yt-dlp\n%e%", e, true);
 				}
 
-			});
+			}, false);
 		} catch (IOException e1) {
 			task.failed();
 			SwingDialogs.error("Error [" + task.getVideoName() + "]", "[Task" + task.getTaskNum() + "|downloading] Couldn't start yt-dlp :\n%e%" , e1, true);
