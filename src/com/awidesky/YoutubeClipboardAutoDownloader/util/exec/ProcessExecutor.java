@@ -21,16 +21,13 @@ import com.awidesky.YoutubeClipboardAutoDownloader.util.workers.TaskThreadPool;
  * */
 public class ProcessExecutor {
 	
-	//TODO : don't return Process. return custom object that has f1, f2, and Process.
-	//		 and use waitProcess, waitOutputs, waitStdout, waitStderr to wait each  
-
-	public static int runNow(Logger logger, File dir, String... command) throws InterruptedException, IOException {
-		return run(Arrays.asList(command), dir, br -> br.lines().forEach(logger::log), br -> br.lines().forEach(logger::log), true).waitFor();
+	public static int runNow(Logger logger, File dir, String... command) throws InterruptedException, ExecutionException, IOException {
+		return run(Arrays.asList(command), dir, br -> br.lines().forEach(logger::log), br -> br.lines().forEach(logger::log)).wait_all();
 	}
-	public static Process run(List<String> command, File dir, Consumer<BufferedReader> allOut, boolean waitOutput) throws IOException {
-		return run(command, dir, allOut, allOut, waitOutput);
+	public static ProcessHandle run(List<String> command, File dir, Consumer<BufferedReader> allOut) throws IOException {
+		return run(command, dir, allOut, allOut);
 	}
-	public static Process run(List<String> command, File dir, Consumer<BufferedReader> stdout, Consumer<BufferedReader> stderr, boolean waitOutput) throws IOException {
+	public static ProcessHandle run(List<String> command, File dir, Consumer<BufferedReader> stdout, Consumer<BufferedReader> stderr) throws IOException {
 		
 		ProcessBuilder pb = new ProcessBuilder(command);
 		// start process
@@ -53,16 +50,26 @@ public class ProcessExecutor {
 			}
 		});
 		
-		if(waitOutput) {
-			try {
-				f1.get();
-				f2.get();
-			} catch (InterruptedException | ExecutionException e) {
-				SwingDialogs.error("Unable to wait process output stream to end!!", "Process : " + command.stream().collect(Collectors.joining(" "))
-						+ "\n%e%", e, false);
-			}
+		return new ProcessHandle(p, f1, f2); 
+	}
+	
+	public static class ProcessHandle {
+		private final Process proc;
+		private final Future<?> stdout;
+		private final Future<?> stderr;
+		
+		public ProcessHandle(Process proc, Future<?> stdout, Future<?> stderr) {
+			this.proc = proc;
+			this.stdout = stdout;
+			this.stderr = stderr;
 		}
 		
-		return p; 
+		public int waitProcess() throws InterruptedException { return proc.waitFor(); }
+		public void wait_output() throws InterruptedException, ExecutionException { stdout.get(); stderr.get(); }
+		
+		public int wait_all() throws InterruptedException, ExecutionException { wait_output(); return waitProcess(); }
+		
+		public Process getProcess() { return proc; }
+		
 	}
 }

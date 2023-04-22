@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -159,12 +160,12 @@ public class YoutubeAudioDownloader {
 				stderr.append(str);
 				stderr.append('\n');
 				log.log("yt-dlp stderr : " + str);
-			}), true).waitFor();
+			})).wait_all();
 			
 			log.log("yt-dlp installation check command terminated with exit code : " + ret);
 			if(!stderr.isEmpty()) SwingDialogs.error("yt-dlp Error! code : " + ret, stderr.toString(), null, false);
 			return ret == 0;
-		} catch (InterruptedException | IOException e) {
+		} catch (InterruptedException | IOException | ExecutionException e) {
 			log.log("Error when checking yt-dlp\n\t" + e.getMessage());
 			return false;
 		} finally { log.newLine(); }
@@ -199,7 +200,7 @@ public class YoutubeAudioDownloader {
 			task.logger.log("[validating] Video name command : \"" + args.stream().collect(Collectors.joining(" ")) + "\"");
 
 			// start process
-			Process p1 = ProcessExecutor.run(args, null, br -> {
+			ProcessExecutor.ProcessHandle p1 = ProcessExecutor.run(args, null, br -> {
 				try {
 					String name = br.readLine();
 					if (playListOption == PlayListOption.YES) {
@@ -222,9 +223,9 @@ public class YoutubeAudioDownloader {
 				} catch (IOException e) {
 					SwingDialogs.error("Error when getting video name", "[Task" + task.getTaskNum() + "|validating] %e%", e, true);
 				}
-			}, false);
-			task.setProcess(p1);
-			int exit = p1.waitFor();
+			});
+			task.setProcess(p1.getProcess());
+			int exit = p1.wait_all();
 			Duration diff = Duration.between(startTime, Instant.now());
 			task.logger.log("[validating] Video name : " + task.getVideoName());
 			task.logger.log("[validating] Terminated with exit code : " + exit);
@@ -234,7 +235,7 @@ public class YoutubeAudioDownloader {
 				task.failed();
 				return false;
 			} else { return true; }
-		} catch (InterruptedException | IOException e) {
+		} catch (InterruptedException | IOException | ExecutionException e) {
 			SwingDialogs.error("Error when getting video name", "[Task" + task.getTaskNum() + "|validating] %e%", e, true);
 		}
 		return false;
@@ -270,7 +271,7 @@ public class YoutubeAudioDownloader {
 		task.logger.log("[downloading] Video download command : \"" + arguments.stream().collect(Collectors.joining(" ")) + "\"");
 
 		// start process
-		Process p = null;
+		ProcessExecutor.ProcessHandle p = null;
 		try {
 			p = ProcessExecutor.run(arguments, new File(Config.getSaveto()), br -> {
 				try {
@@ -346,19 +347,19 @@ public class YoutubeAudioDownloader {
 					SwingDialogs.error("Error [" + task.getVideoName() + "]", "[Task" + task.getTaskNum() + "|downloading] Error when redirecting error output of yt-dlp\n%e%", e, true);
 				}
 
-			}, false);
+			});
 		} catch (IOException e1) {
 			task.failed();
 			SwingDialogs.error("Error [" + task.getVideoName() + "]", "[Task" + task.getTaskNum() + "|downloading] Couldn't start yt-dlp :\n%e%" , e1, true);
 			return;
 		}
 		
-		task.setProcess(p);
+		task.setProcess(p.getProcess());
 		task.setStatus("Initiating download");
 		task.setProgress(0);
 		
 		try {
-			int errorCode = p.waitFor();
+			int errorCode = p.wait_all();
 			Duration diff = Duration.between(startTime, Instant.now());
 			if(errorCode != 0) { 
 				SwingDialogs.error("Error in yt-dlp", "[Task" + task.getTaskNum() + "|downloading] yt-dlp has ended with error code : " + errorCode, null, true);
@@ -372,7 +373,7 @@ public class YoutubeAudioDownloader {
 				task.logger.log("[finished] Finished!\n");
 				task.finished();
 			}
-		} catch (InterruptedException e) {
+		} catch (InterruptedException | ExecutionException e) {
 			task.failed();
 			SwingDialogs.error("Error [" + task.getVideoName() + "]", "[Task" + task.getTaskNum() + "|downloading] Failed to wait yt-dlp process : %e%", e, true);
 		}
