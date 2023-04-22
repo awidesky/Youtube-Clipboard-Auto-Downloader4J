@@ -32,6 +32,7 @@ public class ClipBoardCheckerThread extends Thread {
 	private Logger logger = Main.getLogger("[ClipBoardChecker] ");
 	
 	public ClipBoardCheckerThread() {
+		super("ClipBoardChecker");
 		this.setDaemon(true);
 	}
 
@@ -48,7 +49,7 @@ public class ClipBoardCheckerThread extends Thread {
 	}
 	
 	public void submit(FlavorEvent e) {
-		history.removeIf(h -> System.currentTimeMillis() - h.timeStamp > 1000);
+		history.removeIf(h -> System.currentTimeMillis() - h.timeStamp > 100);
 		queue.offer(this::checkClipBoard);
 	}
 
@@ -102,7 +103,7 @@ public class ClipBoardCheckerThread extends Thread {
 			Arrays.stream(data.split(Pattern.quote("\n"))).forEach(Main::submitDownload);
 			history.add(new InputHistory(data, System.currentTimeMillis()));
 			
-		} catch (InterruptedException | HeadlessException | UnsupportedFlavorException | IOException e1) {
+		} catch (InterruptedException | HeadlessException | IllegalStateException | UnsupportedFlavorException | IOException | NullPointerException e1) {
 			SwingDialogs.error("Error when checking clipboard!", "%e%", e1, true);
 		}
 	}
