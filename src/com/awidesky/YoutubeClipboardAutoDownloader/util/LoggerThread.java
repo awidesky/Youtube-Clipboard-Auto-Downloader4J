@@ -25,7 +25,7 @@ public class LoggerThread extends Thread {
 
 	public static final String version = "v1.8.0";
 	
-	public LoggerThread() {}
+	public LoggerThread() { super("LoggerThread"); }
 	
 	public void setLogDestination(OutputStream os) throws IllegalArgumentException {
 		setLogDestination(os, true, Charset.defaultCharset());

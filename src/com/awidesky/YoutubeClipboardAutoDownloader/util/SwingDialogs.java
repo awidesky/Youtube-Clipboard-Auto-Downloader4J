@@ -27,7 +27,7 @@ public class SwingDialogs {
 	public static void error(String title, String content, Exception e, boolean waitTillClosed) {
 
 		logger.log("\n");
-		String co = content.replace("%e%", (e == null) ? "null" : e.getMessage());
+		String co = content.replace("%e%", (e == null || e.getMessage() == null) ? "null" : e.getMessage());
 		
 		if (waitTillClosed) {
 			showErrorDialog(title, co);
@@ -81,7 +81,7 @@ public class SwingDialogs {
 	public static void warning(String title, String content, Exception e, boolean waitTillClosed) {
 
 		logger.log("\n");
-		String co = content.replace("%e%", (e == null) ? "null" : e.getMessage());
+		String co = content.replace("%e%", (e == null || e.getMessage() == null) ? "null" : e.getMessage());
 		
 		if (waitTillClosed) {
 			showWarningDialog(title, co);
