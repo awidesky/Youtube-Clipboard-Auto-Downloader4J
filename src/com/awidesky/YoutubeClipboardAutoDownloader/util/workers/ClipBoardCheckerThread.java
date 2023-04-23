@@ -3,9 +3,11 @@ package com.awidesky.YoutubeClipboardAutoDownloader.util.workers;
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.FlavorEvent;
 import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -25,7 +27,7 @@ import com.awidesky.YoutubeClipboardAutoDownloader.enums.ClipBoardOption;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.Logger;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.SwingDialogs;
 
-public class ClipBoardCheckerThread extends Thread {
+public class ClipBoardCheckerThread extends Thread implements ClipboardOwner {
 
 	private LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
 	private Set<ClipBoardCheckerThread.InputHistory> history = new HashSet<>();
@@ -49,17 +51,20 @@ public class ClipBoardCheckerThread extends Thread {
 	}
 	
 	public void submit(FlavorEvent e) {
-		history.removeIf(h -> System.currentTimeMillis() - h.timeStamp > 100);
-		queue.offer(this::checkClipBoard);
+		long l = System.currentTimeMillis();
+		queue.offer(() -> checkClipBoard(l));
 	}
 
-	private void checkClipBoard() {
+	private void checkClipBoard(long now) {
+		history.removeIf(h -> now - h.timeStamp > 100);
+		
 		if (Config.getClipboardListenOption() == ClipBoardOption.NOLISTEN) {
 			logger.logVerbose("[debug] clipboard ignored due to ClipboardListenOption == \"" + ClipBoardOption.NOLISTEN.getString() + "\"");
 			return;
 		}
 		try {
-			Thread.sleep(50);
+			//https://stackoverflow.com/questions/51797673/in-java-why-do-i-get-java-lang-illegalstateexception-cannot-open-system-clipboaS
+			Thread.sleep(50);	//Wait small amount of time for the clipboard to be "ready"
 
 			Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
 			if (!cb.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
@@ -78,7 +83,7 @@ public class ClipBoardCheckerThread extends Thread {
 				return;
 			}
 			final String data = (String) cb.getData(DataFlavor.stringFlavor);
-			cb.setContents(new StringSelection(data), null); // reset clipboard ownership so that we won't miss another
+			cb.setContents(new StringSelection(data), this); // reset clipboard ownership so that we won't miss another
 															 // clipboard event
 			
 			logger.logVerbose("[debug] Clipboard : " + data);
@@ -135,6 +140,11 @@ public class ClipBoardCheckerThread extends Thread {
 		public boolean sameHash(String plainString) {
 			return hash.equals(InputHistory.hash(plainString));
 		}
+	}
+
+	@Override
+	public void lostOwnership(Clipboard clipboard, Transferable contents) {
+		logger.logVerbose("Lost ownership from clipboard \"" + clipboard.getName() + "\"");
 	}
 	
 }
