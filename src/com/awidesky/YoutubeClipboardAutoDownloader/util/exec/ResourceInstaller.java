@@ -67,6 +67,8 @@ public class ResourceInstaller {
 			}
 		}
 		Files.delete(Paths.get(root, "ffmpeg.zip"));
+		Files.delete(Paths.get(root, "ffmpeg", "bin", "ffplay.exe"));
+		Files.delete(Paths.get(root, "ffmpeg", "bin", "ffprobe.exe"));
 		deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "doc"));
 		
 		hideProgress();

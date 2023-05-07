@@ -28,6 +28,8 @@ foreach($d in $dirs) {
     Rename-Item "$PSScriptRoot\YoutubeAudioAutoDownloader-resources\$d" -NewName "ffmpeg" -Force
 }
 Remove-Item -Path ".\YoutubeAudioAutoDownloader-resources\ffmpeg.zip"
+Remove-Item -Path '.\YoutubeAudioAutoDownloader-resources\ffmpeg\bin\ffplay.exe'
+Remove-Item -Path '.\YoutubeAudioAutoDownloader-resources\ffmpeg\bin\ffprobe.exe'
 
 Remove-Item -Path '.\YoutubeAudioAutoDownloader-resources\ffmpeg\doc' -Recurse
 
