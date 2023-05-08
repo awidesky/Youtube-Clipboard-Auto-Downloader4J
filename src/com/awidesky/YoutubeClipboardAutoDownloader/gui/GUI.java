@@ -253,8 +253,7 @@ public class GUI {
 	}
 	
 	private void swapMode() {
-		
-		if(Main.audioMode) {
+		if(Main.audioMode.get()) {
 			cb_format.setModel(videoFormatCBoxModel);
 			cb_quality.setModel(videoQualityCBoxModel);
 			quality.setText("Video Quality :");
@@ -267,8 +266,8 @@ public class GUI {
 		}
 
 		cb_quality.setSelectedIndex(0);
-		Main.audioMode = !Main.audioMode;
-		
+		boolean b;
+		do { b = Main.audioMode.get(); } while (!Main.audioMode.compareAndSet(b, !b));
 	}
 
 

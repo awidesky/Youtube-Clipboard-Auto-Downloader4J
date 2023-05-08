@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
@@ -48,7 +49,7 @@ public class Main {
 	
 	public static final Charset NATIVECHARSET = Charset.forName(System.getProperty("native.encoding"));
 	
-	public static volatile boolean audioMode = true;
+	public static volatile AtomicBoolean audioMode = new AtomicBoolean(true);
 	
 	private static GUI gui = new GUI();
 	private static Function<String, TaskLogger> taskLogGetter;
@@ -190,7 +191,7 @@ public class Main {
 		TaskLogger logTask = getTaskLogger("[Task" + num + "] ");
 		logTask.log("Received a link from your clipboard : " + data);
 
-		TaskData t = new TaskData(num, logTask, Main.audioMode);
+		TaskData t = new TaskData(num, logTask, Main.audioMode.get());
 		
 		t.setUrl(data); 
 		t.setVideoName(data); // temporarily set video name as url
