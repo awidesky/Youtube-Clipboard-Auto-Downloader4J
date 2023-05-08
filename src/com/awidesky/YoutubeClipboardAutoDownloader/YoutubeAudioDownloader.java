@@ -43,7 +43,7 @@ public class YoutubeAudioDownloader {
 		// start process
 		if (!checkFfmpegPath(ytdlpPath, log) && !checkFfmpegPath("", log)) {
 			SwingDialogs.error("Error!", "no vaild ffmpeg installation in\n" + ytdlpPath + "\nor system %PATH%", null, true);
-			if (SwingDialogs.confirm("ffmpeg installation invalid!", "Install ffmpeg in app resource folder?")) {
+			if (ResourceInstaller.ffmpegAvailable() && SwingDialogs.confirm("ffmpeg installation invalid!", "Install ffmpeg in app resource folder?")) {
 				try {
 					ResourceInstaller.getFFmpeg();
 					log.log("ffmpeg installation success. re-checking ffmpeg...");
@@ -88,7 +88,7 @@ public class YoutubeAudioDownloader {
 				 ytdlpPath = "";
 			} else {
 				SwingDialogs.error("Error!", "no vaild yt-dlp installation in\n" + ytdlpPath + "\nor system %PATH%", null, true);
-				if (SwingDialogs.confirm("yt-dlp installation invalid!", "Install yt-dlp in app resource folder?")) {
+				if (ResourceInstaller.ytdlpAvailable() && SwingDialogs.confirm("yt-dlp installation invalid!", "Install yt-dlp in app resource folder?")) {
 					try {
 						ResourceInstaller.getYtdlp();
 						log.log("yt-dlp installation success. re-checking yt-dlp...");

@@ -21,6 +21,8 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -37,8 +39,7 @@ import com.awidesky.YoutubeClipboardAutoDownloader.util.Logger;
 
 public class ResourceInstaller {
 
-	public static final String FFMPEG_URL = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"; 
-	public static final String YTDLP_URL = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe"; 
+	public static final String YTDLP_URL = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp"; 
 	private static final String root = YoutubeAudioDownloader.getResourcePath();
 	
 	private static JLabel loadingStatus;
@@ -48,16 +49,37 @@ public class ResourceInstaller {
 	private static final int BUFFER_SIZE = 32 * 1024; // It seems URL connection only reads 16KB per one read operation. 32 will be sufficient.
 	
 	private static final Logger log = Main.getLogger("[util.ResourceInstaller] ");
+	private static final String OS = System.getProperty("os.name");
+	
+	public static boolean ffmpegAvailable() {
+		return isWindows() || isMac();
+	}
+	public static boolean ytdlpAvailable() {
+		return isWindows() || isMac() || isLinux();
+	}
+	
 	
 	public static void getFFmpeg() throws MalformedURLException, IOException {
 		deleteDirectoryRecursion(Paths.get(root, "ffmpeg"));
 		
 		log.log("Installing ffmpeg...");
 		showProgress("Downloading ffmpeg");
-		long filesize = getFileSize(new URL(FFMPEG_URL));
-		log.log("Length of " + FFMPEG_URL + " : " + filesize);
-		setLoadingFrameContent("Downloading ffmpeg version " + getContent(new URL("https://www.gyan.dev/ffmpeg/builds/release-version")), filesize);
-		download(new URL(FFMPEG_URL), new File(root + File.separator + "ffmpeg.zip"));
+		String url = "Unknown_OS!";
+		
+		if(isWindows()) url = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip";
+		else if(isMac()) url = "https://evermeet.cx/ffmpeg/getrelease/zip";
+		
+		long filesize = getFileSize(new URL(url));
+		log.log("Length of " + url + " : " + filesize);
+		
+		if(isWindows())	setLoadingFrameContent("Downloading ffmpeg version " + getContent(new URL("https://www.gyan.dev/ffmpeg/builds/release-version")), filesize);
+		else if(isMac()) {
+			String verName = getRedirectedURL(new URL(url));
+			verName = verName.substring(verName.lastIndexOf("/ffmpeg-") + 8).replace(".zip", "");
+			setLoadingFrameContent("Downloading ffmpeg version " + verName, filesize);
+		} else setLoadingFrameContent("Unknown OS : " + OS, filesize); //This should not happen
+			
+		download(new URL(url), new File(root + File.separator + "ffmpeg.zip"));
 		
 		unzipFolder(Paths.get(root, "ffmpeg.zip"), Paths.get(root));
 		
@@ -66,23 +88,37 @@ public class ResourceInstaller {
 				ff.renameTo(new File(ff.getParentFile().getAbsolutePath() + File.separator + "ffmpeg"));
 			}
 		}
-		Files.delete(Paths.get(root, "ffmpeg.zip"));
-		Files.delete(Paths.get(root, "ffmpeg", "bin", "ffplay.exe"));
-		Files.delete(Paths.get(root, "ffmpeg", "bin", "ffprobe.exe"));
-		deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "doc"));
+		
+		if (isWindows()) {
+			Files.delete(Paths.get(root, "ffmpeg.zip"));
+			Files.delete(Paths.get(root, "ffmpeg", "bin", "ffplay.exe"));
+			Files.delete(Paths.get(root, "ffmpeg", "bin", "ffprobe.exe"));
+			Files.delete(Paths.get(root, "ffmpeg", "README.txt"));
+			deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "doc"));
+			deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "presets"));
+		} else if(isMac()) {
+			Files.delete(Paths.get(root, "ffmpeg.zip"));
+			Files.move(Paths.get(root, "ffmpeg"), Paths.get(root, "ffmpeg_temp"), StandardCopyOption.REPLACE_EXISTING);
+			Files.createDirectories(Paths.get(root, "ffmpeg", "bin"));
+			Files.move(Paths.get(root, "ffmpeg_temp"), Paths.get(root, "ffmpeg", "bin", "ffmpeg"), StandardCopyOption.REPLACE_EXISTING);
+		}
 		
 		hideProgress();
 		log.log("ffmpeg installed!!");
 	}
 	
 	public static void getYtdlp() throws MalformedURLException, IOException {
+		Arrays.stream(Optional.ofNullable(new File(root + File.separator + "ffmpeg" + File.separator + "bin").listFiles()).orElse(new File[] {}))
+			.filter(File::isFile).filter(f -> f.getName().startsWith("yt-dlp")).forEach(File::delete);
+		
 		log.log("Installing yt-dlp...");
 		showProgress("Downloading yt-dlp");
-		long filesize = getFileSize(new URL(YTDLP_URL));
-		log.log("Length of " + YTDLP_URL + " : " + filesize);
+		String url = YTDLP_URL + (isWindows() ? ".exe" : (isMac() ? "_macos" : "_linux"));
+		long filesize = getFileSize(new URL(url));
+		log.log("Length of " + url + " : " + filesize);
 		String releaseURL = getRedirectedURL(new URL("https://github.com/yt-dlp/yt-dlp/releases/latest"));
 		setLoadingFrameContent("Downloading yt-dlp version " + releaseURL.substring(releaseURL.lastIndexOf('/') + 1), filesize);
-		download(new URL(YTDLP_URL), new File(root + File.separator + "ffmpeg" + File.separator + "bin"  + File.separator + "yt-dlp.exe"));
+		download(new URL(url), new File(root + File.separator + "ffmpeg" + File.separator + "bin"  + File.separator + (isWindows() ? "yt-dlp.exe" : "yt-dlp")));
 		hideProgress();
 		log.log("yt-dlp installed!!");
 	}
@@ -209,6 +245,7 @@ public class ResourceInstaller {
 		if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
 			try (DirectoryStream<Path> entries = Files.newDirectoryStream(path)) {
 				for (Path entry : entries) {
+					if(entry.toFile().isFile()) { entry.toFile().delete(); continue; }
 					if(entry.toFile().exists()) deleteDirectoryRecursion(entry);
 				}
 			}
@@ -319,4 +356,9 @@ public class ResourceInstaller {
 
         return normalizePath;
     }
+    
+    
+    private static boolean isWindows() { return OS.contains("Windows"); }
+    private static boolean isMac() { return OS.contains("Mac"); }
+    private static boolean isLinux() { return OS.contains("Linux"); }
 }
