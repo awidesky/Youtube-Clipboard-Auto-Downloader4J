@@ -2,6 +2,7 @@ package com.awidesky.YoutubeClipboardAutoDownloader;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -158,8 +159,7 @@ public class YoutubeAudioDownloader {
 					SwingDialogs.error("Error when redirecting output of yt-dlp : " + e.getClass().getName(), "%e%", e, true);
 				}
 			}, br -> br.lines().forEach(str -> {
-				stderr.append(str);
-				stderr.append('\n');
+				stderr.append(str).append('\n');
 				log.log("yt-dlp stderr : " + str);
 			})).wait_all();
 			
@@ -167,29 +167,19 @@ public class YoutubeAudioDownloader {
 			if(!stderr.isEmpty()) SwingDialogs.error("yt-dlp Error! code : " + ret, stderr.toString(), null, false);
 			return ret == 0;
 		} catch (InterruptedException | IOException | ExecutionException e) {
-			log.log("Error when checking yt-dlp : " + e.getClass().getName());
-			log.log(e.getMessage());
+			log.log("Error when checking yt-dlp : " + e.getClass().getName() + "\n" + e.getMessage());
 			return false;
 		} finally { log.newLine(); }
 
 	}
 	
-
-	public static String getProjectpath() {
-		return projectpath;
-	}
-	public static String getResourcePath() {
-		return projectpath + File.separator + "YoutubeAudioAutoDownloader-resources";
-	}
-	public static String getYtdlpPath() {
-		return ytdlpPath;
-	}
-
+	public static String getProjectpath() { return projectpath; }
+	public static String getResourcePath() { return projectpath + File.separator + "YoutubeAudioAutoDownloader-resources"; }
+	public static String getYtdlpPath() { return ytdlpPath; }
 
 
 	/** get video name */
 	public static boolean validateAndSetName(String url, TaskData task, PlayListOption playListOption) {
-		
 		try {
 			Instant startTime = Instant.now();
 			
@@ -217,12 +207,10 @@ public class YoutubeAudioDownloader {
 					SwingDialogs.error("Error when getting video name", "[Task" + task.getTaskNum() + "|validating] " + e.getClass().getName() + " : %e%", e, true);
 				}
 			}, br -> {
-				String line;
 				try {
-					while ((line = br.readLine()) != null) { //TODO : stream
-						task.logger.log("[validating] yt-dlp stderr : " + line);
-					}
-				} catch (IOException e) {
+					br.lines().forEach(l -> task.logger.log("[validating] yt-dlp stderr : " + l));
+				} catch (UncheckedIOException e1) {
+					IOException e = e1.getCause();
 					SwingDialogs.error("Error when getting video name", "[Task" + task.getTaskNum() + "|validating] " + e.getClass().getName() + " :  %e%", e, true);
 				}
 			});
