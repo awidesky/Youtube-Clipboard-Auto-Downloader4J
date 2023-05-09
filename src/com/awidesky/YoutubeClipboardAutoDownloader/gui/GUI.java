@@ -254,11 +254,13 @@ public class GUI {
 	
 	private void swapMode() {
 		if(Main.audioMode.get()) {
+			Main.audioMode.set(false);
 			cb_format.setModel(videoFormatCBoxModel);
 			cb_quality.setModel(videoQualityCBoxModel);
 			quality.setText("Video Quality :");
 			modeSwitch.setText("<-> download audio");
 		} else {
+			Main.audioMode.set(true);
 			cb_format.setModel(audioFormatCBoxModel);
 			cb_quality.setModel(audioQualityCBoxModel);
 			quality.setText("Audio Quality :");
@@ -266,8 +268,6 @@ public class GUI {
 		}
 
 		cb_quality.setSelectedIndex(0);
-		boolean b;
-		do { b = Main.audioMode.get(); } while (!Main.audioMode.compareAndSet(b, !b));
 	}
 
 
