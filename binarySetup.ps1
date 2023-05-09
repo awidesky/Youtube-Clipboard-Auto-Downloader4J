@@ -30,8 +30,10 @@ foreach($d in $dirs) {
 Remove-Item -Path ".\YoutubeAudioAutoDownloader-resources\ffmpeg.zip"
 Remove-Item -Path '.\YoutubeAudioAutoDownloader-resources\ffmpeg\bin\ffplay.exe'
 Remove-Item -Path '.\YoutubeAudioAutoDownloader-resources\ffmpeg\bin\ffprobe.exe'
+Remove-Item -Path '.\YoutubeAudioAutoDownloader-resources\ffmpeg\bin\README.txt'
 
 Remove-Item -Path '.\YoutubeAudioAutoDownloader-resources\ffmpeg\doc' -Recurse
+Remove-Item -Path '.\YoutubeAudioAutoDownloader-resources\ffmpeg\presets' -Recurse
 
 
 Write-output "  Downloading yt-dlp..."
