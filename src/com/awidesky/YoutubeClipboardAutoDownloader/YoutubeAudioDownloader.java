@@ -290,15 +290,16 @@ public class YoutubeAudioDownloader {
 						}
 						
 						Matcher m = percentPtn.matcher(line);
-						if (m.find() && line.contains("ETA")) {
+						if (m.find() && line.startsWith("[download]") && !line.contains("Destination: ")) {
+							String percentStr = m.group().replace("%", "");
 							task.setStatus("Downloading (" + task.getNowVideoNum() + "/" + task.getTotalNumVideo() + ")");
-							int num = (int)Math.round(Double.parseDouble(m.group().replace("%", "")));
+							int percent = (int)Math.round(Double.parseDouble(percentStr));
 							if(downloadVideoAndAudioSeparately) {
-								task.setProgress(((videoDownloadDone) ? 50 : 0) + num/2);
+								task.setProgress(((videoDownloadDone) ? 50 : 0) + percent/2);
 							} else {
-								task.setProgress(num);
+								task.setProgress(percent);
 							}
-							if(num == 100) videoDownloadDone = true;
+							if(percent == 100 && !percentStr.contains(".")) videoDownloadDone = true;
 						}
 						task.logger.log("[downloading] yt-dlp stdout : " + line);
 					}
