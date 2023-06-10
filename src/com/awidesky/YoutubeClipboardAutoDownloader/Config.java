@@ -2,12 +2,15 @@ package com.awidesky.YoutubeClipboardAutoDownloader;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.awidesky.YoutubeClipboardAutoDownloader.enums.ClipBoardOption;
 import com.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
 
 public class Config { 
+	
+	private static final Pattern QUALITYPATTERN = Pattern.compile("0\\(best\\)|9\\(worst\\)");
 	
 	private static String saveto = getDefaultSaveto();
 	private static String format = getDefaultFormat();
@@ -25,7 +28,7 @@ public class Config {
 	
 	public static String getQuality() { return quality; }
 	public static synchronized void setQuality(String quality) {
-		if(quality.matches("0\\(best\\)|9\\(worst\\)")) {
+		if(QUALITYPATTERN.matcher(quality).matches()) {
 			quality = quality.substring(0, 1);
 		}
 		Config.quality = quality;

@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 import com.awidesky.YoutubeClipboardAutoDownloader.Main;
 import com.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
@@ -169,6 +170,7 @@ public class ProjectPathGetter {
 	    return url == null ? null : urlToFile(url.toString());
 	}
 
+	private static final Pattern FILEURLPATTERN = Pattern.compile("file:[A-Za-z]:.*");
 	/**
 	 * Converts the given URL string to its corresponding {@link File}.
 	 * 
@@ -184,7 +186,7 @@ public class ProjectPathGetter {
 	        path = path.substring(4, index);
 	    }
 	    try {
-	        if (System.getProperty("os.name").startsWith("Windows") && path.matches("file:[A-Za-z]:.*")) {
+	        if (System.getProperty("os.name").startsWith("Windows") && FILEURLPATTERN.matcher(path).matches()) {
 	            path = "file:/" + path.substring(5);
 	        }
 	        return new File(new URL(path).toURI());

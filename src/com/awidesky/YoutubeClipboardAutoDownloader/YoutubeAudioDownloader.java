@@ -30,8 +30,10 @@ public class YoutubeAudioDownloader {
 
 	private static String projectpath = ProjectPathGetter.getProjectPath();
 	private static String ytdlpPath = projectpath + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "ffmpeg" + File.separator + "bin" + File.separator;
-	private static Pattern percentPtn = Pattern.compile("[0-9]+\\.*[0-9]+%");
-	private static Pattern versionPtn = Pattern.compile("\\d{4}\\.\\d{2}\\.\\d{2}");
+	private static final Pattern percentPtn = Pattern.compile("[0-9]+\\.*[0-9]+%");
+	private static final Pattern versionPtn = Pattern.compile("\\d{4}\\.\\d{2}\\.\\d{2}");
+	private static final Pattern downloadFormatPtn = Pattern.compile("[\\s|\\S]+Downloading [\\d]+ format\\(s\\)\\:[\\s|\\S]+");
+	private static final Pattern downloadIndexPtn = Pattern.compile("\\[download\\] Downloading item [\\d]+ of [\\d]+");
 	
 	/**
 	 * @return <code>true</code> if ffmpeg is found
@@ -269,11 +271,11 @@ public class YoutubeAudioDownloader {
 					boolean downloadVideoAndAudioSeparately = false, videoDownloadDone = false;
 					
 					while ((line = br.readLine()) != null) {
-						if(!task.isAudioMode() && line.matches("[\\s|\\S]+Downloading [\\d]+ format\\(s\\)\\:[\\s|\\S]+")) {
+						if(!task.isAudioMode() && downloadFormatPtn.matcher(line).matches()) {
 							downloadVideoAndAudioSeparately = line.contains("+");
 						}
 						
-						if(line.matches("\\[download\\] Downloading item [\\d]+ of [\\d]+")) {
+						if(downloadIndexPtn.matcher(line).matches()) {
 							task.logger.newLine(); task.logger.newLine();
 							Scanner sc = new Scanner(line);
 							sc.useDelimiter("[^\\d]+");
