@@ -24,6 +24,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -52,58 +53,54 @@ public class ResourceInstaller {
 	private static final String OS = System.getProperty("os.name");
 	
 	public static boolean ffmpegAvailable() {
-		return isWindows() || isMac();
+		return isWindows() || isMac() || isLinux();
 	}
 	public static boolean ytdlpAvailable() {
 		return isWindows() || isMac() || isLinux();
 	}
 	
 	
-	public static void getFFmpeg() throws MalformedURLException, IOException {
+	public static void getFFmpeg() throws MalformedURLException, IOException, InterruptedException, ExecutionException {
 		deleteDirectoryRecursion(Paths.get(root, "ffmpeg"));
 		
 		log.log("Installing ffmpeg...");
 		showProgress("Downloading ffmpeg");
 		String url = "Unknown_OS!";
 		
-		if(isWindows()) url = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip";
-		else if(isMac()) url = "https://evermeet.cx/ffmpeg/getrelease/zip";
-		
-		long filesize = getFileSize(new URL(url));
-		log.log("Length of " + url + " : " + filesize);
-		
-		if(isWindows())	setLoadingFrameContent("Downloading ffmpeg version " + getContent(new URL("https://www.gyan.dev/ffmpeg/builds/release-version")), filesize);
-		else if(isMac()) {
-			String verName = getRedirectedURL(new URL(url));
-			verName = verName.substring(verName.lastIndexOf("/ffmpeg-") + 8).replace(".zip", "");
-			setLoadingFrameContent("Downloading ffmpeg version " + verName, filesize);
-		} else setLoadingFrameContent("Unknown OS : " + OS, filesize); //This should not happen
+		if(isWindows()) {
+			url = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip";		
+			long filesize = getFileSize(new URL(url));
+			log.log("Length of " + url + " : " + filesize);
 			
-		download(new URL(url), new File(root + File.separator + "ffmpeg.zip"));
+			setLoadingFrameContent("Downloading ffmpeg version " + getContent(new URL("https://www.gyan.dev/ffmpeg/builds/release-version")), filesize);
 		
-		unzipFolder(Paths.get(root, "ffmpeg.zip"), Paths.get(root));
-		
-		for(File ff : new File(root).listFiles(f -> f.getName().startsWith("ffmpeg"))) {
-			if(ff.isDirectory()) {
-				ff.renameTo(new File(ff.getParentFile().getAbsolutePath() + File.separator + "ffmpeg"));
+			download(new URL(url), new File(root + File.separator + "ffmpeg.zip"));
+			
+			unzipFolder(Paths.get(root, "ffmpeg.zip"), Paths.get(root));
+			
+			for(File ff : new File(root).listFiles(f -> f.getName().startsWith("ffmpeg"))) {
+				if(ff.isDirectory()) {
+					ff.renameTo(new File(ff.getParentFile().getAbsolutePath() + File.separator + "ffmpeg"));
+				}
 			}
-		}
-		
-		if (isWindows()) {
+			
 			Files.delete(Paths.get(root, "ffmpeg.zip"));
 			Files.delete(Paths.get(root, "ffmpeg", "bin", "ffplay.exe"));
 			Files.delete(Paths.get(root, "ffmpeg", "bin", "ffprobe.exe"));
 			Files.delete(Paths.get(root, "ffmpeg", "README.txt"));
 			deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "doc"));
 			deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "presets"));
+
+			hideProgress();
 		} else if(isMac()) {
-			Files.delete(Paths.get(root, "ffmpeg.zip"));
-			Files.move(Paths.get(root, "ffmpeg"), Paths.get(root, "ffmpeg_temp"), StandardCopyOption.REPLACE_EXISTING);
-			Files.createDirectories(Paths.get(root, "ffmpeg", "bin"));
-			Files.move(Paths.get(root, "ffmpeg_temp"), Paths.get(root, "ffmpeg", "bin", "ffmpeg"), StandardCopyOption.REPLACE_EXISTING);
+			setLoadingFrameContent("Downloading ffmpeg via \"brew install ffmpeg\"... (Progress bar will stay in 0)", -1);
+			//TODO : big TextArea that shows log outputs(for both windows and linux)
+			ProcessExecutor.runNow(log, null, "/bin/bash", "-c", "/opt/homebrew/bin/brew install ffmpeg");
+		} else if(isLinux()) {
+			setLoadingFrameContent("Downloading ffmpeg via \"sudo apt install ffmpeg\"...", -1);
+			ProcessExecutor.runNow(log, null, "sudo", "apt", "install", "ffmpeg");
 		}
-		
-		hideProgress();
+
 		log.log("ffmpeg installed!!");
 	}
 	
@@ -358,7 +355,7 @@ public class ResourceInstaller {
     }
     
     
-    private static boolean isWindows() { return OS.contains("Windows"); }
-    private static boolean isMac() { return OS.contains("Mac"); }
-    private static boolean isLinux() { return OS.contains("Linux"); }
+    public static boolean isWindows() { return OS.contains("Windows"); }
+    public static boolean isMac() { return OS.contains("Mac"); }
+    public static boolean isLinux() { return OS.contains("Linux"); }
 }

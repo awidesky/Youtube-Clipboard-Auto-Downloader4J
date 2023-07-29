@@ -29,12 +29,19 @@ public class YoutubeAudioDownloader {
 
 
 	private static String projectpath = ProjectPathGetter.getProjectPath();
-	private static String ytdlpPath = projectpath + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "ffmpeg" + File.separator + "bin" + File.separator;
+	private static String ytdlpPath;
 	private static final Pattern percentPtn = Pattern.compile("[0-9]+\\.*[0-9]+%");
 	private static final Pattern versionPtn = Pattern.compile("\\d{4}\\.\\d{2}\\.\\d{2}");
 	private static final Pattern downloadFormatPtn = Pattern.compile("[\\s|\\S]+Downloading [\\d]+ format\\(s\\)\\:[\\s|\\S]+");
 	private static final Pattern downloadIndexPtn = Pattern.compile("\\[download\\] Downloading item [\\d]+ of [\\d]+");
 	
+	static {
+		if(ResourceInstaller.isWindows()) {
+			ytdlpPath = projectpath + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "ffmpeg" + File.separator + "bin" + File.separator;
+		} else if(ResourceInstaller.isMac()) {
+			ytdlpPath = "/opt/homebrew/bin/";
+		}
+	}
 	/**
 	 * @return <code>true</code> if ffmpeg is found
 	 * */
@@ -46,12 +53,14 @@ public class YoutubeAudioDownloader {
 		// start process
 		if (!checkFfmpegPath(ytdlpPath, log) && !checkFfmpegPath("", log)) {
 			SwingDialogs.error("Error!", "no vaild ffmpeg installation in\n" + ytdlpPath + "\nor system %PATH%", null, true);
-			if (ResourceInstaller.ffmpegAvailable() && SwingDialogs.confirm("ffmpeg installation invalid!", "Install ffmpeg in app resource folder?")) {
+			String installPrompt = ResourceInstaller.isWindows() ? "Install ffmpeg in app resource folder?" : 
+				(ResourceInstaller.isMac() ? "Install ffmpeg via \"brew install ffmpeg\"?" : "Install ffmpeg via \"sudo apt install ffmpeg\"?");
+			if (ResourceInstaller.ffmpegAvailable() && SwingDialogs.confirm("ffmpeg installation invalid!", installPrompt)) {
 				try {
 					ResourceInstaller.getFFmpeg();
 					log.log("ffmpeg installation success. re-checking ffmpeg...");
 					return checkFfmpeg();
-				} catch (IOException e1) {
+				} catch (Exception e1) {
 					SwingDialogs.error("Failed to install ffmpeg! : " + e1.getClass().getName(), "%e%", e1, true);
 					return false;
 				}
@@ -69,7 +78,7 @@ public class YoutubeAudioDownloader {
 	private static boolean checkFfmpegPath(String path, Logger log) {
 		log.log("ffmpeg installation check command : \"" + path + "ffmpeg -version" + "\"");
 		try {
-			int ret = ProcessExecutor.runNow(log, null, ytdlpPath + "ffmpeg", "-version");
+			int ret = ProcessExecutor.runNow(log, null, path + "ffmpeg", "-version");
 			log.log("ffmpeg installation check command terminated with exit code : " + ret);
 			return ret == 0;
 		} catch (Exception e) {
