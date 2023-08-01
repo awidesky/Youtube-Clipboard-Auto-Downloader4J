@@ -1,0 +1,29 @@
+package io.github.awidesky.YoutubeAudioAutoDownloader.util.workers;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+import io.github.awidesky.YoutubeAudioAutoDownloader.Main;
+import io.github.awidesky.YoutubeAudioAutoDownloader.util.Logger;
+
+public class TaskThreadPool {
+
+	private static ExecutorService executorService; 
+	private static Logger log = Main.getLogger("[TaskThreadPool] ");
+	
+	public static void setup() { executorService = Executors.newCachedThreadPool(); }
+	public static Future<?> submit(Runnable task) { return executorService.submit(task); }
+	public static void kill(long timeout) {
+		if (executorService != null && !executorService.isShutdown()) {
+			executorService.shutdownNow();
+			try {
+				executorService.awaitTermination(timeout, TimeUnit.MILLISECONDS);
+			} catch (InterruptedException e) {
+				log.log("Failed to wait worker Thread to shutdown!");
+				log.log(e);
+			}
+		}
+	}
+}
