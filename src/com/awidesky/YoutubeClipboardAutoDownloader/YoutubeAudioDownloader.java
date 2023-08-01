@@ -21,8 +21,9 @@ import com.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.Logger;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.ProjectPathGetter;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.SwingDialogs;
-import com.awidesky.YoutubeClipboardAutoDownloader.util.exec.ResourceInstaller;
+import com.awidesky.YoutubeClipboardAutoDownloader.util.exec.OSUtil;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.exec.ProcessExecutor;
+import com.awidesky.YoutubeClipboardAutoDownloader.util.exec.ResourceInstaller;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.exec.YTDLPFallbacks;
 
 public class YoutubeAudioDownloader {
@@ -35,12 +36,12 @@ public class YoutubeAudioDownloader {
 	private static final Pattern downloadFormatPtn = Pattern.compile("[\\s|\\S]+Downloading [\\d]+ format\\(s\\)\\:[\\s|\\S]+");
 	private static final Pattern downloadIndexPtn = Pattern.compile("\\[download\\] Downloading item [\\d]+ of [\\d]+");
 	
-	public static final String ytdlpQuote = ResourceInstaller.isWindows() ? "\"" : "";
+	public static final String ytdlpQuote = OSUtil.isWindows() ? "\"" : "";
 	
 	static {
-		if(ResourceInstaller.isWindows()) {
+		if(OSUtil.isWindows()) {
 			ytdlpPath = projectpath + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "ffmpeg" + File.separator + "bin" + File.separator;
-		} else if(ResourceInstaller.isMac()) {
+		} else if(OSUtil.isMac()) {
 			ytdlpPath = "/opt/homebrew/bin/";
 		}
 	}
@@ -55,8 +56,8 @@ public class YoutubeAudioDownloader {
 		// start process
 		if (!checkFfmpegPath(ytdlpPath, log) && !checkFfmpegPath("", log)) {
 			SwingDialogs.error("Error!", "no vaild ffmpeg installation in\n" + ytdlpPath + "\nor system %PATH%", null, true);
-			String installPrompt = ResourceInstaller.isWindows() ? "Install ffmpeg in app resource folder?" : 
-				(ResourceInstaller.isMac() ? "Install ffmpeg via \"brew install ffmpeg\"?" : "Install ffmpeg via \"sudo apt install ffmpeg\"?");
+			String installPrompt = OSUtil.isWindows() ? "Install ffmpeg in app resource folder?" : 
+				(OSUtil.isMac() ? "Install ffmpeg via \"brew install ffmpeg\"?" : "Install ffmpeg via \"sudo apt install ffmpeg\"?");
 			if (ResourceInstaller.ffmpegAvailable() && SwingDialogs.confirm("ffmpeg installation invalid!", installPrompt)) {
 				try {
 					ResourceInstaller.getFFmpeg();

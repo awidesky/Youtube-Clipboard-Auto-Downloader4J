@@ -36,13 +36,13 @@ import com.awidesky.YoutubeClipboardAutoDownloader.util.Logger;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.LoggerThread;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.SwingDialogs;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.TaskLogger;
-import com.awidesky.YoutubeClipboardAutoDownloader.util.exec.ResourceInstaller;
+import com.awidesky.YoutubeClipboardAutoDownloader.util.exec.OSUtil;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.workers.ClipBoardListeningThread;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.workers.TaskThreadPool;
 
 /** Main class */
 public class Main {
-	
+
 	private static LoggerThread loggerThread = new LoggerThread();
 	private static TaskLogger logger = loggerThread.getLogger("[Main] ");
 
@@ -153,7 +153,7 @@ public class Main {
 			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.PREPARING_THREADS));
 			loggerThread.start();
 			TaskThreadPool.setup();
-			clipChecker = new ClipBoardListeningThread(ResourceInstaller.isMac() ? 150 : -1); // A daemon thread that will keep checking clipboard
+			clipChecker = new ClipBoardListeningThread(OSUtil.isMac() ? 150 : -1); // A daemon thread that will keep checking clipboard
 			Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener(clipChecker::submit);
 			logger.newLine();
 			logger.log("Listening clipboard...\n");

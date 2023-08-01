@@ -38,6 +38,10 @@ import com.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
 import com.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.Logger;
 
+import static com.awidesky.YoutubeClipboardAutoDownloader.util.exec.OSUtil.isLinux;
+import static com.awidesky.YoutubeClipboardAutoDownloader.util.exec.OSUtil.isMac;
+import static com.awidesky.YoutubeClipboardAutoDownloader.util.exec.OSUtil.isWindows;
+
 public class ResourceInstaller {
 
 	public static final String YTDLP_URL = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp"; 
@@ -50,7 +54,6 @@ public class ResourceInstaller {
 	private static final int BUFFER_SIZE = 32 * 1024; // It seems URL connection only reads 16KB per one read operation. 32 will be sufficient.
 	
 	private static final Logger log = Main.getLogger("[util.ResourceInstaller] ");
-	private static final String OS = System.getProperty("os.name");
 	
 	public static boolean ffmpegAvailable() {
 		return isWindows() || isMac() || isLinux();
@@ -354,8 +357,4 @@ public class ResourceInstaller {
         return normalizePath;
     }
     
-    
-    public static boolean isWindows() { return OS.contains("Windows"); }
-    public static boolean isMac() { return OS.contains("Mac"); }
-    public static boolean isLinux() { return OS.contains("Linux"); }
 }
