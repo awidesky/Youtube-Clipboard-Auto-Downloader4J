@@ -154,7 +154,6 @@ public class Main {
 			loggerThread.start();
 			TaskThreadPool.setup();
 			clipChecker = new ClipBoardListeningThread(ResourceInstaller.isMac() ? 150 : -1); // A daemon thread that will keep checking clipboard
-			//TODO : ResourceInstaller to Util
 			Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener(clipChecker::submit);
 			logger.newLine();
 			logger.log("Listening clipboard...\n");

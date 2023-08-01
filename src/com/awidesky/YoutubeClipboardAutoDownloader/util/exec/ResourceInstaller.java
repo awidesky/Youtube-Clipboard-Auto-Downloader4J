@@ -92,7 +92,7 @@ public class ResourceInstaller {
 			deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "presets"));
 
 			hideProgress();
-		} else if(isMac()) { //TODO : if mac, don't do anything.. 
+		} else if(isMac()) {
 			setLoadingFrameContent("Downloading ffmpeg via \"brew install ffmpeg\"... (Progress bar will stay in 0)", -1);
 			//TODO : big TextArea that shows log outputs(for both windows and linux)
 			ProcessExecutor.runNow(log, null, "/bin/bash", "-c", "/opt/homebrew/bin/brew install ffmpeg");
