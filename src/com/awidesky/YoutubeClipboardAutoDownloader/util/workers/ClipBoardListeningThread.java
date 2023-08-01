@@ -33,15 +33,14 @@ public class ClipBoardListeningThread extends Thread implements ClipboardOwner {
 	private LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
 	private Set<ClipBoardListeningThread.InputHistory> history = new HashSet<>();
 	private Logger logger = Main.getLogger("[ClipBoardChecker] ");
-	private final int checkInterval;
-	private String lastIntervalCheckHash = null;
+	private final int resetInterval;
 	
 	/**
-	 * @param checkInterval check the clipboard every {@code checkInterval} milliseconds.
+	 * @param clipboardOwnershipResetInterval check the clipboard every {@code checkInterval} milliseconds.
 	 * */
-	public ClipBoardListeningThread(int checkInterval) {
+	public ClipBoardListeningThread(int clipboardOwnershipResetInterval) {
 		super("ClipBoardChecker");
-		this.checkInterval = checkInterval;
+		this.resetInterval = clipboardOwnershipResetInterval;
 		this.setDaemon(true);
 	}
 
@@ -50,13 +49,21 @@ public class ClipBoardListeningThread extends Thread implements ClipboardOwner {
 		while(true) {
 			try {
 				Runnable r = null;
-				if (checkInterval == -1) {
+				if (resetInterval == -1) {
 					r = queue.take();
 				} else {
-					r = queue.poll(checkInterval, TimeUnit.MILLISECONDS);
-					if(r == null) {
-						long l = System.currentTimeMillis();
-						r = () -> checkClipBoard(l, true);
+					r = queue.poll(resetInterval, TimeUnit.MILLISECONDS);
+					if(r == null) { // reset Clipboard ownership regularly
+						Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
+						try {
+							if (cb.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
+								cb.setContents(new StringSelection((String) cb.getData(DataFlavor.stringFlavor)), this);
+							}
+						} catch (UnsupportedFlavorException | IOException e) {
+							logger.log("Unable to reset ");
+							logger.log(e);
+						}
+						continue;
 					}
 				}
 				r.run();
@@ -69,19 +76,17 @@ public class ClipBoardListeningThread extends Thread implements ClipboardOwner {
 	
 	public void submit(FlavorEvent e) {
 		long l = System.currentTimeMillis();
-		queue.offer(() -> checkClipBoard(l, false));
+		queue.offer(() -> checkClipBoard(l));
 	}
 
-	private void checkClipBoard(long now, boolean intervalExecuted) {
+	private void checkClipBoard(long now) {
 		history.removeIf(h -> now - h.timeStamp > 100);
+		logger.logVerbose("[debug] Executing clipboard checking process fired by system clipboard listner...");
 		
 		if (Config.getClipboardListenOption() == ClipBoardOption.NOLISTEN) {
 			logger.logVerbose("[debug] Clipboard ignored due to ClipboardListenOption == \"" + ClipBoardOption.NOLISTEN.getString() + "\"");
 			return;
 		}
-		
-		if(intervalExecuted) logger.logVerbose("[debug] Executing clipboard checking process every " + checkInterval + " milliseconds...");
-		else logger.logVerbose("[debug] Executing clipboard checking process fired by system clipboard listner...");
 		
 		try {
 			//https://stackoverflow.com/questions/51797673/in-java-why-do-i-get-java-lang-illegalstateexception-cannot-open-system-clipboaS
@@ -107,20 +112,6 @@ public class ClipBoardListeningThread extends Thread implements ClipboardOwner {
 			cb.setContents(new StringSelection(data), this); // reset clipboard ownership so that we won't miss another
 															 // clipboard event
 
-			if(checkInterval != -1) {
-				if(lastIntervalCheckHash == null) {
-					lastIntervalCheckHash = InputHistory.hash(data);
-					return; //ignore if this is first Interval input
-				}
-				if(InputHistory.hash(data).equals(lastIntervalCheckHash)) {
-					logger.logVerbose("[debug] Duplicate input(in last interval execution), ignore : " + data);
-					return;
-				} else {
-					lastIntervalCheckHash = InputHistory.hash(data);
-					//history.add(new InputHistory(data, System.currentTimeMillis()));
-				} 
-			}
-			
 			logger.logVerbose("[debug] Clipboard : " + data);
 			if (!Config.isLinkAcceptable(data)) {
 				logger.logVerbose("[debug] " + data + " is not acceptable!");
