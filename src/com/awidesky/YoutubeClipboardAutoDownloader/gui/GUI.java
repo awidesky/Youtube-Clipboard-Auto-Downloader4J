@@ -2,6 +2,7 @@ package com.awidesky.YoutubeClipboardAutoDownloader.gui;
 
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Taskbar;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.MouseEvent;
@@ -83,6 +84,7 @@ public class GUI {
 		/** make <code>loadingFrame</code> */
 		loadingFrame = new JFrame();
 		loadingFrame.setTitle("loading...");
+		Taskbar.getTaskbar().setIconImage(ICON);
 		loadingFrame.setIconImage(ICON);
 		loadingFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		loadingFrame.setSize(450, 100); //add more height than fxml because it does not think about title length
@@ -115,6 +117,7 @@ public class GUI {
 		/** make <code>mainFrame</code> */
 		mainFrame = new JFrame();
 		mainFrame.setTitle("Youtube Audio Auto Downloader " + Main.version);
+		Taskbar.getTaskbar().setIconImage(ICON);
 		mainFrame.setIconImage(ICON);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.setSize(630, 495);
