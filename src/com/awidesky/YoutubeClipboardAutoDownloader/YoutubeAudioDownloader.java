@@ -35,6 +35,8 @@ public class YoutubeAudioDownloader {
 	private static final Pattern downloadFormatPtn = Pattern.compile("[\\s|\\S]+Downloading [\\d]+ format\\(s\\)\\:[\\s|\\S]+");
 	private static final Pattern downloadIndexPtn = Pattern.compile("\\[download\\] Downloading item [\\d]+ of [\\d]+");
 	
+	public static final String ytdlpQuote = ResourceInstaller.isWindows() ? "\"" : "";
+	
 	static {
 		if(ResourceInstaller.isWindows()) {
 			ytdlpPath = projectpath + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "ffmpeg" + File.separator + "bin" + File.separator;
@@ -195,7 +197,7 @@ public class YoutubeAudioDownloader {
 			Instant startTime = Instant.now();
 			
 			LinkedList<String> args = new LinkedList<>(Arrays.asList(new String[] { ytdlpPath + "yt-dlp", "--get-filename", "-o",
-					"\"" + Config.getFileNameFormat().replace("%(ext)s", Config.getFormat()) + "\"", url }));
+					ytdlpQuote + Config.getFileNameFormat().replace("%(ext)s", Config.getFormat()) + ytdlpQuote, url }));
 			if(playListOption.toCommandArgm() != null) args.add(2, playListOption.toCommandArgm());
 			
 			// retrieve command line argument
@@ -251,7 +253,7 @@ public class YoutubeAudioDownloader {
 		/* download video */
 		Instant startTime = Instant.now();
 		LinkedList<String> arguments = new LinkedList<>(Arrays.asList(
-				ytdlpPath + "yt-dlp", "--newline", "--force-overwrites", playListOption.toCommandArgm(), "--output", "\"" + Config.getFileNameFormat() + "\""));
+				ytdlpPath + "yt-dlp", "--newline", "--force-overwrites", playListOption.toCommandArgm(), "--ffmpeg-location", ytdlpPath, "--output", ytdlpQuote + Config.getFileNameFormat() + ytdlpQuote));
 		
 		if(task.isAudioMode()) {
 			arguments.add("--extract-audio");

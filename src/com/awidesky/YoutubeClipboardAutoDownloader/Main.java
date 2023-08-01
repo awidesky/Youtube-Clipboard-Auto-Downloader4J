@@ -36,7 +36,8 @@ import com.awidesky.YoutubeClipboardAutoDownloader.util.Logger;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.LoggerThread;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.SwingDialogs;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.TaskLogger;
-import com.awidesky.YoutubeClipboardAutoDownloader.util.workers.ClipBoardCheckerThread;
+import com.awidesky.YoutubeClipboardAutoDownloader.util.exec.ResourceInstaller;
+import com.awidesky.YoutubeClipboardAutoDownloader.util.workers.ClipBoardListeningThread;
 import com.awidesky.YoutubeClipboardAutoDownloader.util.workers.TaskThreadPool;
 
 /** Main class */
@@ -45,7 +46,7 @@ public class Main {
 	private static LoggerThread loggerThread = new LoggerThread();
 	private static TaskLogger logger = loggerThread.getLogger("[Main] ");
 
-	private static ClipBoardCheckerThread clipChecker;
+	private static ClipBoardListeningThread clipChecker;
 	
 	public static final Charset NATIVECHARSET = Charset.forName(System.getProperty("native.encoding"));
 	
@@ -152,8 +153,8 @@ public class Main {
 			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.PREPARING_THREADS));
 			loggerThread.start();
 			TaskThreadPool.setup();
-			clipChecker = new ClipBoardCheckerThread(); // A daemon thread that will keep checking clipboard
-			clipChecker.start();
+			clipChecker = new ClipBoardListeningThread(ResourceInstaller.isMac() ? 150 : -1); // A daemon thread that will keep checking clipboard
+			//TODO : ResourceInstaller to Util
 			Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener(clipChecker::submit);
 			logger.newLine();
 			logger.log("Listening clipboard...\n");
@@ -171,6 +172,7 @@ public class Main {
 
 			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.LOADING_WINDOW));
 			SwingUtilities.invokeAndWait(gui::initMainFrame);
+			clipChecker.start();
 
 		} catch (InterruptedException e1) {
 			logger.log("[init] EDT failed while loading application!");
@@ -212,7 +214,7 @@ public class Main {
 		
 		t.setFuture(TaskThreadPool.submit(() -> {
 
-			String url = "\"" + data + "\"";
+			String url = YoutubeAudioDownloader.ytdlpQuote + data + YoutubeAudioDownloader.ytdlpQuote;
 			
 			PlayListOption p = Config.getPlaylistOption();
 			
@@ -242,7 +244,7 @@ public class Main {
 	}
 	
 	private static void prepareLogFile(boolean verbose, boolean datePrefix, boolean logbyTask) {
-		
+		//TODO : add option --logOnConsole
 		try {
 			File logFolder = new File(YoutubeAudioDownloader.getProjectpath() + File.separator + "logs");
 			File logFile = new File(logFolder.getAbsolutePath() + File.separator + "log-" + new SimpleDateFormat("yyyy-MM-dd-kk-mm-ss").format(new Date()) + ".txt");

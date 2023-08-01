@@ -1,6 +1,7 @@
 package com.awidesky.YoutubeClipboardAutoDownloader.gui;
 
 import java.awt.EventQueue;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicReference;
@@ -51,6 +52,7 @@ public class TaskStatusModel extends AbstractTableModel {
 		default:
 			break;
 		}
+		log.log("invalid index - row : " + rowIndex + ", col :" + columnIndex);
 		SwingDialogs.error("Invalid column index!", "Invalid column index : " + columnIndex, null, false);
 		return null; // this should not happen!
 	}
@@ -121,10 +123,21 @@ public class TaskStatusModel extends AbstractTableModel {
 	public void updated(TaskData t) { fireTableRowsUpdated(rows.indexOf(t), rows.indexOf(t)); }
 
 	public void addTask(TaskData t) {
-		SwingUtilities.invokeLater(() -> {
+		Runnable r = () -> {
 			rows.add(t);
 			fireTableRowsInserted(rows.size() - 1, rows.size() - 1);
-		});
+		};
+		if(EventQueue.isDispatchThread()) {
+			SwingUtilities.invokeLater(r);
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(r);
+			} catch (InvocationTargetException | InterruptedException e) {
+				log.log("Exception when waitng EDT for add task to the Table!");
+				log.log(e);
+				SwingUtilities.invokeLater(r);
+			}
+		}
 	}
 
 	public String getProgressToolTip(int row) { return rows.get(row).getProgressToolTip(); }

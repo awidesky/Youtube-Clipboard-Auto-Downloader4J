@@ -87,7 +87,7 @@ public class LoggerThread extends Thread {
 			@Override
 			public void queueLogTask(Consumer<PrintWriter> logTask) {
 				try {
-					loggerQueue.put(logTask);
+					loggerQueue.put(logTask); //TODO : offer 먼저 하고 false면 put
 				} catch (InterruptedException e) {
 					loggerQueue.offer(logTask);
 					if (!isStop) log(e);
