@@ -6,7 +6,8 @@
 	<artifactId>YoutubeAudioAutoDownloader</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>YoutubeAudioAutoDownloader</name>
-	<description>Downloads audio/video from Youtube by automaticly get link from your clipboard.</description>
+	<description>Downloads audio/video from Youtube by automaticly get link from
+		your clipboard.</description>
 	<url>https://github.com/awidesky/YoutubeAudioAutoDownloader</url>
 	<licenses>
 		<license>
@@ -28,15 +29,37 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
-	
+
 	<build>
-		<sourceDirectory>src</sourceDirectory>
+		<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 				<configuration>
 					<release>17</release>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.akman</groupId>
+				<artifactId>jpackage-maven-plugin</artifactId>
+				<version>0.1.5</version>
+				<configuration>
+					<input>${jarApp.dir}</input>
+					<dest>${dir.buildfile}/build</dest>
+					<mainjar>YoutubeAudioAutoDownloader.jar</mainjar>
+					<mainclass>com.awidesky.YoutubeClipboardAutoDownloader.Main</mainclass>
+					<name>YoutubeAudioAutoDownloader</name>
+					<vendor>Eugene Hong</vendor>
+					<icon>
+						${dir.buildfile}/YoutubeAudioAutoDownloader-resources/icon.ico</icon>
+					<appversion>${project.version}</appversion>
+					<licensefile>${dir.buildfile}/LICENSE</licensefile>
+					<copyright>Copyright (c) 2020-2023 Eugene Hong. All Rights
+						Reserved.</copyright>
+					<windirchooser />
+					<winmenu />
+					<winshortcut />
 				</configuration>
 			</plugin>
 		</plugins>
