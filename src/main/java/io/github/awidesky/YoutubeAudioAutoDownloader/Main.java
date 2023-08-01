@@ -32,13 +32,13 @@ import io.github.awidesky.YoutubeAudioAutoDownloader.enums.LoadingStatus;
 import io.github.awidesky.YoutubeAudioAutoDownloader.enums.PlayListOption;
 import io.github.awidesky.YoutubeAudioAutoDownloader.gui.GUI;
 import io.github.awidesky.YoutubeAudioAutoDownloader.gui.TaskStatusModel;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.Logger;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.LoggerThread;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.SwingDialogs;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.TaskLogger;
 import io.github.awidesky.YoutubeAudioAutoDownloader.util.exec.OSUtil;
 import io.github.awidesky.YoutubeAudioAutoDownloader.util.workers.ClipBoardListeningThread;
 import io.github.awidesky.YoutubeAudioAutoDownloader.util.workers.TaskThreadPool;
+import io.github.awidesky.guiUtil.Logger;
+import io.github.awidesky.guiUtil.LoggerThread;
+import io.github.awidesky.guiUtil.SwingDialogs;
+import io.github.awidesky.guiUtil.TaskLogger;
 
 /** Main class */
 public class Main {

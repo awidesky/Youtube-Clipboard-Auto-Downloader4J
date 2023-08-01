@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.SwingUtilities;
 
 import io.github.awidesky.YoutubeAudioAutoDownloader.gui.TaskStatusModel;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.TaskLogger;
+import io.github.awidesky.guiUtil.TaskLogger;
 
 public class TaskData {
 	

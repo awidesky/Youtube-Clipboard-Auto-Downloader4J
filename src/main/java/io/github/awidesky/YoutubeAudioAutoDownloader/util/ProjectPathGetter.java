@@ -13,6 +13,8 @@ import java.util.regex.Pattern;
 import io.github.awidesky.YoutubeAudioAutoDownloader.Main;
 import io.github.awidesky.YoutubeAudioAutoDownloader.YoutubeAudioDownloader;
 import io.github.awidesky.YoutubeAudioAutoDownloader.enums.ExitCodes;
+import io.github.awidesky.guiUtil.SwingDialogs;
+import io.github.awidesky.guiUtil.TaskLogger;
 
 /**
  * https://stackoverflow.com/a/12733172

@@ -6,7 +6,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import io.github.awidesky.YoutubeAudioAutoDownloader.Main;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.Logger;
+import io.github.awidesky.guiUtil.Logger;
 
 public class TaskThreadPool {
 

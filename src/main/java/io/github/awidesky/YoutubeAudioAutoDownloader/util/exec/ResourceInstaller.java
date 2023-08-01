@@ -40,7 +40,7 @@ import javax.swing.SwingUtilities;
 import io.github.awidesky.YoutubeAudioAutoDownloader.Main;
 import io.github.awidesky.YoutubeAudioAutoDownloader.YoutubeAudioDownloader;
 import io.github.awidesky.YoutubeAudioAutoDownloader.gui.GUI;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.Logger;
+import io.github.awidesky.guiUtil.Logger;
 
 public class ResourceInstaller {
 

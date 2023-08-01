@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 
 import io.github.awidesky.YoutubeAudioAutoDownloader.Main;
 import io.github.awidesky.YoutubeAudioAutoDownloader.YoutubeAudioDownloader;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.Logger;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.SwingDialogs;
+import io.github.awidesky.guiUtil.Logger;
+import io.github.awidesky.guiUtil.SwingDialogs;
 
 public class YTDLPFallbacks {
 

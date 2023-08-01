@@ -18,13 +18,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import io.github.awidesky.YoutubeAudioAutoDownloader.enums.PlayListOption;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.Logger;
 import io.github.awidesky.YoutubeAudioAutoDownloader.util.ProjectPathGetter;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.SwingDialogs;
 import io.github.awidesky.YoutubeAudioAutoDownloader.util.exec.OSUtil;
 import io.github.awidesky.YoutubeAudioAutoDownloader.util.exec.ProcessExecutor;
 import io.github.awidesky.YoutubeAudioAutoDownloader.util.exec.ResourceInstaller;
 import io.github.awidesky.YoutubeAudioAutoDownloader.util.exec.YTDLPFallbacks;
+import io.github.awidesky.guiUtil.Logger;
+import io.github.awidesky.guiUtil.SwingDialogs;
 
 public class YoutubeAudioDownloader {
 

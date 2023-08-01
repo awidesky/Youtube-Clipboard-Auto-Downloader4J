@@ -12,9 +12,9 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import io.github.awidesky.YoutubeAudioAutoDownloader.Main;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.Logger;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.SwingDialogs;
 import io.github.awidesky.YoutubeAudioAutoDownloader.util.workers.TaskThreadPool;
+import io.github.awidesky.guiUtil.Logger;
+import io.github.awidesky.guiUtil.SwingDialogs;
 
 /**
  * Executes third party program & commands

@@ -38,8 +38,8 @@ import io.github.awidesky.YoutubeAudioAutoDownloader.enums.ExitCodes;
 import io.github.awidesky.YoutubeAudioAutoDownloader.enums.LoadingStatus;
 import io.github.awidesky.YoutubeAudioAutoDownloader.enums.PlayListOption;
 import io.github.awidesky.YoutubeAudioAutoDownloader.enums.TableColumnEnum;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.Logger;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.SwingDialogs;
+import io.github.awidesky.guiUtil.Logger;
+import io.github.awidesky.guiUtil.SwingDialogs;
 
 public class GUI {
 	

@@ -13,8 +13,8 @@ import javax.swing.table.AbstractTableModel;
 import io.github.awidesky.YoutubeAudioAutoDownloader.Main;
 import io.github.awidesky.YoutubeAudioAutoDownloader.TaskData;
 import io.github.awidesky.YoutubeAudioAutoDownloader.enums.TableColumnEnum;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.Logger;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.SwingDialogs;
+import io.github.awidesky.guiUtil.Logger;
+import io.github.awidesky.guiUtil.SwingDialogs;
 
 public class TaskStatusModel extends AbstractTableModel {
 
