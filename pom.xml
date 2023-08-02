@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.github.awidesky</groupId>
 	<artifactId>YoutubeAudioAutoDownloader</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>2.0.0</version>
 	<name>YoutubeAudioAutoDownloader</name>
 	<description>Downloads audio/video from Youtube by automaticly get link from
 		your clipboard.</description>
@@ -30,55 +30,78 @@
 		</dependency>
 	</dependencies>
 
+	<profiles>
+		<profile>
+			<id>platform-windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.panteleyev</groupId>
+						<artifactId>jpackage-maven-plugin</artifactId>
+						<version>1.4.0</version>
+						<configuration>
+							<winMenu>true</winMenu>
+							<winShortcut>true</winShortcut>
+							<winDirChooser>true</winDirChooser>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	
+	
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
 			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.11.0</version>
-				<configuration>
-					<release>17</release>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>com.github.akman</groupId>
+				<groupId>org.panteleyev</groupId>
 				<artifactId>jpackage-maven-plugin</artifactId>
-				<version>0.1.5</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>jpackage</goal>
-						</goals>
-						<phase>verify</phase>
-					</execution>
-				</executions>
+				<version>1.4.0</version>
+
 				<configuration>
 					<input>${project.build.directory}</input>
-					<dest>${project.build.directory}/jpackage</dest>
-					<mainjar>YoutubeAudioAutoDownloader-${project.versions}.jar</mainjar>
-					<mainclass>com.awidesky.YoutubeClipboardAutoDownloader.Main</mainclass>
+					<destination>${project.build.directory}/jpackage</destination>
+					<mainJar>YoutubeAudioAutoDownloader-${project.version}.jar</mainJar>
+					<mainClass>com.awidesky.YoutubeClipboardAutoDownloader.Main</mainClass>
 					<name>YoutubeAudioAutoDownloader</name>
 					<vendor>Eugene Hong</vendor>
 					<icon>${project.basedir}/YoutubeAudioAutoDownloader-resources/icon.ico</icon>
-					<appversion>${project.version}</appversion>
-					<licensefile>${project.basedir}/LICENSE</licensefile>
+					<appVersion>${project.version}</appVersion>
+					<licenseFile>${project.basedir}/LICENSE</licenseFile>
 					<copyright>Copyright (c) 2020-2023 Eugene Hong. All Rights Reserved.</copyright>
-					<windirchooser />
-					<winmenu />
-					<winshortcut />
-					<!-- right jpackage.opt should be like :
-					# jpackage
-					-dest 'C:/Users/Eugene Hong/Documents/develop/git repos/Youtube-Audio-Auto-Downloader4J/target/jpackage'
-					-app-version '0.0.1'
-					-copyright 'Copyright (c) 2020-2023 Eugene Hong. All Rights Reserved.'
-					-name 'YoutubeAudioAutoDownloader'
-					-vendor 'Eugene Hong'
-					-icon 'C:/Users/Eugene Hong/Documents/develop/git repos/Youtube-Audio-Auto-Downloader4J/YoutubeAudioAutoDownloader-resources/icon.ico'
-					-input 'C:/Users/Eugene Hong/Documents/develop/git repos/Youtube-Audio-Auto-Downloader4J/target'
-					-main-jar 'YoutubeAudioAutoDownloader-0.0.1-SNAPSHOT.jar'
-					-main-class com.awidesky.YoutubeClipboardAutoDownloader.Main
-					-license-file 'C:/Users/Eugene Hong/Documents/develop/git repos/Youtube-Audio-Auto-Downloader4J/LICENSE'
-					-->
+				</configuration>
+
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>jpackage</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>win</id>
+						<configuration>
+							<winMenu>true</winMenu>
+							<winShortcut>true</winShortcut>
+							<winDirChooser>true</winDirChooser>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<source>17</source>
+					<target>17</target>
+					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
 		</plugins>
