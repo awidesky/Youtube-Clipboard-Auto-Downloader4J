@@ -60,7 +60,7 @@
 			<id>jlink-if-not-exist</id>
 			<activation>
 				<file>
-					<missing>${basedir}/jre/bin/java.exe</missing>
+					<missing>${basedir}/jre/release</missing>
 				</file>
 			</activation>
 			<build>
@@ -164,14 +164,14 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.3.0</version>
+				<version>3.3.1</version>
 				<executions>
 					<execution>
-						<id>copy-resource-for-jar</id>
-						<phase>package</phase>
+						<id>copy-resources-for-jar</id>
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>copy-resources</goal>
 						</goals>
@@ -184,22 +184,66 @@
 							</resources>
 						</configuration>
 					</execution>
+					<execution>
+						<id>copy-resources-for-launch4j</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>
+								${build.dir}/launch4j/YoutubeAudioAutoDownloader-resources</outputDirectory>
+							<resources>
+								<resource>
+									<directory>
+										${project.basedir}/YoutubeAudioAutoDownloader-resources</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-jre</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${build.dir}/launch4j/jre</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/jre</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>
 				<groupId>com.coderplus.maven.plugins</groupId>
 				<artifactId>copy-rename-maven-plugin</artifactId>
-				<version>1.0.1</version>
+				<version>1.0</version>
 				<executions>
 					<execution>
 						<id>copy-config-txt</id>
-						<phase>generate-sources</phase>
+						<phase>package</phase>
 						<goals>
 							<goal>copy</goal>
 						</goals>
 						<configuration>
-							<sourceFile>${project.basedir}/config.txt</sourceFile>
-							<destinationFile>${build.dir}/YoutubeAudioAutoDownloader_${project.version}/config.txt</destinationFile>
+							<fileSets>
+								<!-- For jar -->
+								<fileSet>
+									<sourceFile>${project.basedir}/config.txt</sourceFile>
+								<destinationFile>
+										${build.dir}/YoutubeAudioAutoDownloader_${project.version}/config.txt</destinationFile>
+								</fileSet>
+								<!-- For launch4j -->
+								<fileSet>
+									<sourceFile>${project.basedir}/config.txt</sourceFile>
+									<destinationFile>
+										${build.dir}/launch4j/config.txt</destinationFile>
+								</fileSet>
+							</fileSets>
 						</configuration>
 					</execution>
 				</executions>
