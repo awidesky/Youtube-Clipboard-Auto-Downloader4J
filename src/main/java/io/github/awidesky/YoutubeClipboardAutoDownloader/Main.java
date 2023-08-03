@@ -1,4 +1,4 @@
-package io.github.awidesky.YoutubeAudioAutoDownloader;
+package io.github.awidesky.YoutubeClipboardAutoDownloader;
 
 import java.awt.Desktop;
 import java.awt.Toolkit;
@@ -27,14 +27,14 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import io.github.awidesky.YoutubeAudioAutoDownloader.enums.ExitCodes;
-import io.github.awidesky.YoutubeAudioAutoDownloader.enums.LoadingStatus;
-import io.github.awidesky.YoutubeAudioAutoDownloader.enums.PlayListOption;
-import io.github.awidesky.YoutubeAudioAutoDownloader.gui.GUI;
-import io.github.awidesky.YoutubeAudioAutoDownloader.gui.TaskStatusModel;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.exec.OSUtil;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.workers.ClipBoardListeningThread;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.workers.TaskThreadPool;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.ExitCodes;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.LoadingStatus;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.OSUtil;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.ClipBoardListeningThread;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.TaskThreadPool;
 import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.LoggerThread;
 import io.github.awidesky.guiUtil.SwingDialogs;

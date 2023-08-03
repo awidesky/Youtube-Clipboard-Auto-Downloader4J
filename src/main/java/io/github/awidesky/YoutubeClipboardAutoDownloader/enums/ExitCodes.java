@@ -1,4 +1,4 @@
-package io.github.awidesky.YoutubeAudioAutoDownloader.enums;
+package io.github.awidesky.YoutubeClipboardAutoDownloader.enums;
 
 public enum ExitCodes {
 

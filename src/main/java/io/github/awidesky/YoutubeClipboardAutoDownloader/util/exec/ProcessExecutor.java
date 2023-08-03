@@ -1,4 +1,4 @@
-package io.github.awidesky.YoutubeAudioAutoDownloader.util.exec;
+package io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,8 +11,8 @@ import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import io.github.awidesky.YoutubeAudioAutoDownloader.Main;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.workers.TaskThreadPool;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.Main;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.TaskThreadPool;
 import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.SwingDialogs;
 

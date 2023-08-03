@@ -1,11 +1,11 @@
-package io.github.awidesky.YoutubeAudioAutoDownloader.util.workers;
+package io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import io.github.awidesky.YoutubeAudioAutoDownloader.Main;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.Main;
 import io.github.awidesky.guiUtil.Logger;
 
 public class TaskThreadPool {

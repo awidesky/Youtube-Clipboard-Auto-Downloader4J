@@ -1,4 +1,4 @@
-package io.github.awidesky.YoutubeAudioAutoDownloader.gui;
+package io.github.awidesky.YoutubeClipboardAutoDownloader.gui;
 
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
@@ -10,9 +10,9 @@ import java.util.function.Consumer;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
-import io.github.awidesky.YoutubeAudioAutoDownloader.Main;
-import io.github.awidesky.YoutubeAudioAutoDownloader.TaskData;
-import io.github.awidesky.YoutubeAudioAutoDownloader.enums.TableColumnEnum;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.Main;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.TaskData;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.TableColumnEnum;
 import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.SwingDialogs;
 

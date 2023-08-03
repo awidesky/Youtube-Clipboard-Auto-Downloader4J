@@ -1,4 +1,4 @@
-package io.github.awidesky.YoutubeAudioAutoDownloader.gui;
+package io.github.awidesky.YoutubeClipboardAutoDownloader.gui;
 
 import java.awt.Dimension;
 import java.awt.Image;
@@ -30,14 +30,14 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 
-import io.github.awidesky.YoutubeAudioAutoDownloader.Config;
-import io.github.awidesky.YoutubeAudioAutoDownloader.Main;
-import io.github.awidesky.YoutubeAudioAutoDownloader.YoutubeAudioDownloader;
-import io.github.awidesky.YoutubeAudioAutoDownloader.enums.ClipBoardOption;
-import io.github.awidesky.YoutubeAudioAutoDownloader.enums.ExitCodes;
-import io.github.awidesky.YoutubeAudioAutoDownloader.enums.LoadingStatus;
-import io.github.awidesky.YoutubeAudioAutoDownloader.enums.PlayListOption;
-import io.github.awidesky.YoutubeAudioAutoDownloader.enums.TableColumnEnum;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.Config;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.Main;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.ClipBoardOption;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.ExitCodes;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.LoadingStatus;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.TableColumnEnum;
 import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.SwingDialogs;
 

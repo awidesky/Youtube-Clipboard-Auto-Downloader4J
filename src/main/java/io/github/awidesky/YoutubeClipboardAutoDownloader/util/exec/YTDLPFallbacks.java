@@ -1,11 +1,11 @@
-package io.github.awidesky.YoutubeAudioAutoDownloader.util.exec;
+package io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.github.awidesky.YoutubeAudioAutoDownloader.Main;
-import io.github.awidesky.YoutubeAudioAutoDownloader.YoutubeAudioDownloader;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.Main;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
 import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.SwingDialogs;
 

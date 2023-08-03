@@ -1,4 +1,4 @@
-package io.github.awidesky.YoutubeAudioAutoDownloader;
+package io.github.awidesky.YoutubeClipboardAutoDownloader;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,12 +17,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import io.github.awidesky.YoutubeAudioAutoDownloader.enums.PlayListOption;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.ProjectPathGetter;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.exec.OSUtil;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.exec.ProcessExecutor;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.exec.ResourceInstaller;
-import io.github.awidesky.YoutubeAudioAutoDownloader.util.exec.YTDLPFallbacks;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.ProjectPathGetter;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.OSUtil;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.ProcessExecutor;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.ResourceInstaller;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.YTDLPFallbacks;
 import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.SwingDialogs;
 

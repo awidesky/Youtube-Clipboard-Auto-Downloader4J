@@ -1,4 +1,4 @@
-package io.github.awidesky.YoutubeAudioAutoDownloader.util;
+package io.github.awidesky.YoutubeClipboardAutoDownloader.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
-import io.github.awidesky.YoutubeAudioAutoDownloader.Main;
-import io.github.awidesky.YoutubeAudioAutoDownloader.YoutubeAudioDownloader;
-import io.github.awidesky.YoutubeAudioAutoDownloader.enums.ExitCodes;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.Main;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.ExitCodes;
 import io.github.awidesky.guiUtil.SwingDialogs;
 import io.github.awidesky.guiUtil.TaskLogger;
 

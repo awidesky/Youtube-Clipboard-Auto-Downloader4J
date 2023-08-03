@@ -1,4 +1,4 @@
-package io.github.awidesky.YoutubeAudioAutoDownloader.enums;
+package io.github.awidesky.YoutubeClipboardAutoDownloader.enums;
 
 import java.util.HashMap;
 import java.util.Map;

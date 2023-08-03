@@ -1,4 +1,4 @@
-package io.github.awidesky.YoutubeAudioAutoDownloader.util.workers;
+package io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers;
 
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
@@ -22,9 +22,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import io.github.awidesky.YoutubeAudioAutoDownloader.Config;
-import io.github.awidesky.YoutubeAudioAutoDownloader.Main;
-import io.github.awidesky.YoutubeAudioAutoDownloader.enums.ClipBoardOption;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.Config;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.Main;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.ClipBoardOption;
 import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.SwingDialogs;
 

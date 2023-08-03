@@ -1,12 +1,12 @@
-package io.github.awidesky.YoutubeAudioAutoDownloader;
+package io.github.awidesky.YoutubeClipboardAutoDownloader;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import io.github.awidesky.YoutubeAudioAutoDownloader.enums.ClipBoardOption;
-import io.github.awidesky.YoutubeAudioAutoDownloader.enums.PlayListOption;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.ClipBoardOption;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
 
 public class Config { 
 	

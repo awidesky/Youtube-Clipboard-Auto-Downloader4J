@@ -1,9 +1,9 @@
-package io.github.awidesky.YoutubeAudioAutoDownloader.enums;
+package io.github.awidesky.YoutubeClipboardAutoDownloader.enums;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-import io.github.awidesky.YoutubeAudioAutoDownloader.Config;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.Config;
 import io.github.awidesky.guiUtil.SwingDialogs;
 
 public enum ClipBoardOption {

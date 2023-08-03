@@ -1,4 +1,4 @@
-package io.github.awidesky.YoutubeAudioAutoDownloader;
+package io.github.awidesky.YoutubeClipboardAutoDownloader;
 
 import java.util.Objects;
 import java.util.concurrent.Future;
@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.SwingUtilities;
 
-import io.github.awidesky.YoutubeAudioAutoDownloader.gui.TaskStatusModel;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
 import io.github.awidesky.guiUtil.TaskLogger;
 
 public class TaskData {

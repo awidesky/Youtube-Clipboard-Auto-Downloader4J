@@ -6,8 +6,7 @@
 	<artifactId>YoutubeAudioAutoDownloader</artifactId>
 	<version>2.0.0</version>
 	<name>YoutubeAudioAutoDownloader</name>
-	<description>Downloads audio/video from Youtube by automaticly get link from
-		your clipboard.</description>
+	<description>Downloads audio/video from Youtube by automaticly get link from your clipboard.</description>
 	<url>https://github.com/awidesky/YoutubeAudioAutoDownloader</url>
 	<licenses>
 		<license>
@@ -22,6 +21,10 @@
 		</developer>
 	</developers>
 
+	<properties>
+		<build.dir>${project.build.directory}/builds</build.dir>
+	</properties>
+  
 	<dependencies>
 		<dependency>
 			<groupId>io.github.awidesky</groupId>
@@ -53,47 +56,51 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<id>jlink-if-not-exist</id>
+			<activation>
+				<file>
+					<missing>${basedir}/jre/bin/java.exe</missing>
+				</file>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>3.1.0</version>
+						<executions>
+							<execution>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>jlink</executable>
+									<workingDirectory>${project.basedir}</workingDirectory>
+									<arguments>
+										<argument>--output</argument>
+										<argument>jre</argument>
+										<argument>--compress=2</argument>
+										<argument>--strip-debug</argument>
+										<argument>--no-header-files</argument>
+										<argument>--no-man-pages</argument>
+										<argument>--add-modules</argument>
+										<argument>java.base,java.desktop,jdk.crypto.ec</argument>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 	
 	
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
-			<plugin>
-				<groupId>org.panteleyev</groupId>
-				<artifactId>jpackage-maven-plugin</artifactId>
-				<version>1.4.0</version>
-
-				<configuration>
-					<input>${project.build.directory}</input>
-					<destination>${project.build.directory}/jpackage</destination>
-					<mainJar>YoutubeAudioAutoDownloader-${project.version}.jar</mainJar>
-					<mainClass>com.awidesky.YoutubeClipboardAutoDownloader.Main</mainClass>
-					<name>YoutubeAudioAutoDownloader</name>
-					<vendor>Eugene Hong</vendor>
-					<icon>${project.basedir}/YoutubeAudioAutoDownloader-resources/icon.ico</icon>
-					<appVersion>${project.version}</appVersion>
-					<licenseFile>${project.basedir}/LICENSE</licenseFile>
-					<copyright>Copyright (c) 2020-2023 Eugene Hong. All Rights Reserved.</copyright>
-				</configuration>
-
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>jpackage</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>win</id>
-						<configuration>
-							<winMenu>true</winMenu>
-							<winShortcut>true</winShortcut>
-							<winDirChooser>true</winDirChooser>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -103,6 +110,142 @@
 					<target>17</target>
 					<encoding>UTF-8</encoding>
 				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>3.6.0</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<outputDirectory>${build.dir}/YoutubeAudioAutoDownloader_${project.version}</outputDirectory>
+					<archive>
+						<manifest>
+							<mainClass>io.github.awidesky.YoutubeClipboardAutoDownloader.Main</mainClass>
+						</manifest>
+					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<appendAssemblyId>false</appendAssemblyId>
+					<finalName>YoutubeAudioAutoDownloader-${project.version}</finalName>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.panteleyev</groupId>
+				<artifactId>jpackage-maven-plugin</artifactId>
+				<version>1.4.0</version>
+
+				<configuration>
+					<input>${build.dir}/YoutubeAudioAutoDownloader_${project.version}</input>
+					<destination>${build.dir}/jpackage</destination>
+					<mainJar>YoutubeAudioAutoDownloader-${project.version}.jar</mainJar>
+					<mainClass>io.github.awidesky.YoutubeClipboardAutoDownloader.Main</mainClass>
+					<name>YoutubeAudioAutoDownloader_setup</name>
+					<vendor>Eugene Hong</vendor>
+					<icon>${project.basedir}/YoutubeAudioAutoDownloader-resources/icon.ico</icon>
+					<appVersion>${project.version}</appVersion>
+					<licenseFile>${project.basedir}/LICENSE</licenseFile>
+					<copyright>Copyright (c) 2020-2023 Eugene Hong. All Rights Reserved.</copyright>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>jpackage-with-no-resource</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jpackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.3.0</version>
+				<executions>
+					<execution>
+						<id>copy-resource-for-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${build.dir}/YoutubeAudioAutoDownloader_${project.version}/YoutubeAudioAutoDownloader-resources</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/YoutubeAudioAutoDownloader-resources</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.coderplus.maven.plugins</groupId>
+				<artifactId>copy-rename-maven-plugin</artifactId>
+				<version>1.0.1</version>
+				<executions>
+					<execution>
+						<id>copy-config-txt</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<sourceFile>${project.basedir}/config.txt</sourceFile>
+							<destinationFile>${build.dir}/YoutubeAudioAutoDownloader_${project.version}/config.txt</destinationFile>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>com.akathist.maven.plugins.launch4j</groupId>
+				<artifactId>launch4j-maven-plugin</artifactId>
+				<version>2.4.1</version>
+				<executions>
+					<execution>
+						<id>launch4j-clui</id>
+						<phase>package</phase>
+						<goals>
+							<goal>launch4j</goal>
+						</goals>
+						<configuration>
+							<jar>${build.dir}/YoutubeAudioAutoDownloader_${project.version}/YoutubeAudioAutoDownloader-${project.version}.jar</jar>
+							<outfile>${build.dir}/launch4j/YoutubeAudioAutoDownloader-${project.version}.exe</outfile>
+							<dontWrapJar>false</dontWrapJar>
+							<headerType>gui</headerType>
+							<errTitle></errTitle>
+							<cmdLine></cmdLine>
+							<chdir></chdir>
+							<priority>normal</priority>
+							<downloadUrl>https://adoptium.net/</downloadUrl>
+							<supportUrl></supportUrl>
+							<stayAlive>false</stayAlive>
+							<restartOnCrash>false</restartOnCrash>
+							<manifest></manifest>
+							<icon>YoutubeAudioAutoDownloader-resources\icon.ico</icon>
+							<classPath>
+								<mainClass>io.github.awidesky.YoutubeClipboardAutoDownloader.Main</mainClass>
+							</classPath>
+							<jre>
+								<path>jre</path>
+								<bundledJre64Bit>true</bundledJre64Bit>
+								<bundledJreAsFallback>false</bundledJreAsFallback>
+								<minVersion>1.17.0</minVersion>
+								<maxVersion></maxVersion>
+								<jdkPreference>jreOnly</jdkPreference>
+								<runtimeBits>64/32</runtimeBits>
+							</jre>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

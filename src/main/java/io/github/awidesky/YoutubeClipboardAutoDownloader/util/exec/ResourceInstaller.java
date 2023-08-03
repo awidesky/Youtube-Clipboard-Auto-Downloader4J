@@ -1,8 +1,8 @@
-package io.github.awidesky.YoutubeAudioAutoDownloader.util.exec;
+package io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec;
 
-import static io.github.awidesky.YoutubeAudioAutoDownloader.util.exec.OSUtil.isLinux;
-import static io.github.awidesky.YoutubeAudioAutoDownloader.util.exec.OSUtil.isMac;
-import static io.github.awidesky.YoutubeAudioAutoDownloader.util.exec.OSUtil.isWindows;
+import static io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.OSUtil.isLinux;
+import static io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.OSUtil.isMac;
+import static io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.OSUtil.isWindows;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -37,9 +37,9 @@ import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
-import io.github.awidesky.YoutubeAudioAutoDownloader.Main;
-import io.github.awidesky.YoutubeAudioAutoDownloader.YoutubeAudioDownloader;
-import io.github.awidesky.YoutubeAudioAutoDownloader.gui.GUI;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.Main;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import io.github.awidesky.guiUtil.Logger;
 
 public class ResourceInstaller {

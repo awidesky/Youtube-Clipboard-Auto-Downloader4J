@@ -1,4 +1,4 @@
-package io.github.awidesky.YoutubeAudioAutoDownloader.gui;
+package io.github.awidesky.YoutubeClipboardAutoDownloader.gui;
 
 import java.awt.Component;
 
