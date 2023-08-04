@@ -4,6 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.github.awidesky</groupId>
 	<artifactId>YoutubeAudioAutoDownloader</artifactId>
+	<inceptionYear>2020</inceptionYear>
+	<organization>
+		<name>awidesky</name>
+		<url>https://github.com/awidesky</url>
+	</organization>
 	<version>2.0.0</version>
 	<name>YoutubeAudioAutoDownloader</name>
 	<description>Downloads audio/video from Youtube by automaticly get link from your clipboard.</description>
@@ -23,6 +28,7 @@
 
 	<properties>
 		<build.dir>${project.build.directory}/builds</build.dir>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
   
 	<dependencies>
@@ -280,12 +286,11 @@
 							</classPath>
 							<jre>
 								<path>jre</path>
-								<bundledJre64Bit>true</bundledJre64Bit>
-								<bundledJreAsFallback>false</bundledJreAsFallback>
+								<requires64Bit>true</requires64Bit>
 								<minVersion>1.17.0</minVersion>
 								<maxVersion></maxVersion>
-								<jdkPreference>jreOnly</jdkPreference>
-								<runtimeBits>64/32</runtimeBits>
+								<requiresJdk>false</requiresJdk>
+								<requires64Bit>false</requires64Bit>
 							</jre>
 						</configuration>
 					</execution>
