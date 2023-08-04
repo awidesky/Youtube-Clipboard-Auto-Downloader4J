@@ -62,7 +62,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		boolean verbose = false, datePrefix = false, logbyTask = false;
+		boolean verbose = false, datePrefix = false, logbyTask = false, logOnConsole = false;
 		for (String arg : args) {
 			if ("--help".equals(arg)) {
 				System.out.println("YoutubeClipboardAutoDownloader " + version);
@@ -76,6 +76,7 @@ public class Main {
 				System.out.println("\t--logbyTask : Logs from a task is gathered till the task is done/terminated.");
 				System.out.println("\t              Useful when you don't want to see dirty log file when multiple tasks running.");
 				System.out.println("\t--logTime : Log with TimeStamps");
+				System.out.println("\t--logOnConsole : Write log in command line console, not in a log file.");
 				System.out.println("\t--verbose : Print verbose logs(like GUI Windows or extra debug info, etc.)");
 				System.out.println("\t--ytdlpArgs=<options...> : Add additional yt-dlp options(listed at https://github.com/yt-dlp/yt-dlp#usage-and-options)");
 				System.out.println("\t                           that will be appended at the end(but before the url) of yt-dlp execution.");
@@ -100,6 +101,8 @@ public class Main {
 				datePrefix = true;
 			} else if ("--logbyTask".equals(arg)) {
 				logbyTask = true;
+			} else if ("--logOnConsole".equals(arg)) {
+				logOnConsole = true;
 			} else if (arg.startsWith("--ytdlpArgs")) {
 				ytdlpAdditionalOptions = arg.split("=")[1].split(" ");
 			} else {
@@ -119,7 +122,7 @@ public class Main {
 			}
 		});
 		
-		prepareLogFile(verbose, datePrefix, logbyTask);
+		prepareLogFile(verbose, datePrefix, logbyTask, logOnConsole);
 		setup();
 		
 		if(args.length == 0) return;
@@ -242,14 +245,17 @@ public class Main {
 		}));
 	}
 	
-	private static void prepareLogFile(boolean verbose, boolean datePrefix, boolean logbyTask) {
-		//TODO : add option --logOnConsole
+	private static void prepareLogFile(boolean verbose, boolean datePrefix, boolean logbyTask, boolean logOnConsole) {
 		try {
-			File logFolder = new File(YoutubeClipboardAutoDownloader.getProjectpath() + File.separator + "logs");
-			File logFile = new File(logFolder.getAbsolutePath() + File.separator + "log-" + new SimpleDateFormat("yyyy-MM-dd-kk-mm-ss").format(new Date()) + ".txt");
-			logFolder.mkdirs();
-			logFile.createNewFile();
-			loggerThread.setLogDestination(new FileOutputStream(logFile), true);
+			if(logOnConsole) {
+				loggerThread.setLogDestination(System.out, true);
+			} else {
+				File logFolder = new File(YoutubeClipboardAutoDownloader.getProjectpath() + File.separator + "logs");
+				File logFile = new File(logFolder.getAbsolutePath() + File.separator + "log-" + new SimpleDateFormat("yyyy-MM-dd-kk-mm-ss").format(new Date()) + ".txt");
+				logFolder.mkdirs();
+				logFile.createNewFile();
+				loggerThread.setLogDestination(new FileOutputStream(logFile), true);
+			}
 		} catch (IOException e) {
 			loggerThread.setLogDestination(System.out, true);
 			SwingDialogs.error("Error when creating log flie, log in console instead...", "%e%", e, false);
