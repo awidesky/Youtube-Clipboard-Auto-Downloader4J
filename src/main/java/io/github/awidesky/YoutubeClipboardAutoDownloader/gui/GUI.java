@@ -9,12 +9,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
+import javax.imageio.ImageIO;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -50,7 +51,7 @@ public class GUI {
 	private JLabel loadingStatus;
 	private JProgressBar initProgress;
 	
-	public static final Image ICON = new ImageIcon(YoutubeClipboardAutoDownloader.getResourcePath().replace(File.separator, "/") + "/icon.png").getImage();
+	public static final Image ICON = getICON();
 
 	private JFrame mainFrame;
 	private JButton browse, cleanCompleted, removeSwitch, nameFormatHelp, openConfig, modeSwitch, openSaveDir;
@@ -417,6 +418,17 @@ public class GUI {
 			return Config.getSaveto();
 		}
 		return result.get();
-	} 
+	}
+	
+	
+	private static Image getICON() {
+		final File f = new File(YoutubeClipboardAutoDownloader.getResourcePath().replace(File.separator, "/") + "/icon.png");
+		try {
+			return ImageIO.read(f);
+		} catch (IOException e) {
+			SwingDialogs.warning("Unable to find the icon image file!", "%e%\n" + f.getAbsolutePath() + "\nDoes not exist! Default Java icon will be used...", e, false);
+			return null;
+		}
+	}
 	
 }
