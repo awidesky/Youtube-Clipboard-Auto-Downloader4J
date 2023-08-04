@@ -10,10 +10,11 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -143,13 +144,8 @@ public class ClipBoardListeningThread extends Thread implements ClipboardOwner {
 
 		private final static String hash(String input) {
 			try {
-				byte[] hash = MessageDigest.getInstance("SHA-1").digest(input.getBytes("UTF-8")); //TODO : SHA-516 for security
-				StringBuffer ret = new StringBuffer();
-				for (byte b : hash) {
-					ret.append(String.format("%02x", b));
-				}
-				return ret.toString();
-			} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+				return Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-512").digest(input.getBytes(StandardCharsets.UTF_8)));
+			} catch (NoSuchAlgorithmException e) {
 				SwingDialogs.error("Clipboard input hash error", "%e%", e, true);
 				return "";
 			}
