@@ -3,7 +3,7 @@ package io.github.awidesky.YoutubeClipboardAutoDownloader.enums;
 public enum ExitCodes {
 
 	SUCCESSFUL("Program exited successfully as user intended", 0),
-	PROJECTPATHNOTFOUND("Unable to locate project root library(\"YoutubeAudioAutoDownloader-resources\" folder)", 100),
+	PROJECTPATHNOTFOUND("Unable to locate project root library(\"YoutubeClipboardAutoDownloader-resources\" folder)", 100),
 	FFMPEGNOTEXISTS("Failed to find ffmpeg installation", 200),
 	YOUTUBEDNOTEXISTS("Failed to find yt-dlp installation", 300),
 	INVALIDCOMMANDARGS("Invalid command line argument(s)", -1),

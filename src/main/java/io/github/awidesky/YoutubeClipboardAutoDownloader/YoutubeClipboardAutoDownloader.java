@@ -188,7 +188,7 @@ public class YoutubeClipboardAutoDownloader {
 	}
 	
 	public static String getProjectpath() { return projectpath; }
-	public static String getResourcePath() { return projectpath + File.separator + "YoutubeAudioAutoDownloader-resources"; }
+	public static String getResourcePath() { return projectpath + File.separator + "YoutubeClipboardAutoDownloader-resources"; }
 	public static String getYtdlpPath() { return ytdlpPath; }
 
 
