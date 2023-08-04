@@ -37,11 +37,11 @@ public class ProjectPathGetter {
 				ret += File.separator + "app";
 			}
 			logger.log("Project path candidate (method : " + candidate.name + ") : " + ret);
-			return ret + File.separator + "YoutubeAudioAutoDownloader-resources";
+			return ret + File.separator + "YoutubeClipboardAutoDownloader-resources";
 		}).map(s -> new File(s)).filter(File::exists).map(File::getParentFile).map(File::getAbsolutePath).toList();
 		
 		if(list.isEmpty()) {
-			SwingDialogs.error("Unable to get executing jar directory!", "Cannot find YoutubeAudioAutoDownloader-resources directory! please reinstall th app!", null, true);
+			SwingDialogs.error("Unable to get executing jar directory!", "Cannot find YoutubeClipboardAutoDownloader-resources directory! please reinstall the app!", null, true);
 			Main.kill(ExitCodes.PROJECTPATHNOTFOUND);
 			return null; //Unreachable
 		} else {
