@@ -1,8 +1,8 @@
 
-!YoutubeAudioAutoDownloader-resources
-YoutubeAudioAutoDownloader-resources/*
-!YoutubeAudioAutoDownloader-resources/icon.png
-!YoutubeAudioAutoDownloader-resources/icon.ico
+!YoutubeClipboardAutoDownloader-resources
+YoutubeClipboardAutoDownloader-resources/*
+!YoutubeClipboardAutoDownloader-resources/icon.png
+!YoutubeClipboardAutoDownloader-resources/icon.ico
 
 
 logs/

@@ -26,7 +26,7 @@ import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.YTDLPFallback
 import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.SwingDialogs;
 
-public class YoutubeAudioDownloader {
+public class YoutubeClipboardAutoDownloader {
 
 
 	private static String projectpath = ProjectPathGetter.getProjectPath();
@@ -40,7 +40,7 @@ public class YoutubeAudioDownloader {
 	
 	static {
 		if(OSUtil.isWindows()) {
-			ytdlpPath = projectpath + File.separator + "YoutubeAudioAutoDownloader-resources" + File.separator + "ffmpeg" + File.separator + "bin" + File.separator;
+			ytdlpPath = projectpath + File.separator + "YoutubeClipboardAutoDownloader-resources" + File.separator + "ffmpeg" + File.separator + "bin" + File.separator;
 		} else if(OSUtil.isMac()) {
 			ytdlpPath = "/opt/homebrew/bin/";
 		}

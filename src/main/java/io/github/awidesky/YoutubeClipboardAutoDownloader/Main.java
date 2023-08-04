@@ -65,10 +65,10 @@ public class Main {
 		boolean verbose = false, datePrefix = false, logbyTask = false;
 		for (String arg : args) {
 			if ("--help".equals(arg)) {
-				System.out.println("YoutubeAudioAutoDownloader " + version);
+				System.out.println("YoutubeClipboardAutoDownloader " + version);
 				System.out.println("Copyright (c) 2020-2023. Eugene Hong. All Rights Reserved.");
 				System.out.println();
-				System.out.println("Usage : java -jar YoutubeAudioAutoDownloader " + version + ".jar [options]");
+				System.out.println("Usage : java -jar YoutubeClipboardAutoDownloader " + version + ".jar [options]");
 				System.out.println();
 				System.out.println("Options :");
 				System.out.println("\t--help : show this help info.");
@@ -88,7 +88,7 @@ public class Main {
 				});
 				Main.kill(ExitCodes.SUCCESSFUL);
 			} else if ("--version".equals(arg)) {
-				System.out.println("YoutubeAudioAutoDownloader " + version);
+				System.out.println("YoutubeClipboardAutoDownloader " + version);
 				System.out.println("Copyright (c) 2020-2023 Eugene Hong. All Rights Reserved.");
 				System.out.println();
 				System.out.println("This software is distributed under MIT licence.");
@@ -159,11 +159,11 @@ public class Main {
 			logger.log("Listening clipboard...\n");
 
 			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.CHECKING_FFMPEG));
-			if (!YoutubeAudioDownloader.checkFfmpeg())
+			if (!YoutubeClipboardAutoDownloader.checkFfmpeg())
 				Main.kill(ExitCodes.FFMPEGNOTEXISTS);
 			
 			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.CHECKING_YTDLP));
-			if (!YoutubeAudioDownloader.checkYtdlp())
+			if (!YoutubeClipboardAutoDownloader.checkYtdlp())
 				Main.kill(ExitCodes.YOUTUBEDNOTEXISTS);
 
 			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.READING_PROPERTIES));
@@ -213,7 +213,7 @@ public class Main {
 		
 		t.setFuture(TaskThreadPool.submit(() -> {
 
-			String url = YoutubeAudioDownloader.ytdlpQuote + data + YoutubeAudioDownloader.ytdlpQuote;
+			String url = YoutubeClipboardAutoDownloader.ytdlpQuote + data + YoutubeClipboardAutoDownloader.ytdlpQuote;
 			
 			PlayListOption p = Config.getPlaylistOption();
 			
@@ -221,7 +221,7 @@ public class Main {
 				p = (SwingDialogs.confirm("Download entire Playlist?", "PlayList Link : " + url)) ? PlayListOption.YES : PlayListOption.NO;
 			}
 					
-			if (YoutubeAudioDownloader.validateAndSetName(url, t, p)) {
+			if (YoutubeClipboardAutoDownloader.validateAndSetName(url, t, p)) {
 				t.setStatus("Preparing...");
 				String save = t.getDest();
 				File file = new File(save);
@@ -232,7 +232,7 @@ public class Main {
 					SwingDialogs.error("Download Path is invalid!", "Invalid path : " + save, null, false);
 					return;
 				}
-				YoutubeAudioDownloader.download(url, t, p, ytdlpAdditionalOptions);
+				YoutubeClipboardAutoDownloader.download(url, t, p, ytdlpAdditionalOptions);
 			} else {
 				t.failed();
 				SwingDialogs.error("[Task" + num + "|validating] Not a valid url!",	data + "\nis invalid or unsupported url!", null, true);
@@ -245,7 +245,7 @@ public class Main {
 	private static void prepareLogFile(boolean verbose, boolean datePrefix, boolean logbyTask) {
 		//TODO : add option --logOnConsole
 		try {
-			File logFolder = new File(YoutubeAudioDownloader.getProjectpath() + File.separator + "logs");
+			File logFolder = new File(YoutubeClipboardAutoDownloader.getProjectpath() + File.separator + "logs");
 			File logFile = new File(logFolder.getAbsolutePath() + File.separator + "log-" + new SimpleDateFormat("yyyy-MM-dd-kk-mm-ss").format(new Date()) + ".txt");
 			logFolder.mkdirs();
 			logFile.createNewFile();
@@ -283,7 +283,7 @@ public class Main {
 		
 		
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
-				YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt")))) {
+				YoutubeClipboardAutoDownloader.getProjectpath() + File.separator + "config.txt")))) {
 
 			UnaryOperator<String> read = str -> {
 				try {
@@ -334,9 +334,9 @@ public class Main {
 
 		/** Write <code>properties</code> */
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
-				YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt"), false))) {
+				YoutubeClipboardAutoDownloader.getProjectpath() + File.separator + "config.txt"), false))) {
 
-			File cfg = new File(YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt");
+			File cfg = new File(YoutubeClipboardAutoDownloader.getProjectpath() + File.separator + "config.txt");
 			if (!cfg.exists()) cfg.createNewFile();
 
 			UnaryOperator<String> savP = s -> Config.getDefaultSaveto().equalsIgnoreCase(s) ? "%user.home%" : s;
@@ -393,7 +393,7 @@ public class Main {
 		TaskThreadPool.kill(2500);
 		writeProperties();
 		if(logger != null) {
-			logger.log("YoutubeAudioAutoDownloader exit code : " + exitCode.getCode());
+			logger.log("YoutubeClipboardAutoDownloader exit code : " + exitCode.getCode());
 			logger.close();
 		}
 		loggerThread.kill(2500);
@@ -421,7 +421,7 @@ public class Main {
 	
 
 	public static void openConfig() {
-		File f = new File(YoutubeAudioDownloader.getProjectpath() + File.separator + "config.txt");
+		File f = new File(YoutubeClipboardAutoDownloader.getProjectpath() + File.separator + "config.txt");
 		try {
 			Desktop.getDesktop().open(f);
 		} catch (IOException e) {

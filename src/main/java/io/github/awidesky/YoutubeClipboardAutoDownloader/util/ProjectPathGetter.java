@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import io.github.awidesky.YoutubeClipboardAutoDownloader.Main;
-import io.github.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.YoutubeClipboardAutoDownloader;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.ExitCodes;
 import io.github.awidesky.guiUtil.SwingDialogs;
 import io.github.awidesky.guiUtil.TaskLogger;
@@ -70,7 +70,7 @@ public class ProjectPathGetter {
 	 * doesn't work in IDE(points bin folder of project root)
 	 * */
 	private static String classLocationBased() {
-		return urlToFile(getLocation(YoutubeAudioDownloader.class)).getAbsolutePath();
+		return urlToFile(getLocation(YoutubeClipboardAutoDownloader.class)).getAbsolutePath();
 	}
 	/**
 	 * Get project path by getting system property java.class.path

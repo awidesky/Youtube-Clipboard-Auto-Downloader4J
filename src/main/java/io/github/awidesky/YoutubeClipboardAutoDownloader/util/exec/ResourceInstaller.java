@@ -38,14 +38,14 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
 import io.github.awidesky.YoutubeClipboardAutoDownloader.Main;
-import io.github.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.YoutubeClipboardAutoDownloader;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import io.github.awidesky.guiUtil.Logger;
 
 public class ResourceInstaller {
 
 	public static final String YTDLP_URL = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp"; 
-	private static final String root = YoutubeAudioDownloader.getResourcePath();
+	private static final String root = YoutubeClipboardAutoDownloader.getResourcePath();
 	
 	private static JLabel loadingStatus;
 	private static JProgressBar progress;

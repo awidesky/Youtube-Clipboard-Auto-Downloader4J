@@ -32,7 +32,7 @@ import javax.swing.text.JTextComponent;
 
 import io.github.awidesky.YoutubeClipboardAutoDownloader.Config;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.Main;
-import io.github.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.YoutubeClipboardAutoDownloader;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.ClipBoardOption;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.ExitCodes;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.LoadingStatus;
@@ -49,7 +49,7 @@ public class GUI {
 	private JLabel loadingStatus;
 	private JProgressBar initProgress;
 	
-	public static final Image ICON = new ImageIcon(YoutubeAudioDownloader.getResourcePath().replace(File.separator, "/") + "/icon.png").getImage();
+	public static final Image ICON = new ImageIcon(YoutubeClipboardAutoDownloader.getResourcePath().replace(File.separator, "/") + "/icon.png").getImage();
 
 	private JFrame mainFrame;
 	private JButton browse, cleanCompleted, removeSwitch, nameFormatHelp, openConfig, modeSwitch, openSaveDir;
@@ -116,7 +116,7 @@ public class GUI {
 		
 		/** make <code>mainFrame</code> */
 		mainFrame = new JFrame();
-		mainFrame.setTitle("Youtube Audio Auto Downloader " + Main.version);
+		mainFrame.setTitle("Youtube Clipboard Auto Downloader " + Main.version);
 		Taskbar.getTaskbar().setIconImage(ICON);
 		mainFrame.setIconImage(ICON);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);

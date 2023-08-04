@@ -3,16 +3,16 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.github.awidesky</groupId>
-	<artifactId>YoutubeAudioAutoDownloader</artifactId>
+	<artifactId>YoutubeClipboardAutoDownloader</artifactId>
 	<inceptionYear>2020</inceptionYear>
 	<organization>
 		<name>awidesky</name>
 		<url>https://github.com/awidesky</url>
 	</organization>
 	<version>2.0.0</version>
-	<name>YoutubeAudioAutoDownloader</name>
+	<name>YoutubeClipboardAutoDownloader</name>
 	<description>Downloads audio/video from Youtube by automaticly get link from your clipboard.</description>
-	<url>https://github.com/awidesky/YoutubeAudioAutoDownloader</url>
+	<url>https://github.com/awidesky/YoutubeClipboardAutoDownloader</url>
 	<licenses>
 		<license>
 			<name>MIT License</name>
@@ -129,7 +129,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<outputDirectory>${build.dir}/YoutubeAudioAutoDownloader_${project.version}</outputDirectory>
+					<outputDirectory>${build.dir}/YoutubeClipboardAutoDownloader_${project.version}</outputDirectory>
 					<archive>
 						<manifest>
 							<mainClass>io.github.awidesky.YoutubeClipboardAutoDownloader.Main</mainClass>
@@ -139,7 +139,7 @@
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
 					<appendAssemblyId>false</appendAssemblyId>
-					<finalName>YoutubeAudioAutoDownloader-${project.version}</finalName>
+					<finalName>YoutubeClipboardAutoDownloader-${project.version}</finalName>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -148,13 +148,13 @@
 				<version>1.4.0</version>
 
 				<configuration>
-					<input>${build.dir}/YoutubeAudioAutoDownloader_${project.version}</input>
+					<input>${build.dir}/YoutubeClipboardAutoDownloader_${project.version}</input>
 					<destination>${build.dir}/jpackage</destination>
-					<mainJar>YoutubeAudioAutoDownloader-${project.version}.jar</mainJar>
+					<mainJar>YoutubeClipboardAutoDownloader-${project.version}.jar</mainJar>
 					<mainClass>io.github.awidesky.YoutubeClipboardAutoDownloader.Main</mainClass>
-					<name>YoutubeAudioAutoDownloader_setup</name>
+					<name>YoutubeClipboardAutoDownloader_setup</name>
 					<vendor>Eugene Hong</vendor>
-					<icon>${project.basedir}/YoutubeAudioAutoDownloader-resources/icon.ico</icon>
+					<icon>${project.basedir}/YoutubeClipboardAutoDownloader-resources/icon.ico</icon>
 					<appVersion>${project.version}</appVersion>
 					<licenseFile>${project.basedir}/LICENSE</licenseFile>
 					<copyright>Copyright (c) 2020-2023 Eugene Hong. All Rights Reserved.</copyright>
@@ -182,10 +182,10 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${build.dir}/YoutubeAudioAutoDownloader_${project.version}/YoutubeAudioAutoDownloader-resources</outputDirectory>
+							<outputDirectory>${build.dir}/YoutubeClipboardAutoDownloader_${project.version}/YoutubeClipboardAutoDownloader-resources</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${project.basedir}/YoutubeAudioAutoDownloader-resources</directory>
+									<directory>${project.basedir}/YoutubeClipboardAutoDownloader-resources</directory>
 								</resource>
 							</resources>
 						</configuration>
@@ -198,11 +198,11 @@
 						</goals>
 						<configuration>
 							<outputDirectory>
-								${build.dir}/launch4j/YoutubeAudioAutoDownloader-resources</outputDirectory>
+								${build.dir}/launch4j/YoutubeClipboardAutoDownloader-resources</outputDirectory>
 							<resources>
 								<resource>
 									<directory>
-										${project.basedir}/YoutubeAudioAutoDownloader-resources</directory>
+										${project.basedir}/YoutubeClipboardAutoDownloader-resources</directory>
 								</resource>
 							</resources>
 						</configuration>
@@ -241,7 +241,7 @@
 								<fileSet>
 									<sourceFile>${project.basedir}/config.txt</sourceFile>
 								<destinationFile>
-										${build.dir}/YoutubeAudioAutoDownloader_${project.version}/config.txt</destinationFile>
+										${build.dir}/YoutubeClipboardAutoDownloader_${project.version}/config.txt</destinationFile>
 								</fileSet>
 								<!-- For launch4j -->
 								<fileSet>
@@ -267,8 +267,8 @@
 							<goal>launch4j</goal>
 						</goals>
 						<configuration>
-							<jar>${build.dir}/YoutubeAudioAutoDownloader_${project.version}/YoutubeAudioAutoDownloader-${project.version}.jar</jar>
-							<outfile>${build.dir}/launch4j/YoutubeAudioAutoDownloader-${project.version}.exe</outfile>
+							<jar>${build.dir}/YoutubeClipboardAutoDownloader_${project.version}/YoutubeClipboardAutoDownloader-${project.version}.jar</jar>
+							<outfile>${build.dir}/launch4j/YoutubeClipboardAutoDownloader-${project.version}.exe</outfile>
 							<dontWrapJar>false</dontWrapJar>
 							<headerType>gui</headerType>
 							<errTitle></errTitle>
@@ -280,7 +280,7 @@
 							<stayAlive>false</stayAlive>
 							<restartOnCrash>false</restartOnCrash>
 							<manifest></manifest>
-							<icon>YoutubeAudioAutoDownloader-resources\icon.ico</icon>
+							<icon>YoutubeClipboardAutoDownloader-resources\icon.ico</icon>
 							<classPath>
 								<mainClass>io.github.awidesky.YoutubeClipboardAutoDownloader.Main</mainClass>
 							</classPath>

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import io.github.awidesky.YoutubeClipboardAutoDownloader.Main;
-import io.github.awidesky.YoutubeClipboardAutoDownloader.YoutubeAudioDownloader;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.YoutubeClipboardAutoDownloader;
 import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.SwingDialogs;
 
@@ -13,7 +13,7 @@ public class YTDLPFallbacks {
 
 	private static Logger log = Main.getLogger("[runFixCommand] ");
 	private static FixCommand[] fixArr = new FixCommand[] {
-		new FixCommand("ERROR: unable to download video data: HTTP Error 403: Forbidden", YoutubeAudioDownloader.getYtdlpPath() + "yt-dlp", "--rm-cache-dir")
+		new FixCommand("ERROR: unable to download video data: HTTP Error 403: Forbidden", YoutubeClipboardAutoDownloader.getYtdlpPath() + "yt-dlp", "--rm-cache-dir")
 	};
 	
 	public static boolean runFixCommand(String err) {
