@@ -107,7 +107,7 @@ public class Main {
 				ytdlpAdditionalOptions = arg.split("=")[1].split(" ");
 			} else {
 				System.err.println("Invaild option : \"" + arg + "\"");
-				System.err.println("If you want to find usage, please use --help flag");
+				System.err.println("If you want to find usage, use --help");
 				Main.kill(ExitCodes.INVALIDCOMMANDARGS);
 			}
 				
