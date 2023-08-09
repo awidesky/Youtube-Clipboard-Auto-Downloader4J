@@ -31,7 +31,7 @@ public class ProjectPathGetter {
 		
 		List<String> list = Arrays.stream(projectpathCandidates).map(candidate -> {
 			String ret = candidate.method.get();
-			File f = new File(ret);
+			File f = new File(ret).getAbsoluteFile();
 			if(!f.isDirectory()) ret = f.getParentFile().getAbsolutePath();
 			if (System.getProperty("jpackage.app-path") != null) {
 				ret += File.separator + "app";
