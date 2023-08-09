@@ -63,6 +63,30 @@
 			</build>
 		</profile>
 		<profile>
+			<id>platform-macOS</id>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.panteleyev</groupId>
+						<artifactId>jpackage-maven-plugin</artifactId>
+						<version>1.4.0</version>
+						<configuration>
+							<type>PKG</type>
+							<macPackageIdentifier>YoutubeClipboardAutoDownloader-${project.version}</macPackageIdentifier>
+							<macPackageName>Youtube Clipboard Auto Downloader</macPackageName>
+							<!-- <macSign>true</macSign> -->
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
 			<id>jlink-if-not-exist</id>
 			<activation>
 				<file>
