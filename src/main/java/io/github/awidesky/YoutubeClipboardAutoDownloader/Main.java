@@ -402,7 +402,7 @@ public class Main {
 			logger.log("YoutubeClipboardAutoDownloader exit code : " + exitCode.getCode());
 			logger.close();
 		}
-		loggerThread.kill(2500);
+		loggerThread.shutdown(2500);
 		System.exit(exitCode.getCode());
 	}
 
