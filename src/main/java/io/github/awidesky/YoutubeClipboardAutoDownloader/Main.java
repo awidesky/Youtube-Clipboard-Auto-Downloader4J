@@ -238,7 +238,6 @@ public class Main {
 				YoutubeClipboardAutoDownloader.download(url, t, p, ytdlpAdditionalOptions);
 			} else {
 				t.failed();
-				SwingDialogs.error("[Task" + num + "|validating] Not a valid url!",	data + "\nis invalid or unsupported url!", null, true);
 				return;
 			}
 

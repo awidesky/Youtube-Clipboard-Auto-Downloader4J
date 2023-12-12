@@ -222,7 +222,12 @@ public class YoutubeClipboardAutoDownloader {
 				}
 			}, br -> {
 				try {
-					br.lines().forEach(l -> task.logger.log("[validating] yt-dlp stderr : " + l));
+					StringBuilder sb = new StringBuilder();
+					br.lines().forEach(l -> {
+						task.logger.log("[validating] yt-dlp stderr : " + l);
+						sb.append(l).append("\n");
+					});
+					if(!sb.isEmpty()) SwingDialogs.error("Error when getting video name", "[Task" + task.getTaskNum() + "|validating]\n" + sb.toString(), null, true);
 				} catch (UncheckedIOException e1) {
 					IOException e = e1.getCause();
 					SwingDialogs.error("Error when getting video name", "[Task" + task.getTaskNum() + "|validating] " + e.getClass().getName() + " :  %e%", e, true);
