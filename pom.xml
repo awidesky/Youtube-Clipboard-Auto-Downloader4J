@@ -176,7 +176,7 @@
 					<destination>${build.dir}/jpackage</destination>
 					<mainJar>YoutubeClipboardAutoDownloader-${project.version}.jar</mainJar>
 					<mainClass>io.github.awidesky.YoutubeClipboardAutoDownloader.Main</mainClass>
-					<name>YoutubeClipboardAutoDownloader_setup</name>
+					<name>YoutubeClipboardAutoDownloader</name>
 					<vendor>Eugene Hong</vendor>
 					<icon>${project.basedir}/YoutubeClipboardAutoDownloader-resources/icon.ico</icon>
 					<appVersion>${project.version}</appVersion>
