@@ -182,6 +182,7 @@
 					<appVersion>${project.version}</appVersion>
 					<licenseFile>${project.basedir}/LICENSE</licenseFile>
 					<copyright>Copyright (c) 2020-2023 Eugene Hong. All Rights Reserved.</copyright>
+					<runtimeImage>${basedir}/jre</runtimeImage>
 				</configuration>
 
 				<executions>
