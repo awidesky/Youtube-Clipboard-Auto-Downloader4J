@@ -34,6 +34,7 @@ public class ProjectPathGetter {
 			File f = new File(ret).getAbsoluteFile();
 			if(!f.isDirectory()) ret = f.getParentFile().getAbsolutePath();
 			if (System.getProperty("jpackage.app-path") != null) {
+				SwingDialogs.information("jpackage.app-path", System.getProperty("jpackage.app-path"), true); //TODO
 				ret += File.separator + "app";
 			}
 			logger.log("Project path candidate (method : " + candidate.name + ") : " + ret);
@@ -47,11 +48,39 @@ public class ProjectPathGetter {
 		} else {
 			list.stream().forEach(s -> logger.log("Selected project path : " + s));
 			logger.newLine();
-			return list.get(0);
+			File f = new File(list.get(0));
+			if(!f.canWrite() && f.setWritable(true)) {
+				return list.get(0);
+			} else {
+				SwingDialogs.information("Permission denied!", "Unable to gain access to :\n" + list.get(0) + "\nUse local appdata folder instead...", true);
+				String ret = appLocalFolder();
+				logger.log("Final project path : " + ret);
+				return ret;
+			}
 		}
 
 	}
 	
+	public static String appLocalFolder() {
+		String home = System.getProperty("user.home");
+		String os = System.getProperty("os.name").toLowerCase();
+		String projectPath;
+		if (os.startsWith("mac")) {
+			projectPath = home + "/Library/Application Support/awidesky/YoutubeClipboardAutoDownloader";
+		} else if (os.startsWith("windows")) {
+			projectPath = System.getenv("LOCALAPPDATA") + "\\awidesky\\YoutubeClipboardAutoDownloader";
+		} else {
+			// Assume linux.
+			projectPath = home + "/.local/share/awidesky/YoutubeClipboardAutoDownloader";
+		}
+		File f = new File(projectPath);
+		f.mkdirs();
+		if (!f.exists()) {
+			SwingDialogs.error("Cannot detect appdata directory!", projectPath + "\nis not a valid data directory!", null, true);
+			Main.kill(ExitCodes.PROJECTPATHNOTFOUND);
+		}
+		return projectPath;
+	}
 	
 	private static class PathFindCandidates {
 		public Supplier<String> method;
