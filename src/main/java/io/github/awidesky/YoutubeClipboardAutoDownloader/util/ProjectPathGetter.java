@@ -22,14 +22,14 @@ import io.github.awidesky.guiUtil.TaskLogger;
 public class ProjectPathGetter {
 
 	private static TaskLogger logger = Main.getLogger("[ProjectPathGetter] "); 
-	private static PathFindCandidates[] projectpathCandidates = new PathFindCandidates[]
+	private static PathFindCandidates[] projectPathCandidates = new PathFindCandidates[]
 			{ new PathFindCandidates(ProjectPathGetter::classLocationBased, "YoutubeAudioDownloader.class location"),
 					new PathFindCandidates(ProjectPathGetter::propertyBased, "System property java.class.path"),
 					new PathFindCandidates(ProjectPathGetter::fileBased, "new File(\"\")") };
 	
 	public static String getProjectPath() {
 		
-		List<String> list = Arrays.stream(projectpathCandidates).map(candidate -> {
+		List<String> list = Arrays.stream(projectPathCandidates).map(candidate -> {
 			String ret = candidate.method.get();
 			File f = new File(ret).getAbsoluteFile();
 			if(!f.isDirectory()) ret = f.getParentFile().getAbsolutePath();
@@ -49,7 +49,10 @@ public class ProjectPathGetter {
 			list.stream().forEach(s -> logger.log("Selected project path : " + s));
 			logger.newLine();
 			File f = new File(list.get(0));
-			if(!f.canWrite() && f.setWritable(true)) {
+			System.out.println(f.canRead()); //TODO
+			System.out.println(f.setReadable(true));
+			System.out.println(f.canRead());
+			if(f.canWrite() || f.setWritable(true)) {
 				return list.get(0);
 			} else {
 				SwingDialogs.information("Permission denied!", "Unable to gain access to :\n" + list.get(0) + "\nUse local appdata folder instead...", true);

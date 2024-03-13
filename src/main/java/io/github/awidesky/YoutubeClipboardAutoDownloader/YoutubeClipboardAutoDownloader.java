@@ -29,7 +29,7 @@ import io.github.awidesky.guiUtil.SwingDialogs;
 public class YoutubeClipboardAutoDownloader {
 
 
-	private static String projectpath = ProjectPathGetter.getProjectPath();
+	private static final String projectpath = ProjectPathGetter.getProjectPath();
 	private static String ytdlpPath;
 	private static final Pattern percentPtn = Pattern.compile("[0-9]+\\.*[0-9]+%");
 	private static final Pattern versionPtn = Pattern.compile("\\d{4}\\.\\d{2}\\.\\d{2}");
