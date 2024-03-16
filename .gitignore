@@ -3,7 +3,7 @@
 YoutubeClipboardAutoDownloader-resources/*
 !YoutubeClipboardAutoDownloader-resources/icon.png
 !YoutubeClipboardAutoDownloader-resources/icon.ico
-
+!YoutubeClipboardAutoDownloader-resources/icon.icns
 
 logs/
 build/
