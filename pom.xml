@@ -54,6 +54,8 @@
 						<artifactId>jpackage-maven-plugin</artifactId>
 						<version>1.4.0</version>
 						<configuration>
+							<type>MSI</type>
+							<icon>${project.basedir}/YoutubeClipboardAutoDownloader-resources/icon.ico</icon>
 							<winMenu>true</winMenu>
 							<winShortcut>true</winShortcut>
 							<winDirChooser>true</winDirChooser>
@@ -77,6 +79,7 @@
 						<version>1.4.0</version>
 						<configuration>
 							<type>PKG</type>
+							<icon>${project.basedir}/YoutubeClipboardAutoDownloader-resources/icon.icns</icon>
 							<macPackageIdentifier>YoutubeClipboardAutoDownloader-${project.version}</macPackageIdentifier>
 							<macPackageName>Youtube Clipboard Auto Downloader</macPackageName>
 							<!-- <macSign>true</macSign> -->
@@ -178,7 +181,6 @@
 					<mainClass>io.github.awidesky.YoutubeClipboardAutoDownloader.Main</mainClass>
 					<name>YoutubeClipboardAutoDownloader</name>
 					<vendor>Eugene Hong</vendor>
-					<icon>${project.basedir}/YoutubeClipboardAutoDownloader-resources/icon.ico</icon>
 					<appVersion>${project.version}</appVersion>
 					<licenseFile>${project.basedir}/LICENSE</licenseFile>
 					<copyright>Copyright (c) 2020-2023 Eugene Hong. All Rights Reserved.</copyright>
