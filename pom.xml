@@ -29,6 +29,7 @@
 	<properties>
 		<build.dir>${project.build.directory}/builds</build.dir>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<jre_modules>java.base,java.desktop,jdk.crypto.ec</jre_modules>
 	</properties>
   
 	<dependencies>
@@ -58,7 +59,6 @@
 							<icon>${project.basedir}/YoutubeClipboardAutoDownloader-resources/icon.ico</icon>
 							<winMenu>true</winMenu>
 							<winShortcut>true</winShortcut>
-							<winDirChooser>true</winDirChooser>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -119,7 +119,7 @@
 										<argument>--no-header-files</argument>
 										<argument>--no-man-pages</argument>
 										<argument>--add-modules</argument>
-										<argument>java.base,java.desktop,jdk.crypto.ec</argument>
+										<argument>${jre_modules}</argument>
 									</arguments>
 								</configuration>
 							</execution>
@@ -184,7 +184,7 @@
 					<appVersion>${project.version}</appVersion>
 					<licenseFile>${project.basedir}/LICENSE</licenseFile>
 					<copyright>Copyright (c) 2020-2023 Eugene Hong. All Rights Reserved.</copyright>
-					<runtimeImage>${basedir}/jre</runtimeImage>
+					<addModules>${jre_modules}</addModules>
 				</configuration>
 
 				<executions>
