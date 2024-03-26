@@ -85,8 +85,8 @@
 						<configuration>
 							<type>PKG</type>
 							<icon>${project.basedir}/icon.icns</icon>
-							<macPackageIdentifier>YoutubeClipboardAutoDownloader-${project.version}</macPackageIdentifier>
-							<macPackageName>Youtube Clipboard Auto Downloader</macPackageName>
+							<macPackageIdentifier>Clipboard-dl-${project.version}</macPackageIdentifier>
+							<macPackageName>Clipboard-dl</macPackageName>
 							<!-- <macSign>true</macSign> -->
 						</configuration>
 					</plugin>
@@ -161,7 +161,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<outputDirectory>${build.dir}/YoutubeClipboardAutoDownloader_${project.version}</outputDirectory>
+					<outputDirectory>${build.dir}/Clipboard-dl_${project.version}</outputDirectory>
 					<archive>
 						<manifest>
 							<mainClass>io.github.awidesky.YoutubeClipboardAutoDownloader.Main</mainClass>
@@ -171,7 +171,7 @@
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
 					<appendAssemblyId>false</appendAssemblyId>
-					<finalName>YoutubeClipboardAutoDownloader-${project.version}</finalName>
+					<finalName>Clipboard-dl_${project.version}</finalName>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -180,11 +180,11 @@
 				<version>1.4.0</version>
 
 				<configuration>
-					<input>${build.dir}/YoutubeClipboardAutoDownloader_${project.version}</input>
+					<input>${build.dir}/Clipboard-dl_${project.version}</input>
 					<destination>${build.dir}/jpackage</destination>
-					<mainJar>YoutubeClipboardAutoDownloader-${project.version}.jar</mainJar>
+					<mainJar>Clipboard-dl_${project.version}.jar</mainJar>
 					<mainClass>io.github.awidesky.YoutubeClipboardAutoDownloader.Main</mainClass>
-					<name>YoutubeClipboardAutoDownloader</name>
+					<name>Clipboard-dl</name>
 					<vendor>Eugene Hong</vendor>
 					<appVersion>${project.version}</appVersion>
 					<licenseFile>${project.basedir}/LICENSE</licenseFile>
@@ -214,7 +214,7 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${build.dir}/YoutubeClipboardAutoDownloader_${project.version}/</outputDirectory>
+							<outputDirectory>${build.dir}/Clipboard-dl_${project.version}/</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${project.basedir}</directory>
@@ -274,8 +274,8 @@
 							<goal>launch4j</goal>
 						</goals>
 						<configuration>
-							<jar>${build.dir}/YoutubeClipboardAutoDownloader_${project.version}/YoutubeClipboardAutoDownloader-${project.version}.jar</jar>
-							<outfile>${build.dir}/launch4j/YoutubeClipboardAutoDownloader-${project.version}.exe</outfile>
+							<jar>${build.dir}/Clipboard-dl_${project.version}/Clipboard-dl_${project.version}.jar</jar>
+							<outfile>${build.dir}/launch4j/Clipboard-dl_${project.version}.exe</outfile>
 							<dontWrapJar>false</dontWrapJar>
 							<headerType>gui</headerType>
 							<errTitle></errTitle>
