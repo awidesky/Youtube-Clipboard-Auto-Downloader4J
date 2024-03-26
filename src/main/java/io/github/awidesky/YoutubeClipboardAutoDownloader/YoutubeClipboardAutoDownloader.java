@@ -18,18 +18,20 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
-import io.github.awidesky.YoutubeClipboardAutoDownloader.util.ProjectPathGetter;
-import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.OSUtil;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.ProcessExecutor;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.ResourceInstaller;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.YTDLPFallbacks;
 import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.SwingDialogs;
+import io.github.awidesky.projectPath.JarPath;
+import io.github.awidesky.projectPath.UserDataPath;
 
 public class YoutubeClipboardAutoDownloader {
 
 
-	private static final String projectpath = ProjectPathGetter.getProjectPath();
+	private static final String projectPath = JarPath.getProjectPath(YoutubeClipboardAutoDownloader.class);
+	private static final String appDataPath = UserDataPath.appLocalFolder("awidesky", "YoutubeClipboardAutoDownloader");
 	private static String ytdlpPath;
 	private static final Pattern percentPtn = Pattern.compile("[0-9]+\\.*[0-9]+%");
 	private static final Pattern versionPtn = Pattern.compile("\\d{4}\\.\\d{2}\\.\\d{2}");
@@ -40,7 +42,7 @@ public class YoutubeClipboardAutoDownloader {
 	
 	static {
 		if(OSUtil.isWindows()) {
-			ytdlpPath = projectpath + File.separator + "YoutubeClipboardAutoDownloader-resources" + File.separator + "ffmpeg" + File.separator + "bin" + File.separator;
+			ytdlpPath = projectPath + File.separator + "YoutubeClipboardAutoDownloader-resources" + File.separator + "ffmpeg" + File.separator + "bin" + File.separator;
 		} else if(OSUtil.isMac()) {
 			ytdlpPath = "/opt/homebrew/bin/";
 		}
@@ -121,7 +123,7 @@ public class YoutubeClipboardAutoDownloader {
 			}
 		}
 			
-		log.log("projectpath = " + projectpath);
+		log.log("projectPath = " + projectPath);
 		log.log("ytdlpPath = " + (ytdlpPath.equals("") ? "system %PATH%" : ytdlpPath) + "\n");
 		return true;
 		
@@ -187,10 +189,9 @@ public class YoutubeClipboardAutoDownloader {
 
 	}
 	
-	public static String getProjectpath() { return projectpath; }
-	public static String getResourcePath() { return projectpath + File.separator + "YoutubeClipboardAutoDownloader-resources"; }
 	public static String getYtdlpPath() { return ytdlpPath; }
-
+	public static String getProjectPath() { return projectPath; }
+	public static String getAppdataPath() { return appDataPath;	}
 
 	/** get video name */
 	public static boolean validateAndSetName(String url, TaskData task, PlayListOption playListOption) {

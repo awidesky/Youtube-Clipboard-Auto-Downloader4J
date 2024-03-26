@@ -39,7 +39,7 @@ import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.ExitCodes;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.LoadingStatus;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.TableColumnEnum;
-import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.OSUtil;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil;
 import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.SwingDialogs;
 
@@ -422,7 +422,7 @@ public class GUI {
 	
 	
 	private static Image getICON() {
-		final File f = new File(YoutubeClipboardAutoDownloader.getResourcePath().replace(File.separator, "/") + "/icon.png");
+		final File f = new File(YoutubeClipboardAutoDownloader.getProjectPath().replace(File.separator, "/") + "/icon.png");
 		try {
 			return ImageIO.read(f);
 		} catch (IOException e) {

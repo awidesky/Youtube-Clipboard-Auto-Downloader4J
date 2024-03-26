@@ -1,4 +1,4 @@
-package io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec;
+package io.github.awidesky.YoutubeClipboardAutoDownloader.util;
 
 public class OSUtil {
 

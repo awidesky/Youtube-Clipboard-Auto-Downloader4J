@@ -38,6 +38,11 @@
 			<artifactId>GUIUtil</artifactId>
 			<version>1.0.0</version>
 		</dependency>
+		<dependency>
+			<groupId>io.github.awidesky</groupId>
+			<artifactId>ProjectPath</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>
@@ -56,7 +61,7 @@
 						<version>1.4.0</version>
 						<configuration>
 							<type>MSI</type>
-							<icon>${project.basedir}/YoutubeClipboardAutoDownloader-resources/icon.ico</icon>
+							<icon>${project.basedir}/icon.ico</icon>
 							<winMenu>true</winMenu>
 							<winShortcut>true</winShortcut>
 						</configuration>
@@ -79,7 +84,7 @@
 						<version>1.4.0</version>
 						<configuration>
 							<type>PKG</type>
-							<icon>${project.basedir}/YoutubeClipboardAutoDownloader-resources/icon.icns</icon>
+							<icon>${project.basedir}/icon.icns</icon>
 							<macPackageIdentifier>YoutubeClipboardAutoDownloader-${project.version}</macPackageIdentifier>
 							<macPackageName>Youtube Clipboard Auto Downloader</macPackageName>
 							<!-- <macSign>true</macSign> -->
@@ -209,10 +214,13 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${build.dir}/YoutubeClipboardAutoDownloader_${project.version}/YoutubeClipboardAutoDownloader-resources</outputDirectory>
+							<outputDirectory>${build.dir}/YoutubeClipboardAutoDownloader_${project.version}/</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${project.basedir}/YoutubeClipboardAutoDownloader-resources</directory>
+									<directory>${project.basedir}</directory>
+									<includes>
+										<include>icon.png</include>
+									</includes>
 								</resource>
 							</resources>
 						</configuration>
@@ -225,11 +233,13 @@
 						</goals>
 						<configuration>
 							<outputDirectory>
-								${build.dir}/launch4j/YoutubeClipboardAutoDownloader-resources</outputDirectory>
+								${build.dir}/launch4j</outputDirectory>
 							<resources>
 								<resource>
-									<directory>
-										${project.basedir}/YoutubeClipboardAutoDownloader-resources</directory>
+									<directory>${project.basedir}</directory>
+									<includes>
+										<include>icon.png</include>
+									</includes>
 								</resource>
 							</resources>
 						</configuration>
@@ -247,36 +257,6 @@
 									<directory>${basedir}/jre</directory>
 								</resource>
 							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>com.coderplus.maven.plugins</groupId>
-				<artifactId>copy-rename-maven-plugin</artifactId>
-				<version>1.0</version>
-				<executions>
-					<execution>
-						<id>copy-config-txt</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-						<configuration>
-							<fileSets>
-								<!-- For jar -->
-								<fileSet>
-									<sourceFile>${project.basedir}/config.txt</sourceFile>
-								<destinationFile>
-										${build.dir}/YoutubeClipboardAutoDownloader_${project.version}/config.txt</destinationFile>
-								</fileSet>
-								<!-- For launch4j -->
-								<fileSet>
-									<sourceFile>${project.basedir}/config.txt</sourceFile>
-									<destinationFile>
-										${build.dir}/launch4j/config.txt</destinationFile>
-								</fileSet>
-							</fileSets>
 						</configuration>
 					</execution>
 				</executions>
@@ -307,7 +287,7 @@
 							<stayAlive>false</stayAlive>
 							<restartOnCrash>false</restartOnCrash>
 							<manifest></manifest>
-							<icon>YoutubeClipboardAutoDownloader-resources\icon.ico</icon>
+							<icon>${project.basedir}\icon.ico</icon>
 							<classPath>
 								<mainClass>io.github.awidesky.YoutubeClipboardAutoDownloader.Main</mainClass>
 							</classPath>

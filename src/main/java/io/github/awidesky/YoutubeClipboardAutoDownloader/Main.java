@@ -32,13 +32,14 @@ import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.LoadingStatus;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
-import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.OSUtil;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.ClipBoardListeningThread;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.TaskThreadPool;
 import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.LoggerThread;
 import io.github.awidesky.guiUtil.SwingDialogs;
 import io.github.awidesky.guiUtil.TaskLogger;
+import io.github.awidesky.projectPath.UserDataPath;
 
 /** Main class */
 public class Main {
@@ -249,7 +250,7 @@ public class Main {
 			if(logOnConsole) {
 				loggerThread.setLogDestination(System.out, true);
 			} else {
-				File logFolder = new File(YoutubeClipboardAutoDownloader.getProjectpath() + File.separator + "logs");
+				File logFolder = new File(UserDataPath.appLocalFolder("awidesky", "YoutubeClipboardAutoDownloader", "logs"));
 				File logFile = new File(logFolder.getAbsolutePath() + File.separator + "log-" + new SimpleDateFormat("yyyy-MM-dd-kk-mm-ss").format(new Date()) + ".txt");
 				logFolder.mkdirs();
 				logFile.createNewFile();
@@ -288,7 +289,7 @@ public class Main {
 		
 		
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
-				YoutubeClipboardAutoDownloader.getProjectpath() + File.separator + "config.txt")))) {
+				YoutubeClipboardAutoDownloader.getAppdataPath() + File.separator + "config.txt")))) {
 
 			UnaryOperator<String> read = str -> {
 				try {
@@ -337,11 +338,10 @@ public class Main {
 	 * */
 	public static void writeProperties() {
 
+		File cfg = new File(YoutubeClipboardAutoDownloader.getAppdataPath() + File.separator + "config.txt");
 		/** Write <code>properties</code> */
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
-				YoutubeClipboardAutoDownloader.getProjectpath() + File.separator + "config.txt"), false))) {
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(cfg, false))) {
 
-			File cfg = new File(YoutubeClipboardAutoDownloader.getProjectpath() + File.separator + "config.txt");
 			if (!cfg.exists()) cfg.createNewFile();
 
 			UnaryOperator<String> savP = s -> Config.getDefaultSaveto().equalsIgnoreCase(s) ? "%user.home%" : s;
@@ -426,7 +426,7 @@ public class Main {
 	
 
 	public static void openConfig() {
-		File f = new File(YoutubeClipboardAutoDownloader.getProjectpath() + File.separator + "config.txt");
+		File f = new File(YoutubeClipboardAutoDownloader.getAppdataPath() + File.separator + "config.txt");
 		try {
 			Desktop.getDesktop().open(f);
 		} catch (IOException e) {

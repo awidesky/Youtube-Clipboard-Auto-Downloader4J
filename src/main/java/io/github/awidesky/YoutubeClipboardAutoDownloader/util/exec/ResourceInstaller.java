@@ -1,8 +1,8 @@
 package io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec;
 
-import static io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.OSUtil.isLinux;
-import static io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.OSUtil.isMac;
-import static io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.OSUtil.isWindows;
+import static io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil.isLinux;
+import static io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil.isMac;
+import static io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil.isWindows;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -45,7 +45,7 @@ import io.github.awidesky.guiUtil.Logger;
 public class ResourceInstaller {
 
 	public static final String YTDLP_URL = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp"; 
-	private static final String root = YoutubeClipboardAutoDownloader.getResourcePath();
+	private static final String root = YoutubeClipboardAutoDownloader.getAppdataPath();
 	
 	private static JLabel loadingStatus;
 	private static JProgressBar progress;
