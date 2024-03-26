@@ -1,6 +1,8 @@
 package io.github.awidesky.YoutubeClipboardAutoDownloader.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.Taskbar;
 import java.awt.Toolkit;
@@ -15,12 +17,16 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -64,7 +70,6 @@ public class GUI {
 	private DefaultComboBoxModel<String> videoQualityCBoxModel = new DefaultComboBoxModel<>(new String[] { "best", "240p", "360p", "360p", "480p", "720p", "1080p", "1440p", "2160p" });
 	private JFileChooser jfc = new JFileChooser();
 	private JTable table;
-	private JScrollPane scrollPane;
 	
 	private Logger logger = null;
 	
@@ -122,10 +127,9 @@ public class GUI {
 		if(!OSUtil.isWindows()) Taskbar.getTaskbar().setIconImage(ICON);
 		mainFrame.setIconImage(ICON);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		mainFrame.setSize(630, 495);
-		mainFrame.setLocation(dim.width/2-mainFrame.getSize().width/2, dim.height/2-mainFrame.getSize().height/2);
-		mainFrame.setLayout(null);
-		mainFrame.setResizable(false);
+		mainFrame.setSize(630, 500);
+		mainFrame.setLayout(new BorderLayout());
+		mainFrame.setResizable(true);
 		mainFrame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -137,27 +141,61 @@ public class GUI {
 			}
 		});
 
-		addFileChooser();
-		addLabels();
-		addTextFields();
-		addButtons();
-		addComboBoxes();
-		addTable();
-		disposeLoadingFrame();
+		setFileChooser();
+		setLabels();
+		setTextFields();
+		setButtons();
+		setComboBoxes();
+		setTable();
 		
+		JPanel root = new JPanel(new BorderLayout());
+		/*root.addComponentListener(new ComponentAdapter() {  
+	        public void componentResized(ComponentEvent evt) {
+	        	int d = mainFrame.getWidth() - getPrevWidth();
+	        	prevWidth = mainFrame.getWidth();
+	        	if(d > 0) {
+	        		Dimension dm = pathField.getPreferredSize();
+	        		dm.width += d;
+	        		System.out.println(dm);
+	        		pathField.setPreferredSize(dm);
+	        	}
+	        }
+		});*/
+		final int strutBetweenPanels = 10;
+		JPanel configPanel = new JPanel();
+		configPanel.setLayout(new BoxLayout(configPanel, BoxLayout.Y_AXIS));
+		configPanel.add(Box.createVerticalStrut(strutBetweenPanels));
+		configPanel.add(formatPanel());
+		configPanel.add(Box.createVerticalStrut(strutBetweenPanels));
+		configPanel.add(savetoPanel());
+		configPanel.add(Box.createVerticalStrut(strutBetweenPanels));
+		configPanel.add(fileNamePanel());
+		configPanel.add(Box.createVerticalStrut(strutBetweenPanels));
+		root.add(configPanel, BorderLayout.NORTH);
+		
+		root.add(tablePanel(), BorderLayout.CENTER);
+		
+		root.add(bottomPanel(), BorderLayout.SOUTH);
+		mainFrame.add(root, BorderLayout.CENTER);
+		mainFrame.pack();
+		prevWidth = mainFrame.getWidth();
+		mainFrame.setLocation(dim.width/2-mainFrame.getSize().width/2, dim.height/2-mainFrame.getSize().height/2);
+
+		disposeLoadingFrame();
+
 		mainFrame.setVisible(true);
 		browse.requestFocus();
 		
 	}
 	
 
-	private void addFileChooser() {
+	private void setFileChooser() {
 		jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		jfc.setDialogTitle("Choose directory to save music!");
 		jfc.setCurrentDirectory(new File(Config.getSaveto()));
 	}
 	
-	private void addLabels() {
+	private void setLabels() {
 		
 		format = new JLabel("Format :");
 		quality = new JLabel("Audio Quality :");
@@ -165,24 +203,19 @@ public class GUI {
 		nameFormat = new JLabel("Filename Format : ");
 		playList = new JLabel("Download Playlist? : ");
 		
-		format.setBounds(26, 23, format.getPreferredSize().width, format.getPreferredSize().height);
-		quality.setBounds(200, 23, quality.getPreferredSize().width, quality.getPreferredSize().height);
-		path.setBounds(12, 70, path.getPreferredSize().width, path.getPreferredSize().height);
-		nameFormat.setBounds(10, 126, nameFormat.getPreferredSize().width, nameFormat.getPreferredSize().height);
-		playList.setBounds(395, 126, playList.getPreferredSize().width, playList.getPreferredSize().height);
-		
-		mainFrame.add(format);
-		mainFrame.add(path);
-		mainFrame.add(quality);
-		mainFrame.add(nameFormat);
-		mainFrame.add(playList);
-		
+		format.setSize(format.getPreferredSize().width, format.getPreferredSize().height);
+		quality.setSize(quality.getPreferredSize().width, quality.getPreferredSize().height);
+		path.setSize(path.getPreferredSize().width, path.getPreferredSize().height);
+		nameFormat.setSize(nameFormat.getPreferredSize().width, nameFormat.getPreferredSize().height);
+		playList.setSize(playList.getPreferredSize().width, playList.getPreferredSize().height);
 	}
 	
-	private void addTextFields() {
+	private void setTextFields() {
 		
 		pathField = new JTextField(Config.getSaveto());
 		nameFormatField =  new JTextField(Config.getFileNameFormat());
+		
+		nameFormatField.setColumns(10);
 		
 		pathField.getDocument().addDocumentListener(new DocumentListener() {
 			public void changedUpdate(DocumentEvent e) { changed(); }
@@ -192,6 +225,12 @@ public class GUI {
 				String str = pathField.getText();
 				File f = new File(str);
 				if (f.isDirectory() && f.exists()) Config.setSaveto(str);
+				int w = pathField.getPreferredSize().width - pathField.getWidth();
+				if(w <= 0) return;
+				w = mainFrame.getX() - w / 2;
+				w = w > 0 ? w : 0;
+				mainFrame.pack();
+				mainFrame.setLocation(dim.width / 2 - mainFrame.getSize().width / 2, mainFrame.getLocation().y);
 			}
 		});
 		nameFormatField.getDocument().addDocumentListener(new DocumentListener() {
@@ -200,16 +239,10 @@ public class GUI {
 			public void insertUpdate(DocumentEvent e) { changed(); }
 			public void changed() { Config.setFileNameFormat(nameFormatField.getText()); }
 		});
-		
-		pathField.setBounds(65, 65, 456, 22); 
-		nameFormatField.setBounds(115, 122, 172, 22);
-
-		mainFrame.add(pathField);
-		mainFrame.add(nameFormatField);
 
 	}
 	
-	private void addButtons() { 
+	private void setButtons() { 
 		
 		browse = new JButton("browse...");
 		cleanCompleted = new JButton("clean completed");
@@ -217,7 +250,7 @@ public class GUI {
 		nameFormatHelp = new JButton("<= help?");
 		openConfig = new JButton("open config.txt");
 		modeSwitch = new JButton(" <-> download video ");
-		openSaveDir = new JButton("open folder");
+		openSaveDir = new JButton("open");
 		
 		browse.addActionListener((e) -> {
 			if (jfc.showDialog(mainFrame, null) != JFileChooser.APPROVE_OPTION) {
@@ -237,23 +270,15 @@ public class GUI {
 		modeSwitch.addActionListener((e) -> { swapMode(); });
 		openSaveDir.addActionListener((e) -> { Main.openSaveFolder(); });
 		
-		browse.setBounds(523, 65, browse.getPreferredSize().width, browse.getPreferredSize().height);
-		cleanCompleted.setBounds(8, 418, cleanCompleted.getPreferredSize().width, cleanCompleted.getPreferredSize().height);
-		removeSwitch.setBounds(145, 418, removeSwitch.getPreferredSize().width, removeSwitch.getPreferredSize().height);
-		nameFormatHelp.setBounds(298, 121, nameFormatHelp.getPreferredSize().width, nameFormatHelp.getPreferredSize().height);
-		openConfig.setBounds(490, 418, openConfig.getPreferredSize().width, openConfig.getPreferredSize().height);
-		modeSwitch.setBounds(440, 19, modeSwitch.getPreferredSize().width, modeSwitch.getPreferredSize().height);
-		openSaveDir.setBounds(515, 90, openSaveDir.getPreferredSize().width, openSaveDir.getPreferredSize().height);
+		browse.setSize(browse.getPreferredSize().width, browse.getPreferredSize().height);
+		cleanCompleted.setSize(cleanCompleted.getPreferredSize().width, cleanCompleted.getPreferredSize().height);
+		removeSwitch.setSize(removeSwitch.getPreferredSize().width, removeSwitch.getPreferredSize().height);
+		nameFormatHelp.setSize(nameFormatHelp.getPreferredSize().width, nameFormatHelp.getPreferredSize().height);
+		openConfig.setSize(openConfig.getPreferredSize().width, openConfig.getPreferredSize().height);
+		modeSwitch.setSize(modeSwitch.getPreferredSize().width, modeSwitch.getPreferredSize().height);
+		openSaveDir.setSize(openSaveDir.getPreferredSize().width, openSaveDir.getPreferredSize().height);
 		
 		removeSwitch(false);
-		
-		mainFrame.add(browse);
-		mainFrame.add(cleanCompleted);
-		mainFrame.add(removeSwitch);
-		mainFrame.add(nameFormatHelp);
-		mainFrame.add(openConfig);
-		mainFrame.add(modeSwitch);
-		mainFrame.add(openSaveDir);
 		
 	}
 	
@@ -276,7 +301,7 @@ public class GUI {
 	}
 
 
-	private void addComboBoxes() {
+	private void setComboBoxes() {
 		
 		cb_format = new JComboBox<>(audioFormatCBoxModel);
 		cb_quality = new JComboBox<>(audioQualityCBoxModel);
@@ -317,19 +342,14 @@ public class GUI {
 		cb_playList.addActionListener((e) -> { Config.setPlaylistOption(cb_playList.getSelectedItem().toString()); });
 		cb_clipboardOption.addActionListener((e) -> { Config.setClipboardListenOption(cb_clipboardOption.getSelectedItem().toString());	});
 		
-		cb_format.setBounds(83, 19, 80, 22);
-		cb_quality.setBounds(290, 19, 100, 22);
-		cb_playList.setBounds(518, 122, 90, 22);
-		cb_clipboardOption.setBounds(280, 419, 200, 22);
-		
-		mainFrame.add(cb_format);
-		mainFrame.add(cb_quality);
-		mainFrame.add(cb_playList);
-		mainFrame.add(cb_clipboardOption);
+		cb_format.setSize(80, 22);
+		cb_quality.setSize(100, 22);
+		cb_playList.setSize(90, 22);
+		cb_clipboardOption.setSize(200, 22);
 		
 	}
 	
-	private void addTable() {
+	private void setTable() {
 		
 		table = new JTable() {
 			/** serialVersionUID */
@@ -354,16 +374,90 @@ public class GUI {
 		table.getColumnModel().getColumn(TableColumnEnum.DESTINATION.getIndex()).setPreferredWidth(300);
 		table.getColumnModel().getColumn(TableColumnEnum.PROGRESS.getIndex()).setPreferredWidth(73);
 		table.getColumnModel().getColumn(TableColumnEnum.STATUS.getIndex()).setPreferredWidth(82);
+		table.setPreferredScrollableViewportSize(new Dimension(table.getPreferredSize().width, 300));
+		table.setFillsViewportHeight(true);
 		
 		TaskStatusModel.getinstance().setCheckBoxSelectedCallback(this::removeSwitch);
 		
-		scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPane.setBounds(8, 168, 600, 240);
-
-		mainFrame.add(scrollPane);
-
 	}
 
+	
+	private JPanel formatPanel() {
+		JPanel root = new JPanel(new BorderLayout());
+		JPanel formats = new JPanel();
+		formats.add(Box.createHorizontalStrut(15));
+		formats.add(format);
+		formats.add(cb_format);
+		formats.add(Box.createHorizontalStrut(15));
+		formats.add(quality);
+		formats.add(cb_quality);
+		formats.add(Box.createHorizontalStrut(35));
+		root.add(formats, BorderLayout.WEST);
+		JPanel mode = new JPanel();
+		mode.add(modeSwitch);
+		root.add(mode, BorderLayout.EAST);
+		return root;
+	}
+	
+	private JPanel savetoPanel() {
+		JPanel root = new JPanel(new BorderLayout());
+		JPanel saveTo = new JPanel();
+
+		saveTo.add(Box.createHorizontalStrut(5));
+		saveTo.add(path);
+		saveTo.add(pathField);
+
+		JPanel buttons = new JPanel();
+		buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 5));
+		buttons.add(browse);
+		buttons.add(openSaveDir);
+		buttons.add(Box.createHorizontalStrut(5));
+		
+		root.add(saveTo, BorderLayout.WEST);
+		root.add(buttons, BorderLayout.EAST);
+		return root;
+	}
+	
+	private JPanel fileNamePanel() {
+		JPanel root = new JPanel(new BorderLayout());
+		JPanel nameForm = new JPanel();
+		
+		nameForm.add(Box.createHorizontalStrut(5));
+		nameForm.add(nameFormat);
+		nameForm.add(nameFormatField);
+		nameForm.add(Box.createHorizontalStrut(5));
+		nameForm.add(nameFormatHelp);
+		
+		JPanel playListOpt = new JPanel();
+		playListOpt.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 5));
+		playListOpt.add(playList);
+		playListOpt.add(cb_playList);
+		playListOpt.add(Box.createHorizontalStrut(5));
+		
+		root.add(nameForm, BorderLayout.WEST);
+		root.add(playListOpt, BorderLayout.EAST);
+		return root;
+	}
+	
+	private JComponent tablePanel() {
+		JScrollPane scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		JPanel root = new JPanel(new BorderLayout(5, 5));
+		root.add(Box.createHorizontalStrut(5), BorderLayout.WEST);
+		root.add(Box.createHorizontalStrut(5), BorderLayout.EAST);
+		root.add(Box.createVerticalStrut(5), BorderLayout.SOUTH);
+		root.add(scrollPane, BorderLayout.CENTER);
+		return root;
+	}
+	
+	private JPanel bottomPanel() {
+		JPanel root = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		root.add(cleanCompleted);
+		root.add(removeSwitch);
+		root.add(cb_clipboardOption);
+		root.add(openConfig);
+		return root;
+	}
+	
 	private void removeSwitch(boolean selectedMode) {
 		if(selectedMode) {
 			removeSwitch.setText("remove selected");
