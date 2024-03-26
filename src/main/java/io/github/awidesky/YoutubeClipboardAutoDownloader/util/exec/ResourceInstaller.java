@@ -97,7 +97,6 @@ public class ResourceInstaller {
 			hideProgress();
 		} else if(isMac()) {
 			setLoadingFrameContent("Downloading ffmpeg via \"brew install ffmpeg\"... (Progress bar will stay in 0)", -1);
-			//TODO : big TextArea that shows log outputs(for both windows and linux)
 			ProcessExecutor.runNow(log, null, "/bin/bash", "-c", "/opt/homebrew/bin/brew install ffmpeg");
 		} else if(isLinux()) {
 			setLoadingFrameContent("Downloading ffmpeg via \"sudo apt install ffmpeg\"...", -1);
