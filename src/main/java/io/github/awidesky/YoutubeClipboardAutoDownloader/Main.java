@@ -39,6 +39,7 @@ import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.LoggerThread;
 import io.github.awidesky.guiUtil.SwingDialogs;
 import io.github.awidesky.guiUtil.TaskLogger;
+import io.github.awidesky.projectPath.JarPath;
 import io.github.awidesky.projectPath.UserDataPath;
 
 /** Main class */
@@ -66,10 +67,11 @@ public class Main {
 		boolean verbose = false, datePrefix = false, logbyTask = false, logOnConsole = false;
 		for (String arg : args) {
 			if ("--help".equals(arg)) {
-				System.out.println("YoutubeClipboardAutoDownloader " + version);
-				System.out.println("Copyright (c) 2020-2023. Eugene Hong. All Rights Reserved.");
+				System.out.println("Youtube Clipboard Auto Downloader (a.k.a. Clipboard-dl) " + version);
+				System.out.println("Copyright (c) 2020-2024. Eugene Hong. All Rights Reserved.");
 				System.out.println();
-				System.out.println("Usage : java -jar YoutubeClipboardAutoDownloader " + version + ".jar [options]");
+				System.out.println("Usage : java -jar " + Optional.ofNullable(JarPath.getJarName(Main.class))
+										.orElse("Clipboard-dl_" + version + ".jar") + " [options]");
 				System.out.println();
 				System.out.println("Options :");
 				System.out.println("\t--help : show this help info.");
@@ -90,8 +92,8 @@ public class Main {
 				});
 				Main.kill(ExitCodes.SUCCESSFUL);
 			} else if ("--version".equals(arg)) {
-				System.out.println("YoutubeClipboardAutoDownloader " + version);
-				System.out.println("Copyright (c) 2020-2023 Eugene Hong. All Rights Reserved.");
+				System.out.println("Youtube Clipboard Auto Downloader (a.k.a. Clipboard-dl) " + version);
+				System.out.println("Copyright (c) 2020-2024 Eugene Hong. All Rights Reserved.");
 				System.out.println();
 				System.out.println("This software is distributed under MIT licence.");
 				System.out.println("Please refer to : https://github.com/awidesky/Youtube-Audio-Auto-Downloader4J/blob/master/LICENSE");
