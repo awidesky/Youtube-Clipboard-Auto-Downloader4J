@@ -396,9 +396,11 @@ public class GUI {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         saveTo.add(Box.createHorizontalStrut(5));
         saveTo.add(pathField, gbc);
+        saveTo.add(Box.createHorizontalStrut(10));
 
 		JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 5));
 		buttons.add(browse);
+		buttons.add(Box.createHorizontalStrut(5));
 		buttons.add(openSaveDir);
 		buttons.add(Box.createHorizontalStrut(5));
 		
