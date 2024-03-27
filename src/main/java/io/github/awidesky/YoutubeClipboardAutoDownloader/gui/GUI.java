@@ -3,6 +3,8 @@ package io.github.awidesky.YoutubeClipboardAutoDownloader.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Taskbar;
 import java.awt.Toolkit;
@@ -148,19 +150,6 @@ public class GUI {
 		setComboBoxes();
 		setTable();
 		
-		JPanel root = new JPanel(new BorderLayout());
-		/*root.addComponentListener(new ComponentAdapter() {  
-	        public void componentResized(ComponentEvent evt) {
-	        	int d = mainFrame.getWidth() - getPrevWidth();
-	        	prevWidth = mainFrame.getWidth();
-	        	if(d > 0) {
-	        		Dimension dm = pathField.getPreferredSize();
-	        		dm.width += d;
-	        		System.out.println(dm);
-	        		pathField.setPreferredSize(dm);
-	        	}
-	        }
-		});*/
 		final int strutBetweenPanels = 10;
 		JPanel configPanel = new JPanel();
 		configPanel.setLayout(new BoxLayout(configPanel, BoxLayout.Y_AXIS));
@@ -171,14 +160,12 @@ public class GUI {
 		configPanel.add(Box.createVerticalStrut(strutBetweenPanels));
 		configPanel.add(fileNamePanel());
 		configPanel.add(Box.createVerticalStrut(strutBetweenPanels));
-		root.add(configPanel, BorderLayout.NORTH);
+		mainFrame.add(configPanel, BorderLayout.NORTH);
 		
-		root.add(tablePanel(), BorderLayout.CENTER);
+		mainFrame.add(tablePanel(), BorderLayout.CENTER);
 		
-		root.add(bottomPanel(), BorderLayout.SOUTH);
-		mainFrame.add(root, BorderLayout.CENTER);
+		mainFrame.add(bottomPanel(), BorderLayout.SOUTH);
 		mainFrame.pack();
-		prevWidth = mainFrame.getWidth();
 		mainFrame.setLocation(dim.width/2-mainFrame.getSize().width/2, dim.height/2-mainFrame.getSize().height/2);
 
 		disposeLoadingFrame();
@@ -385,13 +372,12 @@ public class GUI {
 	private JPanel formatPanel() {
 		JPanel root = new JPanel(new BorderLayout());
 		JPanel formats = new JPanel();
-		formats.add(Box.createHorizontalStrut(15));
+		formats.add(Box.createHorizontalStrut(5));
 		formats.add(format);
 		formats.add(cb_format);
 		formats.add(Box.createHorizontalStrut(15));
 		formats.add(quality);
 		formats.add(cb_quality);
-		formats.add(Box.createHorizontalStrut(35));
 		root.add(formats, BorderLayout.WEST);
 		JPanel mode = new JPanel();
 		mode.add(modeSwitch);
@@ -401,19 +387,22 @@ public class GUI {
 	
 	private JPanel savetoPanel() {
 		JPanel root = new JPanel(new BorderLayout());
-		JPanel saveTo = new JPanel();
+		
+		JPanel saveTo = new JPanel(new GridBagLayout());
+		saveTo.add(Box.createHorizontalStrut(15));
+		saveTo.add(path, new GridBagConstraints());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        saveTo.add(Box.createHorizontalStrut(5));
+        saveTo.add(pathField, gbc);
 
-		saveTo.add(Box.createHorizontalStrut(5));
-		saveTo.add(path);
-		saveTo.add(pathField);
-
-		JPanel buttons = new JPanel();
-		buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 5));
+		JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 5));
 		buttons.add(browse);
 		buttons.add(openSaveDir);
 		buttons.add(Box.createHorizontalStrut(5));
 		
-		root.add(saveTo, BorderLayout.WEST);
+		root.add(saveTo, BorderLayout.CENTER);
 		root.add(buttons, BorderLayout.EAST);
 		return root;
 	}
