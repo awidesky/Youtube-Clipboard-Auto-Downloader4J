@@ -42,7 +42,7 @@ public class YoutubeClipboardAutoDownloader {
 	
 	static {
 		if(OSUtil.isWindows()) {
-			ytdlpPath = projectPath + File.separator + "YoutubeClipboardAutoDownloader-resources" + File.separator + "ffmpeg" + File.separator + "bin" + File.separator;
+			ytdlpPath = appDataPath + File.separator + "ffmpeg" + File.separator + "bin" + File.separator;
 		} else if(OSUtil.isMac()) {
 			ytdlpPath = "/opt/homebrew/bin/";
 		}
