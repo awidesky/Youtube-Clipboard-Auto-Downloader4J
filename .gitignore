@@ -1,13 +1,5 @@
 
-!YoutubeClipboardAutoDownloader-resources
-YoutubeClipboardAutoDownloader-resources/*
-!YoutubeClipboardAutoDownloader-resources/icon.png
-!YoutubeClipboardAutoDownloader-resources/icon.ico
-!YoutubeClipboardAutoDownloader-resources/icon.icns
-
-logs/
-build/
-jre*/
+jre/
 config.txt
 
 # Test audio files
