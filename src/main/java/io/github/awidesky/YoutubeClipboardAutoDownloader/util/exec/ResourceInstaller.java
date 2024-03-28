@@ -4,7 +4,9 @@ import static io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil.isLi
 import static io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil.isMac;
 import static io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil.isWindows;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,8 +34,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.swing.Box;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
@@ -203,19 +207,27 @@ public class ResourceInstaller {
 			loadingFrame.setSize(420, 100);
 			loadingFrame.setLocation(dim.width / 2 - loadingFrame.getSize().width / 2,
 					dim.height / 2 - loadingFrame.getSize().height / 2);
-			loadingFrame.setLayout(null);
+			loadingFrame.setLayout(new BorderLayout());
 			loadingFrame.setResizable(false);
 
 			loadingStatus = new JLabel("0.00byte / -");
-			loadingStatus.setBounds(14, 8, 370, 18);
+			loadingStatus.setSize(370, 18);
 
+			JPanel loading = new JPanel(new FlowLayout(FlowLayout.LEFT));
+			loading.add(Box.createVerticalStrut(20));
+			loading.add(loadingStatus);
+			
 			progress = new JProgressBar();
 			progress.setStringPainted(true);
-			progress.setBounds(15, 27, 370, 18);
-
-			loadingFrame.add(loadingStatus);
-			loadingFrame.add(progress);
+			progress.setSize(370, 18);
+			JPanel init = new JPanel(new FlowLayout(FlowLayout.LEFT));
+			init.add(Box.createVerticalStrut(10));
+			init.add(progress);
+			
+			loadingFrame.add(loading, BorderLayout.NORTH);
+			loadingFrame.add(init, BorderLayout.CENTER);
 			loadingFrame.setVisible(true);
+
 		});
 	}
 	private static void setLoadingFrameContent(String title, long totalSize) {
