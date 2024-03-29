@@ -137,7 +137,8 @@ public class Main {
 		/** Set Default Uncaught Exception Handlers */
 		Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
 			try {
-				SwingDialogs.error("Unhandled exception in thread " + t.getName() + " : " + ((Exception)e).getClass().getName(), "%e%", (Exception)e , true);
+				SwingDialogs.error("Unhandled exception in thread " + t.getName() + " : " + e.getClass().getName(), "%e%", e , true);
+				e.printStackTrace();
 				Main.kill(ExitCodes.UNKNOWNERROR);
 			} catch(Exception err) {
 				err.printStackTrace();
@@ -146,7 +147,8 @@ public class Main {
 		SwingUtilities.invokeLater(() -> {
 			Thread.currentThread().setUncaughtExceptionHandler((t, e) -> {
 				try {
-					SwingDialogs.error("Unhandled exception in EDT : " + ((Exception) e).getClass().getName(), "%e%", (Exception) e, true);
+					SwingDialogs.error("Unhandled exception in EDT : " + e.getClass().getName(), "%e%", e, true);
+					e.printStackTrace();
 					Main.kill(ExitCodes.EDTFAILED);
 				} catch (Exception err) {
 					err.printStackTrace();
@@ -185,7 +187,7 @@ public class Main {
 			Main.kill(ExitCodes.EDTFAILED);
 		} catch (InvocationTargetException e2) {
 			logger.log("[init] " + e2.getCause().getClass().getSimpleName() + " thrown while loading application!");
-			SwingDialogs.error("Loading Failed!", "%e%", (Exception)e2.getCause(), true);
+			SwingDialogs.error("Loading Failed!", "%e%", e2.getCause(), true);
 			Main.kill(ExitCodes.EDTFAILED);
 		}
 
