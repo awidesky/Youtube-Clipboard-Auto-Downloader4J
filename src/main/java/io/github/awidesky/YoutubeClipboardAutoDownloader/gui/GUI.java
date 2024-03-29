@@ -96,9 +96,9 @@ public class GUI {
 		if(!OSUtil.isWindows()) Taskbar.getTaskbar().setIconImage(ICON);
 		loadingFrame.setIconImage(ICON);
 		loadingFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		loadingFrame.setSize(450, 90); //add more height than fxml because it does not think about title length
+		loadingFrame.setSize(450, 100); //add more height than fxml because it does not think about title length
 		loadingFrame.setLocation(dim.width/2-loadingFrame.getSize().width/2, dim.height/2-loadingFrame.getSize().height/2);
-		loadingFrame.setLayout(new BorderLayout());
+		loadingFrame.getContentPane().setLayout(new BoxLayout(loadingFrame.getContentPane(), BoxLayout.Y_AXIS));
 		loadingFrame.setResizable(false);
 		loadingFrame.addWindowListener(new WindowAdapter() {
 			@Override
@@ -109,20 +109,24 @@ public class GUI {
 			}
 		});
 		
+		
 		loadingStatus = new JLabel("");
-		loadingStatus.setSize(370, 18);
-		JPanel loading = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		loading.add(Box.createVerticalStrut(20));
-		loading.add(loadingStatus);
+		JPanel loading = new JPanel(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+		loading.add(Box.createHorizontalStrut(10));
+		loading.add(loadingStatus, gbc);
 		
 		initProgress = new JProgressBar();
-		initProgress.setSize(370, 18);
-		JPanel init = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		init.add(Box.createVerticalStrut(10));
-		init.add(initProgress);
+		JPanel init = new JPanel(new GridBagLayout());
+		init.add(Box.createHorizontalStrut(10));
+		init.add(initProgress, gbc);
+		init.add(Box.createHorizontalStrut(10));
 		
-		loadingFrame.add(loading, BorderLayout.NORTH);
-		loadingFrame.add(init, BorderLayout.CENTER);
+
+		loadingFrame.add(loading);
+		loadingFrame.add(init);
 		loadingFrame.setVisible(true);
 		
 	}

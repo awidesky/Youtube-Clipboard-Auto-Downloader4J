@@ -4,9 +4,9 @@ import static io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil.isLi
 import static io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil.isMac;
 import static io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil.isWindows;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,6 +35,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -207,25 +208,28 @@ public class ResourceInstaller {
 			loadingFrame.setSize(420, 100);
 			loadingFrame.setLocation(dim.width / 2 - loadingFrame.getSize().width / 2,
 					dim.height / 2 - loadingFrame.getSize().height / 2);
-			loadingFrame.setLayout(new BorderLayout());
+			loadingFrame.getContentPane().setLayout(new BoxLayout(loadingFrame.getContentPane(), BoxLayout.Y_AXIS));
 			loadingFrame.setResizable(false);
 
 			loadingStatus = new JLabel("0.00byte / -");
-			loadingStatus.setSize(370, 18);
 
-			JPanel loading = new JPanel(new FlowLayout(FlowLayout.LEFT));
-			loading.add(Box.createVerticalStrut(20));
-			loading.add(loadingStatus);
+			GridBagConstraints gbc = new GridBagConstraints();
+	        gbc.weightx = 1;
+	        gbc.fill = GridBagConstraints.HORIZONTAL;
+			
+			JPanel loading = new JPanel(new GridBagLayout());
+			loading.add(Box.createHorizontalStrut(10));
+			loading.add(loadingStatus, gbc);
 			
 			progress = new JProgressBar();
 			progress.setStringPainted(true);
-			progress.setSize(370, 18);
-			JPanel init = new JPanel(new FlowLayout(FlowLayout.LEFT));
-			init.add(Box.createVerticalStrut(10));
-			init.add(progress);
+			JPanel init = new JPanel(new GridBagLayout());
+			init.add(Box.createHorizontalStrut(10));
+			init.add(progress, gbc);
+			init.add(Box.createHorizontalStrut(10));
 			
-			loadingFrame.add(loading, BorderLayout.NORTH);
-			loadingFrame.add(init, BorderLayout.CENTER);
+			loadingFrame.add(loading);
+			loadingFrame.add(init);
 			loadingFrame.setVisible(true);
 
 		});
