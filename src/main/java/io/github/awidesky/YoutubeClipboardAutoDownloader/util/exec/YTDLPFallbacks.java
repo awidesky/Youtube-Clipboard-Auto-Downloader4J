@@ -2,7 +2,9 @@ package io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import io.github.awidesky.YoutubeClipboardAutoDownloader.Main;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.YoutubeClipboardAutoDownloader;
@@ -11,33 +13,29 @@ import io.github.awidesky.guiUtil.SwingDialogs;
 
 public class YTDLPFallbacks {
 
-	private static Logger log = Main.getLogger("[runFixCommand] ");
+	private static Logger log = Main.getLogger("[RunFixCommand] ");
 	private static FixCommand[] fixArr = new FixCommand[] {
-		new FixCommand("ERROR: unable to download video data: HTTP Error 403: Forbidden", YoutubeClipboardAutoDownloader.getYtdlpPath() + "yt-dlp", "--rm-cache-dir")
+		new FixCommand(Pattern.quote("ERROR: unable to download video data: HTTP Error 403: Forbidden"), YoutubeClipboardAutoDownloader.getYtdlpPath() + "yt-dlp", "--rm-cache-dir")
 	};
 	
-	public static boolean runFixCommand(String err) {
-		List<FixCommand> list = Arrays.stream(fixArr).filter(f -> err.startsWith(f.error)).toList();
+	public static Stream<Boolean> runFixCommand(String err) {
+		List<FixCommand> list = Arrays.stream(fixArr).filter(f -> f.error.matcher(err).matches()).toList();
 
 		if(list.isEmpty()) {
 			log.log("no available fix for : " + err);
-			return false;
+			return Stream.of(Boolean.FALSE);
 		}
-		if (list.size() > 1) {
-			return list.stream().filter(f -> err.equals(f.error)).map(FixCommand::runFixCommand).allMatch(b-> b);
-		} else {
-			return list.get(0).runFixCommand();
-		}
+		return list.stream().map(FixCommand::runFixCommand);
 	}
 	
 	
 	static class FixCommand {
 		
-		private final String error;
+		private final Pattern error;
 		private final String[] command;
 		
 		FixCommand(String error, String... command) {
-			this.error = error;
+			this.error = Pattern.compile(error);
 			this.command = command;
 		}
 		
@@ -48,12 +46,13 @@ public class YTDLPFallbacks {
 			
 			// start process
 			try {
-				log.log("Executing ended with exit code : " + ProcessExecutor.runNow(log, null, command));
+				int ret = ProcessExecutor.runNow(log, null, command);
+				log.log("Executing ended with exit code : " + ret);
+				return ret == 0;
 			} catch (Exception e) {
 				SwingDialogs.error("Error!", "Error when fixing yt-dlp problem!\n%e%", e, false);
 				return false;
 			}
-			return true;
 		}
 	}
 }

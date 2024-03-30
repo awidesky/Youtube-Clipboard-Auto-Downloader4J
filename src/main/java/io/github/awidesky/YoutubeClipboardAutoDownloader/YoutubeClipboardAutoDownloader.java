@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil;
@@ -223,12 +224,14 @@ public class YoutubeClipboardAutoDownloader {
 				}
 			}, br -> {
 				try {
-					StringBuilder sb = new StringBuilder();
+					StringBuilder warning = new StringBuilder();
+					StringBuilder error = new StringBuilder();
 					br.lines().forEach(l -> {
 						task.logger.log("[validating] yt-dlp stderr : " + l);
-						sb.append(l).append("\n");
+						(l.startsWith("WARNING") ? warning : error).append(l).append("\n");
 					});
-					if(!sb.isEmpty()) SwingDialogs.error("Error when getting video name", "[Task" + task.getTaskNum() + "|validating]\n" + sb.toString(), null, true);
+					if(!warning.isEmpty()) SwingDialogs.warning("Warning when getting video name", "[Task" + task.getTaskNum() + "|validating]\n" + warning.toString(), null, true);
+					if(!error.isEmpty()) SwingDialogs.error("Error when getting video name", "[Task" + task.getTaskNum() + "|validating]\n" + error.toString(), null, true);
 				} catch (UncheckedIOException e1) {
 					IOException e = e1.getCause();
 					SwingDialogs.error("Error when getting video name", "[Task" + task.getTaskNum() + "|validating] " + e.getClass().getName() + " :  %e%", e, true);
@@ -331,27 +334,31 @@ public class YoutubeClipboardAutoDownloader {
 			}, br -> {
 				try {
 					String line = null;
-					List<String> lines = new ArrayList<>();
+					List<String> errors = new ArrayList<>();
+					List<String> warnings = new ArrayList<>();
 					while ((line = br.readLine()) != null) {
 						task.logger.log("[downloading] yt-dlp stderr : " + line);
-						lines.add(line);
+						(line.startsWith("WARNING") ? warnings : errors).add(line);
 					}
 
-					if (!lines.isEmpty()) {
-						if (lines.stream().map(YTDLPFallbacks::runFixCommand).allMatch(b -> b)) {
-							task.setVideoName(task.getVideoName() + " (error occurred but fixed, continuing download)");
-							if (task.getTotalNumVideo() == 1) { // not a PlayList?
-								download(url, task, playListOption);
-							} else {
-								download(url, task, playListOption, "--playlist-start", String.valueOf(task.getNowVideoNum()));
-							}
-							return;
+					if (Stream.concat(errors.stream(), warnings.stream()).flatMap(YTDLPFallbacks::runFixCommand).reduce(Boolean.FALSE, Boolean::logicalOr)) {
+						task.setVideoName(task.getVideoName() + " (problem occurred but fixed, re-trying download)");
+						if (task.getTotalNumVideo() == 1) { // not a PlayList?
+							download(url, task, playListOption);
+						} else {
+							download(url, task, playListOption, "--playlist-start", String.valueOf(task.getNowVideoNum()));
 						}
-
-						task.failed();
+						return;
+					}
+					if (!errors.isEmpty()) {
 						SwingDialogs.error("Error [" + task.getVideoName() + "]",
-								"[Task" + task.getTaskNum() + "|downloading] There's Error(s) in yt-dlp proccess!\n"
-										+ lines.stream().collect(Collectors.joining("\n")), null, true);
+								"[Task" + task.getTaskNum() + "|downloading] There's error(s) in yt-dlp proccess!\n"
+										+ errors.stream().collect(Collectors.joining("\n")), null, true);
+					}
+					if (!warnings.isEmpty()) {
+						SwingDialogs.warning("Warning [" + task.getVideoName() + "]",
+							"[Task" + task.getTaskNum() + "|downloading] There's warning(s) in yt-dlp proccess!\n"
+									+ warnings.stream().collect(Collectors.joining("\n")), null, true);
 					}
 				} catch (Exception e) {
 					task.failed();
