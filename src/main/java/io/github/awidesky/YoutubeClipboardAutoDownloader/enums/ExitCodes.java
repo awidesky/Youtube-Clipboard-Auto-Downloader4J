@@ -20,4 +20,9 @@ public enum ExitCodes {
 	public String getMsg() { return msg; }
 	public int getCode() { return code; }
 
+	@Override
+	public String toString() {
+		return code + " (" + msg + ")";
+	}
+
 }

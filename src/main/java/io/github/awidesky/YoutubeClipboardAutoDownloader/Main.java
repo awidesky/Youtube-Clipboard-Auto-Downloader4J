@@ -402,7 +402,8 @@ public class Main {
 		TaskThreadPool.kill(2500);
 		writeProperties();
 		if(logger != null) {
-			logger.log("YoutubeClipboardAutoDownloader exit code : " + exitCode.getCode());
+			logger.log("Clipboard-dl exit code : " + exitCode.getCode());
+			if(exitCode != ExitCodes.SUCCESSFUL) SwingDialogs.error("Error code : " + exitCode.getCode(), "Exit code : " + exitCode, null, true);
 			logger.close();
 		}
 		loggerThread.shutdown(2500);
