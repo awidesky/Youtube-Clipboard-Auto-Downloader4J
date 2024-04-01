@@ -215,6 +215,7 @@
 									<directory>${project.basedir}</directory>
 									<includes>
 										<include>icon.png</include>
+										<include>LICENSE</include>
 									</includes>
 								</resource>
 							</resources>
@@ -234,6 +235,7 @@
 									<directory>${project.basedir}</directory>
 									<includes>
 										<include>icon.png</include>
+										<include>LICENSE</include>
 									</includes>
 								</resource>
 							</resources>
