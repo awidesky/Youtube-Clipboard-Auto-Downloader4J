@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.ClipBoardOption;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
+import io.github.awidesky.guiUtil.SwingDialogs;
 
 public class Config { 
 	
@@ -18,6 +19,7 @@ public class Config {
 	private static PlayListOption playlistOption = getDefaultPlaylistOption();
 	private static String fileNameFormat = getDefaultFileNameFormat();
 	private static ClipBoardOption clipboardListenOption = getDefaultClipboardListenOption();
+	private static long ytdlpUpdateDuration = getDefaultYtdlpUpdateDuration();
 	private static List<String> acceptableLinks = new ArrayList<>(List.of("https://www.youtu", "youtube.com"));
 	
 	public static String getSaveto() { return saveto; }
@@ -43,13 +45,22 @@ public class Config {
 	public static ClipBoardOption getClipboardListenOption() { return clipboardListenOption; }
 	public static void setClipboardListenOption(String clipboardListenOption) { Config.clipboardListenOption = ClipBoardOption.get(clipboardListenOption); }
 
+	public static long getYtdlpUpdateDuration() { return ytdlpUpdateDuration; }
+	public static void setYtdlpUpdateDuration(String ytdlpUpdateDuration) {
+		try {
+			Config.ytdlpUpdateDuration = Long.parseLong(ytdlpUpdateDuration);
+		} catch (NumberFormatException e) {
+			SwingDialogs.warning(ytdlpUpdateDuration + " is not a valid integer!", "%e%\nyt-dlp update period will set to : " + ytdlpUpdateDuration, e, false);
+		}
+	}
+
 	public static void addAcceptableList(String s) { acceptableLinks.add(s); }
 	public static boolean isLinkAcceptable(String s) { return acceptableLinks.stream().anyMatch(valid -> s.startsWith(valid)); }
 	public static String getAcceptedLinkStr(String delimiter) { return acceptableLinks.stream().collect(Collectors.joining(delimiter)); }
 	
 	public static String status() {
-		return String.format("\n\tdownloadpath-%s\n\tformat-%s\n\tquality-%s\n\tplaylistoption-%s\n\tfilenameformat-%s\n\tclipboardListenOption-%s\n\tAccepted links starts by :\n\t    %s\n",
-				Config.saveto, Config.format, Config.quality, Config.playlistOption, Config.fileNameFormat, Config.clipboardListenOption.getString(), Config.getAcceptedLinkStr(System.lineSeparator() + "\t    "));
+		return String.format("\n\tdownloadpath-%s\n\tformat-%s\n\tquality-%s\n\tplaylistoption-%s\n\tfilenameformat-%s\n\tclipboardListenOption-%s\n\tyt-dlp update period(days)-%s\n\tAccepted links starts by :\n\t    %s\n",
+				Config.saveto, Config.format, Config.quality, Config.playlistOption, Config.fileNameFormat, Config.clipboardListenOption.getString(), Config.ytdlpUpdateDuration, Config.getAcceptedLinkStr(System.lineSeparator() + "\t    "));
 	}
 	
 	
@@ -60,4 +71,5 @@ public class Config {
 	public static PlayListOption getDefaultPlaylistOption() { return PlayListOption.NO; }
 	public static String getDefaultFileNameFormat() { return "%(title)s.%(ext)s"; }
 	public static ClipBoardOption getDefaultClipboardListenOption() { return ClipBoardOption.AUTOMATIC; }
+	public static long getDefaultYtdlpUpdateDuration() { return 10; }
 }

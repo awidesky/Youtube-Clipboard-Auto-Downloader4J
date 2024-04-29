@@ -290,6 +290,7 @@ public class Main {
 		String l = Config.getDefaultPlaylistOption().toCommandArgm();
 		String n = Config.getDefaultFileNameFormat(); 
 		String c = Config.getDefaultClipboardListenOption().getString(); 
+		String u = Long.toString(Config.getDefaultYtdlpUpdateDuration()); 
 		
 		
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
@@ -310,6 +311,7 @@ public class Main {
 			l = read.apply(l);
 			n = read.apply(n);
 			c = read.apply(c);
+			u = read.apply(u);
 			
 			String s;
 			while((s = br.readLine()) != null) {
@@ -356,6 +358,7 @@ public class Main {
 			bw.write("Playlist=" + 				Optional.ofNullable(Config.getPlaylistOption())			.orElse(Config.getDefaultPlaylistOption()).toComboBox());		bw.newLine();
 			bw.write("FileNameFormat=" + 		Optional.ofNullable(Config.getFileNameFormat())			.orElse(Config.getDefaultFileNameFormat()));					bw.newLine();
 			bw.write("ClipboardListenOption=" + Optional.ofNullable(Config.getClipboardListenOption())	.orElse(Config.getDefaultClipboardListenOption()).getString());	bw.newLine();
+			bw.write("yt-dlp update (days)=" +  Optional.ofNullable(Config.getYtdlpUpdateDuration())	.orElse(Config.getDefaultYtdlpUpdateDuration()));				bw.newLine();
 			
 			bw.newLine();
 			bw.write("#If you know a type of link that yt-dlp accepts (listed in https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md),"); bw.newLine();

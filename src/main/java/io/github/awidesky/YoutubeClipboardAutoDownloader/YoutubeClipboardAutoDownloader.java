@@ -3,12 +3,13 @@ package io.github.awidesky.YoutubeClipboardAutoDownloader;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -148,23 +149,26 @@ public class YoutubeClipboardAutoDownloader {
 						log.log("Found valid command to execute yt-dlp : \"" + ydlfile + "\"");
 						log.log("yt-dlp version : " + line);
 
-						int today = Integer.parseInt(new SimpleDateFormat("yyyyMMdd").format(new Date()));
-						int ytdlpDay = Integer.parseInt(line.substring(0, 10).replace(".", ""));
-						log.log("Today : " + today + ", yt-dlp release day : " + ytdlpDay);
+						DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+						LocalDate today = LocalDate.now();
+						LocalDate ytdlpDay = LocalDate.parse(line, dateFormat);
 						
-						if (today - ytdlpDay >= 100) { // update if yt-dlp version is older than a month
-							log.log("yt-dlp is older than a month. update process start...");
+						log.log("Today : " + dateFormat.format(today) + ", yt-dlp release day : " + dateFormat.format(ytdlpDay));
+						long duration = Config.getYtdlpUpdateDuration();
+						
+						if (ChronoUnit.DAYS.between(ytdlpDay, today) >= duration) { 
+							log.log("yt-dlp version is older than " + duration + "days. update process start...");
 							try {
 								int e;
 								if ((e = ProcessExecutor.runNow(Main.getLogger("[yt-dlp update] "), null, ydlfile, "--update")) != 0)
 									throw new Exception("Error code : " + e);
 							} catch (Exception e) {
-								SwingDialogs.warning("Failed to update yt-dlp : " + e.getClass().getName(), "%e%\nCannot update yt-dlp!\nUse version " + line + "instead...",
+								SwingDialogs.warning("Failed to update yt-dlp : " + e.getClass().getName(), "%e%\nCannot update yt-dlp!\nUsing version " + line + " instead...",
 										e, true);
 							}
 							
 						} else {
-							log.log("yt-dlp is not older than a month. update process skipped...");
+							log.log("yt-dlp version is not older than " + duration + "days. update process skipped...");
 						}
 
 					} else {
