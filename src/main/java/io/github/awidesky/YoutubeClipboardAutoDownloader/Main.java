@@ -433,8 +433,8 @@ public class Main {
 	}
 	
 
-	public static void openConfig() {
-		File f = new File(YoutubeClipboardAutoDownloader.getAppdataPath() + File.separator + "config.txt");
+	public static void openAppFolder() {
+		File f = new File(YoutubeClipboardAutoDownloader.getAppdataPath());
 		try {
 			Desktop.getDesktop().open(f);
 		} catch (IOException e) {

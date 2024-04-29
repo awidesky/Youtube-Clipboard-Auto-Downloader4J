@@ -62,7 +62,7 @@ public class GUI {
 	public static final Image ICON = getICON();
 
 	private JFrame mainFrame;
-	private JButton browse, cleanCompleted, removeSwitch, nameFormatHelp, openConfig, modeSwitch, openSaveDir;
+	private JButton browse, cleanCompleted, removeSwitch, nameFormatHelp, openAppFolder, modeSwitch, openSaveDir;
 	private JLabel format, quality, path, nameFormat, playList;
 	private JTextField pathField, nameFormatField;
 	private JComboBox<String> cb_format, cb_quality, cb_playList, cb_clipboardOption;
@@ -245,7 +245,7 @@ public class GUI {
 		cleanCompleted = new JButton("clean completed");
 		removeSwitch = new JButton("remove selected");
 		nameFormatHelp = new JButton("<= help?");
-		openConfig = new JButton("open config.txt");
+		openAppFolder = new JButton("open app folder");
 		modeSwitch = new JButton(" <-> download video ");
 		openSaveDir = new JButton("open");
 		
@@ -263,7 +263,7 @@ public class GUI {
 		});
 		cleanCompleted.addActionListener((e) -> { TaskStatusModel.getinstance().clearDone(); });
 		nameFormatHelp.addActionListener((e) -> { Main.webBrowse("https://github.com/yt-dlp/yt-dlp#output-template"); });
-		openConfig.addActionListener((e) -> { Main.openConfig(); });
+		openAppFolder.addActionListener((e) -> { Main.openAppFolder(); });
 		modeSwitch.addActionListener((e) -> { swapMode(); });
 		openSaveDir.addActionListener((e) -> { Main.openSaveFolder(); });
 		
@@ -271,7 +271,7 @@ public class GUI {
 		cleanCompleted.setSize(cleanCompleted.getPreferredSize().width, cleanCompleted.getPreferredSize().height);
 		removeSwitch.setSize(removeSwitch.getPreferredSize().width, removeSwitch.getPreferredSize().height);
 		nameFormatHelp.setSize(nameFormatHelp.getPreferredSize().width, nameFormatHelp.getPreferredSize().height);
-		openConfig.setSize(openConfig.getPreferredSize().width, openConfig.getPreferredSize().height);
+		openAppFolder.setSize(openAppFolder.getPreferredSize().width, openAppFolder.getPreferredSize().height);
 		modeSwitch.setSize(modeSwitch.getPreferredSize().width, modeSwitch.getPreferredSize().height);
 		openSaveDir.setSize(openSaveDir.getPreferredSize().width, openSaveDir.getPreferredSize().height);
 		
@@ -455,7 +455,7 @@ public class GUI {
 		root.add(cleanCompleted);
 		root.add(removeSwitch);
 		root.add(cb_clipboardOption);
-		root.add(openConfig);
+		root.add(openAppFolder);
 		return root;
 	}
 	
