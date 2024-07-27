@@ -203,7 +203,7 @@ public class YoutubeClipboardAutoDownloader {
 		try {
 			Instant startTime = Instant.now();
 			
-			LinkedList<String> args = new LinkedList<>(Arrays.asList(new String[] { ytdlpPath + "yt-dlp", "--get-filename", "-o",
+			LinkedList<String> args = new LinkedList<>(Arrays.asList(new String[] { ytdlpPath + "yt-dlp", "--ffmpeg-location", ytdlpPath, "--get-filename", "-o",
 					ytdlpQuote + Config.getFileNameFormat().replace("%(ext)s", Config.getFormat()) + ytdlpQuote, url }));
 			if(playListOption.toCommandArgm() != null) args.add(2, playListOption.toCommandArgm());
 			
