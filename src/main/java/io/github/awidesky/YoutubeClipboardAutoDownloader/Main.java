@@ -438,7 +438,7 @@ public class Main {
 		try {
 			Desktop.getDesktop().open(f);
 		} catch (IOException e) {
-			SwingDialogs.warning("Cannot open default text file editor!", "Please open manullay " + f.getAbsolutePath() + "\n%e%", e, true);
+			SwingDialogs.warning("Cannot open directory explorer!", "Please open manually " + f.getAbsolutePath() + "\n%e%", e, true);
 		}
 	}
 	
@@ -447,7 +447,7 @@ public class Main {
 		try {
 			Desktop.getDesktop().open(f);
 		} catch (IOException e) {
-			SwingDialogs.warning("Cannot open directory explorer!", "Please open manullay " + f.getAbsolutePath() + "\n%e%", e, true);
+			SwingDialogs.warning("Cannot open directory explorer!", "Please open manually " + f.getAbsolutePath() + "\n%e%", e, true);
 		}
 	}
 
