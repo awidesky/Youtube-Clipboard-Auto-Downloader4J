@@ -10,7 +10,6 @@ import java.awt.GridBagLayout;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -27,6 +26,7 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Scanner;
@@ -134,7 +134,7 @@ public class ResourceInstaller {
 		dest.createNewFile();
 		
 		try (ReadableByteChannel in = Channels.newChannel(url.openStream());
-				FileChannel out = new FileOutputStream(dest).getChannel()) {
+				FileChannel out = FileChannel.open(dest.toPath(), StandardOpenOption.WRITE)) {
 
 			log.log("Downloading from " + url.toString() + " to " + dest.getAbsolutePath());
 			log.log("Buffer size : " + formatFileSize(BUFFER_SIZE));
