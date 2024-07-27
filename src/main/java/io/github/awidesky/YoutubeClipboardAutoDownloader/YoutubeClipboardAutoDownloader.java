@@ -156,11 +156,11 @@ public class YoutubeClipboardAutoDownloader {
 						log.log("Today : " + dateFormat.format(today) + ", yt-dlp release day : " + dateFormat.format(ytdlpDay));
 						long duration = Config.getYtdlpUpdateDuration();
 						
-						if (ChronoUnit.DAYS.between(ytdlpDay, today) >= duration) { 
+						if (ChronoUnit.DAYS.between(ytdlpDay, today) >= duration && SwingDialogs.confirm("Update yt-dlp?", "yt-dlp version is older than " + duration + "days.\nUpdate yt-dlp?")) { 
 							log.log("yt-dlp version is older than " + duration + "days. update process start...");
 							try {
 								int e;
-								if ((e = ProcessExecutor.runNow(Main.getLogger("[yt-dlp update] "), null, ydlfile, "--update")) != 0)
+								if ((e = ProcessExecutor.runNow(Main.getLogger("[yt-dlp update] "), null, getYtdlpUpdateCommands(ydlfile))) != 0)
 									throw new Exception("Error code : " + e);
 							} catch (Exception e) {
 								SwingDialogs.warning("Failed to update yt-dlp : " + e.getClass().getName(), "%e%\nCannot update yt-dlp!\nUsing version " + line + " instead...",
@@ -168,7 +168,7 @@ public class YoutubeClipboardAutoDownloader {
 							}
 							
 						} else {
-							log.log("yt-dlp version is not older than " + duration + "days. update process skipped...");
+							log.log("yt-dlp version is not older than " + duration + "days, or user does not want to update it. update process skipped...");
 						}
 
 					} else {
@@ -194,6 +194,13 @@ public class YoutubeClipboardAutoDownloader {
 
 	}
 	
+	private static String[] getYtdlpUpdateCommands(String ydlfile) {
+		if(ytdlpPath.contains("homebrew"))
+			return new String[]{"brew", "update;", "brew", "upgrade", "yt-dlp"};
+		else 
+			return new String[]{ydlfile, "--update"};
+	}
+
 	public static String getYtdlpPath() { return ytdlpPath; }
 	public static String getProjectPath() { return projectPath; }
 	public static String getAppdataPath() { return appDataPath;	}
