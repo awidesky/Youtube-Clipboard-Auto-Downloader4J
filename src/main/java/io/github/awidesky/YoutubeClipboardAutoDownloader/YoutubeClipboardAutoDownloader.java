@@ -350,7 +350,7 @@ public class YoutubeClipboardAutoDownloader {
 					List<String> warnings = new ArrayList<>();
 					while ((line = br.readLine()) != null) {
 						task.logger.log("[downloading] yt-dlp stderr : " + line);
-						(line.startsWith("WARNING") ? warnings : errors).add(line);
+						(line.startsWith("ERROR") ? errors : warnings).add(line);
 					}
 
 					if (Stream.concat(errors.stream(), warnings.stream()).flatMap(YTDLPFallbacks::runFixCommand).reduce(Boolean.FALSE, Boolean::logicalOr)) {
