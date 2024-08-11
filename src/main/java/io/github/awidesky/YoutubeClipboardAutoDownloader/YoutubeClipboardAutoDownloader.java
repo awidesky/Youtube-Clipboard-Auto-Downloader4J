@@ -158,6 +158,7 @@ public class YoutubeClipboardAutoDownloader {
 						
 						if (ChronoUnit.DAYS.between(ytdlpDay, today) >= duration && SwingDialogs.confirm("Update yt-dlp?", "yt-dlp version is older than " + duration + "days.\nUpdate yt-dlp?")) { 
 							log.log("yt-dlp version is older than " + duration + "days. update process start...");
+							Main.editYtdlpUpdateTitle();
 							try {
 								int e;
 								if ((e = ProcessExecutor.runNow(Main.getLogger("[yt-dlp update] "), null, getYtdlpUpdateCommands(ydlfile))) != 0)
