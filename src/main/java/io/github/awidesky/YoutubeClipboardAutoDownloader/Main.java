@@ -451,7 +451,4 @@ public class Main {
 		}
 	}
 
-	public static void editYtdlpUpdateTitle() {
-		SwingUtilities.invokeLater(() -> gui.setLoadingStat(LoadingStatus.UPDATING_YTDLP));
-	}
 }
