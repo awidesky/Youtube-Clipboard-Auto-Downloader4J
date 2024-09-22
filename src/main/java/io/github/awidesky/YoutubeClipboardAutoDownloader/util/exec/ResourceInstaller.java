@@ -27,10 +27,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -69,18 +74,16 @@ public class ResourceInstaller {
 	
 	
 	public static void getFFmpeg() throws MalformedURLException, IOException, InterruptedException, ExecutionException {
-		deleteDirectoryRecursion(Paths.get(root, "ffmpeg"));
-		
 		log.log("Installing ffmpeg...");
 		showProgress("Downloading ffmpeg");
-		String url = "Unknown_OS!";
 		
 		if(isWindows()) {
-			url = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip";		
+			deleteDirectoryRecursion(Paths.get(root, "ffmpeg"));
+			String url = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip";		
 			long filesize = getFileSize(new URL(url));
 			log.log("Length of " + url + " : " + filesize);
 			
-			setLoadingFrameContent("Downloading ffmpeg version " + getContent(new URL("https://www.gyan.dev/ffmpeg/builds/release-version")), filesize);
+			setLoadingFrameContent("Downloading ffmpeg version " + stripVersionNumbers(new URL("https://www.gyan.dev/ffmpeg/builds/release-version")), filesize);
 		
 			download(new URL(url), new File(root + File.separator + "ffmpeg.zip"));
 			
@@ -95,7 +98,6 @@ public class ResourceInstaller {
 			Files.delete(Paths.get(root, "ffmpeg.zip"));
 			Files.delete(Paths.get(root, "ffmpeg", "bin", "ffplay.exe"));
 			Files.delete(Paths.get(root, "ffmpeg", "bin", "ffprobe.exe"));
-			Files.delete(Paths.get(root, "ffmpeg", "README.txt"));
 			deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "doc"));
 			deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "presets"));
 
@@ -104,8 +106,52 @@ public class ResourceInstaller {
 			setLoadingFrameContent("Downloading ffmpeg via \"brew install ffmpeg\"... (Progress bar will stay in 0)", -1);
 			ProcessExecutor.runNow(log, null, "/bin/bash", "-c", "/opt/homebrew/bin/brew install ffmpeg");
 		} else if(isLinux()) {
-			setLoadingFrameContent("Downloading ffmpeg via \"sudo apt install ffmpeg\"...", -1);
-			ProcessExecutor.runNow(log, null, "sudo", "apt", "install", "ffmpeg");
+			deleteDirectoryRecursion(Paths.get(root, "ffmpeg"));
+			String arch = System.getProperty("os.arch").toLowerCase();
+			arch = switch (arch) {
+			case "aarch64" -> "arm64";
+			case "amd64" -> "amd64";
+			case "x86_64" -> "amd64";
+			case "x86" -> "i686";
+			default -> {
+				String ret;
+				if (arch.contains("amd") || arch.contains("x64"))
+					ret = "amd64";
+				else if (arch.contains("arm") || arch.contains("aarch"))
+					ret = "arm64";
+				else {
+					log.log("Unable to guess architecture. Please report to https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J/issues");
+					ret = "amd64";
+				}
+				log.log("Unrecognized architecture : " + arch + ". Considering it's " + ret);
+				yield ret;
+			}
+			};
+			String url = "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-" + arch + "-static.tar.xz";		
+			long filesize = getFileSize(new URL(url));
+			log.log("Length of " + url + " : " + filesize);
+			
+			setLoadingFrameContent("Downloading ffmpeg version " + stripVersionNumbers(new URL("https://johnvansickle.com/ffmpeg/release-readme.txt")), filesize);
+		
+			download(new URL(url), new File(root + File.separator + "ffmpeg.tar.xz"));
+			
+			List<String> untar = new ArrayList<>();
+			if(!new File(root, "ffmpeg").mkdirs())
+				untar.addAll(List.of("mkdir", "ffmpeg;"));
+			
+			untar.addAll(List.of("tar", "-xf", "ffmpeg.tar.xz", "-C", "ffmpeg", "--strip-components", "1"));
+			log.log("Unzipping ffmpeg.tar.xz with : " + untar.stream().collect(Collectors.joining(" " )));
+			ProcessExecutor.runNow(log, new File(root), untar.toArray(String[]::new));
+			
+			File ff = new File(root + File.separator + "ffmpeg", "ffmpeg");
+			new File(root + File.separator + "ffmpeg" + File.separator + "bin").mkdirs();
+			ff.renameTo(new File(ff.getParentFile().getAbsolutePath() + File.separator + "bin" + File.separator + "ffmpeg"));
+			Files.delete(Paths.get(root, "ffmpeg.tar.xz"));
+			Files.delete(Paths.get(root, "ffmpeg", "ffprobe"));
+			Files.delete(Paths.get(root, "ffmpeg", "qt-faststart"));
+			deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "manpages"));
+
+			hideProgress();
 		}
 
 		log.log("ffmpeg installed!!");
@@ -117,7 +163,7 @@ public class ResourceInstaller {
 		
 		log.log("Installing yt-dlp...");
 		showProgress("Downloading yt-dlp");
-		String url = YTDLP_URL + (isWindows() ? ".exe" : (isMac() ? "_macos" : "_linux"));
+		String url = YTDLP_URL + (isWindows() ? ".exe" : "");
 		long filesize = getFileSize(new URL(url));
 		log.log("Length of " + url + " : " + filesize);
 		String releaseURL = getRedirectedURL(new URL("https://github.com/yt-dlp/yt-dlp/releases/latest"));
@@ -174,10 +220,18 @@ public class ResourceInstaller {
 		}
 	}
 
-	private static String getContent(URL url) {
+	private static String stripVersionNumbers(URL url) {
 		try (Scanner scanner = new Scanner(url.openStream(), StandardCharsets.UTF_8.toString())) {
-			scanner.useDelimiter("\\A");
-			return scanner.hasNext() ? scanner.next() : "";
+			Pattern ptr = Pattern.compile(".*(\\d\\.\\d\\.\\d).*");
+			while(scanner.hasNext()) {
+				String str = scanner.nextLine();
+				Matcher m = ptr.matcher(str);
+				if(m.find()) {
+					return m.group(1);
+				}
+			}
+			
+			return "";
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

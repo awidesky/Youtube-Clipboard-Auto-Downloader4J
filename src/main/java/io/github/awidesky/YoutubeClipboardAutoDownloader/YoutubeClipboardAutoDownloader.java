@@ -48,6 +48,8 @@ public class YoutubeClipboardAutoDownloader {
 			ytdlpPath = appDataPath + File.separator + "ffmpeg" + File.separator + "bin" + File.separator;
 		} else if(OSUtil.isMac()) {
 			ytdlpPath = "/opt/homebrew/bin/";
+		} else if(OSUtil.isLinux()) {
+			ytdlpPath = appDataPath + File.separator + "ffmpeg" + File.separator;
 		}
 	}
 	/**
@@ -61,8 +63,7 @@ public class YoutubeClipboardAutoDownloader {
 		// start process
 		if (!checkFfmpegPath(ytdlpPath, log) && !checkFfmpegPath("", log)) {
 			SwingDialogs.error("Error!", "no vaild ffmpeg installation in\n" + ytdlpPath + "\nor system %PATH%", null, true);
-			String installPrompt = OSUtil.isWindows() ? "Install ffmpeg in app resource folder?" : 
-				(OSUtil.isMac() ? "Install ffmpeg via \"brew install ffmpeg\"?" : "Install ffmpeg via \"sudo apt install ffmpeg\"?");
+			String installPrompt = OSUtil.isMac() ? "Install ffmpeg via \"brew install ffmpeg\"?" : "Install ffmpeg in app resource folder?";
 			if (ResourceInstaller.ffmpegAvailable() && SwingDialogs.confirm("ffmpeg installation invalid!", installPrompt)) {
 				try {
 					ResourceInstaller.getFFmpeg();
