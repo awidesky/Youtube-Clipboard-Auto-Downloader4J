@@ -93,7 +93,7 @@ public class GUI {
 		/** make <code>loadingFrame</code> */
 		loadingFrame = new JFrame();
 		loadingFrame.setTitle("loading...");
-		if(!OSUtil.isWindows()) Taskbar.getTaskbar().setIconImage(ICON);
+		if(!OSUtil.isWindows() && Taskbar.isTaskbarSupported()) Taskbar.getTaskbar().setIconImage(ICON);
 		loadingFrame.setIconImage(ICON);
 		loadingFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		loadingFrame.setSize(450, 100); //add more height than fxml because it does not think about title length
