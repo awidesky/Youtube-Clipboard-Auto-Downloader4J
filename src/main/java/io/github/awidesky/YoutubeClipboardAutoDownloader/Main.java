@@ -183,10 +183,12 @@ public class Main {
 
 		} catch (InterruptedException e1) {
 			logger.log("[init] EDT failed while loading application!");
+			e1.printStackTrace();
 			SwingDialogs.error("EDT Interrupted!", "%e%", e1, true);
 			Main.kill(ExitCodes.EDTFAILED);
 		} catch (InvocationTargetException e2) {
 			logger.log("[init] " + e2.getCause().getClass().getSimpleName() + " thrown while loading application!");
+			e2.printStackTrace();
 			SwingDialogs.error("Loading Failed!", "%e%", e2.getCause(), true);
 			Main.kill(ExitCodes.EDTFAILED);
 		}
