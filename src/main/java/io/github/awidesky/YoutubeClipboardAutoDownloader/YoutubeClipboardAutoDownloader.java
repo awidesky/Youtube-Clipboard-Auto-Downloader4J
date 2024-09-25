@@ -44,12 +44,10 @@ public class YoutubeClipboardAutoDownloader {
 	public static final String ytdlpQuote = OSUtil.isWindows() ? "\"" : "";
 	
 	static {
-		if(OSUtil.isWindows()) {
+		if(OSUtil.isWindows() || OSUtil.isLinux()) {
 			ytdlpPath = appDataPath + File.separator + "ffmpeg" + File.separator + "bin" + File.separator;
 		} else if(OSUtil.isMac()) {
 			ytdlpPath = "/opt/homebrew/bin/";
-		} else if(OSUtil.isLinux()) {
-			ytdlpPath = appDataPath + File.separator + "ffmpeg" + File.separator;
 		}
 	}
 	/**

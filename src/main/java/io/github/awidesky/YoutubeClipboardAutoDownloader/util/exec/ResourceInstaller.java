@@ -107,26 +107,7 @@ public class ResourceInstaller {
 			ProcessExecutor.runNow(log, null, "/bin/bash", "-c", "/opt/homebrew/bin/brew install ffmpeg");
 		} else if(isLinux()) {
 			deleteDirectoryRecursion(Paths.get(root, "ffmpeg"));
-			String arch = System.getProperty("os.arch").toLowerCase();
-			arch = switch (arch) {
-			case "aarch64" -> "arm64";
-			case "amd64" -> "amd64";
-			case "x86_64" -> "amd64";
-			case "x86" -> "i686";
-			default -> {
-				String ret;
-				if (arch.contains("amd") || arch.contains("x64"))
-					ret = "amd64";
-				else if (arch.contains("arm") || arch.contains("aarch"))
-					ret = "arm64";
-				else {
-					log.log("Unable to guess architecture. Please report to https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J/issues");
-					ret = "amd64";
-				}
-				log.log("Unrecognized architecture : " + arch + ". Considering it's " + ret);
-				yield ret;
-			}
-			};
+			String arch = getArch();
 			String url = "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-" + arch + "-static.tar.xz";		
 			long filesize = getFileSize(new URL(url));
 			log.log("Length of " + url + " : " + filesize);
@@ -157,13 +138,50 @@ public class ResourceInstaller {
 		log.log("ffmpeg installed!!");
 	}
 	
+	private static String getArch() {
+		String arch = System.getProperty("os.arch").toLowerCase();
+		return switch (arch) {
+		case "aarch64" -> "arm64";
+		case "amd64" -> "amd64";
+		case "x86_64" -> "amd64";
+		case "x86" -> "i686";
+		default -> {
+			String ret;
+			if (arch.contains("amd") || arch.contains("x64"))
+				ret = "amd64";
+			else if (arch.contains("arm") || arch.contains("aarch"))
+				ret = "arm64";
+			else {
+				log.log("Unable to guess architecture. Please report to https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J/issues");
+				ret = "amd64";
+			}
+			log.log("Unrecognized architecture : " + arch + ". Considering it's " + ret);
+			yield ret;
+		}
+		};
+	}
 	public static void getYtdlp() throws MalformedURLException, IOException {
 		Arrays.stream(Optional.ofNullable(new File(root + File.separator + "ffmpeg" + File.separator + "bin").listFiles()).orElse(new File[] {}))
 			.filter(File::isFile).filter(f -> f.getName().startsWith("yt-dlp")).forEach(File::delete);
 		
 		log.log("Installing yt-dlp...");
 		showProgress("Downloading yt-dlp");
-		String url = YTDLP_URL + (isWindows() ? ".exe" : "");
+		String url = YTDLP_URL;
+		if (isWindows()) url += ".exe";
+		else if (isMac()) url += "_macos";
+		else if (isLinux()) {
+			switch(getArch()) {
+			case "arm64":
+				url += "_linux_aarch64";
+				break;
+			case "amd64":
+				url += "_linux";
+				break;
+			default:
+			}
+		}
+		
+		
 		long filesize = getFileSize(new URL(url));
 		log.log("Length of " + url + " : " + filesize);
 		String releaseURL = getRedirectedURL(new URL("https://github.com/yt-dlp/yt-dlp/releases/latest"));
@@ -178,6 +196,7 @@ public class ResourceInstaller {
 		if(dest.exists()) { dest.delete(); }
 		dest.getParentFile().mkdirs();
 		dest.createNewFile();
+		if(!dest.canExecute()) dest.setExecutable(true); //TODO : necessarily
 		
 		try (ReadableByteChannel in = Channels.newChannel(url.openStream());
 				FileChannel out = FileChannel.open(dest.toPath(), StandardOpenOption.WRITE)) {
