@@ -170,6 +170,9 @@ public class YoutubeClipboardAutoDownloader {
 								SwingDialogs.warning("Failed to update yt-dlp : " + e.getClass().getName(), "%e%\nCannot update yt-dlp!\nUsing version " + line + " instead...",
 										e, true);
 							} finally {
+								try { Thread.sleep(3000); } catch (InterruptedException e) {
+									e.printStackTrace();
+								}
 								upDiag.dispose();
 							}
 							
