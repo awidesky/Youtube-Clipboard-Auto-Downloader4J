@@ -196,7 +196,7 @@ public class ResourceInstaller {
 		if(dest.exists()) { dest.delete(); }
 		dest.getParentFile().mkdirs();
 		dest.createNewFile();
-		if(!dest.canExecute()) dest.setExecutable(true); //TODO : necessarily
+		if(!dest.canExecute()) dest.setExecutable(true);
 		
 		try (ReadableByteChannel in = Channels.newChannel(url.openStream());
 				FileChannel out = FileChannel.open(dest.toPath(), StandardOpenOption.WRITE)) {
