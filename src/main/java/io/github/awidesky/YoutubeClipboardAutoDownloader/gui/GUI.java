@@ -136,7 +136,7 @@ public class GUI {
 		/** make <code>mainFrame</code> */
 		mainFrame = new JFrame();
 		mainFrame.setTitle("Youtube Clipboard Auto Downloader " + Main.version);
-		if(!OSUtil.isWindows()) Taskbar.getTaskbar().setIconImage(ICON);
+		if(Taskbar.isTaskbarSupported()) Taskbar.getTaskbar().setIconImage(ICON);
 		mainFrame.setIconImage(ICON);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.setSize(630, 500);
