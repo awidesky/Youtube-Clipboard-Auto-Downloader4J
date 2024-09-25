@@ -35,6 +35,8 @@
 		
 		<build.dir>${project.build.directory}/builds</build.dir>
 		<jre_modules>java.base,java.desktop,jdk.crypto.ec</jre_modules>
+		
+		<maven.build.timestamp.format>yyMMdd.HHmm</maven.build.timestamp.format>
 	</properties>
   
 	<dependencies>
@@ -93,6 +95,28 @@
 							<macPackageIdentifier>Clipboard-dl-${project.version}</macPackageIdentifier>
 							<macPackageName>Clipboard-dl</macPackageName>
 							<!-- <macSign>true</macSign> -->
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>platform-linux</id>
+			<activation>
+				<os>
+					<family>linux</family>
+				</os>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.panteleyev</groupId>
+						<artifactId>jpackage-maven-plugin</artifactId>
+						<version>1.4.0</version>
+						<configuration>
+							<icon>${project.basedir}/icon.png</icon>
+							<linuxRpmLicenseType>MIT</linuxRpmLicenseType>
+							<linuxAppRelease>${maven.build.timestamp}</linuxAppRelease>
 						</configuration>
 					</plugin>
 				</plugins>
