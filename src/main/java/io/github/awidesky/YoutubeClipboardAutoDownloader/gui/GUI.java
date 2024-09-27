@@ -9,6 +9,7 @@ import java.awt.Image;
 import java.awt.Taskbar;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.Taskbar.Feature;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -136,7 +137,7 @@ public class GUI {
 		/** make <code>mainFrame</code> */
 		mainFrame = new JFrame();
 		mainFrame.setTitle("Youtube Clipboard Auto Downloader " + Main.version);
-		if(Taskbar.isTaskbarSupported()) Taskbar.getTaskbar().setIconImage(ICON);
+		if(Taskbar.isTaskbarSupported() && Taskbar.getTaskbar().isSupported(Feature.ICON_IMAGE)) Taskbar.getTaskbar().setIconImage(ICON);
 		mainFrame.setIconImage(ICON);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.setSize(630, 500);
