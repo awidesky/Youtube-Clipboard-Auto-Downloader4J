@@ -92,7 +92,7 @@
 						<configuration>
 							<type>PKG</type>
 							<icon>${project.basedir}/icon.icns</icon>
-							<macPackageIdentifier>Clipboard-dl-${project.version}</macPackageIdentifier>
+							<macPackageIdentifier>io.github.awidesky.YoutubeClipboardAutoDownloader</macPackageIdentifier>
 							<macPackageName>Clipboard-dl</macPackageName>
 							<!-- <macSign>true</macSign> -->
 						</configuration>
@@ -117,6 +117,7 @@
 							<icon>${project.basedir}/icon.png</icon>
 							<linuxRpmLicenseType>MIT</linuxRpmLicenseType>
 							<linuxAppRelease>${maven.build.timestamp}</linuxAppRelease>
+							<linuxShortcut>true</linuxShortcut>
 						</configuration>
 					</plugin>
 				</plugins>
