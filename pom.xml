@@ -71,6 +71,7 @@
 							<icon>${project.basedir}/icon.ico</icon>
 							<winMenu>true</winMenu>
 							<winShortcut>true</winShortcut>
+							<winUpgradeUuid>1b1b47a8-7087-47cb-abae-9a4742636cfb</winUpgradeUuid>
 						</configuration>
 					</plugin>
 				</plugins>
