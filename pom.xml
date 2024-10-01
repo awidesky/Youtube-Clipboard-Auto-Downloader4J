@@ -65,7 +65,7 @@
 					<plugin>
 						<groupId>org.panteleyev</groupId>
 						<artifactId>jpackage-maven-plugin</artifactId>
-						<version>1.4.0</version>
+						<version>1.6.5</version>
 						<configuration>
 							<type>MSI</type>
 							<icon>${project.basedir}/icon.ico</icon>
@@ -88,7 +88,7 @@
 					<plugin>
 						<groupId>org.panteleyev</groupId>
 						<artifactId>jpackage-maven-plugin</artifactId>
-						<version>1.4.0</version>
+						<version>1.6.5</version>
 						<configuration>
 							<type>PKG</type>
 							<icon>${project.basedir}/icon.icns</icon>
@@ -112,7 +112,7 @@
 					<plugin>
 						<groupId>org.panteleyev</groupId>
 						<artifactId>jpackage-maven-plugin</artifactId>
-						<version>1.4.0</version>
+						<version>1.6.5</version>
 						<configuration>
 							<icon>${project.basedir}/icon.png</icon>
 							<linuxRpmLicenseType>MIT</linuxRpmLicenseType>
@@ -197,7 +197,7 @@
 			<plugin>
 				<groupId>org.panteleyev</groupId>
 				<artifactId>jpackage-maven-plugin</artifactId>
-				<version>1.4.0</version>
+				<version>1.6.5</version>
 
 				<configuration>
 					<input>${build.dir}/Clipboard-dl_${project.version}</input>
@@ -209,6 +209,7 @@
 					<appVersion>${project.version}</appVersion>
 					<licenseFile>${project.basedir}/LICENSE</licenseFile>
 					<copyright>Copyright (c) 2020-2023 Eugene Hong. All Rights Reserved.</copyright>
+					<aboutUrl>https://github.com/awidesky/YoutubeClipboardAutoDownloader</aboutUrl>
 					<addModules>${jre_modules}</addModules>
 				</configuration>
 
