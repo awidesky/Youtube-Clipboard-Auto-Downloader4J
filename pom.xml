@@ -12,7 +12,7 @@
 	<version>2.0.0</version>
 	<name>YoutubeClipboardAutoDownloader</name>
 	<description>Downloads audio/video from Youtube by automaticly get link from your clipboard.</description>
-	<url>https://github.com/awidesky/YoutubeClipboardAutoDownloader</url>
+	<url>https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J</url>
 	<licenses>
 		<license>
 			<name>MIT License</name>
@@ -210,7 +210,7 @@
 					<appVersion>${project.version}</appVersion>
 					<licenseFile>${project.basedir}/LICENSE</licenseFile>
 					<copyright>Copyright (c) 2020-2023 Eugene Hong. All Rights Reserved.</copyright>
-					<aboutUrl>https://github.com/awidesky/YoutubeClipboardAutoDownloader</aboutUrl>
+					<aboutUrl>https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J</aboutUrl>
 					<addModules>${jre_modules}</addModules>
 				</configuration>
 
