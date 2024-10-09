@@ -70,6 +70,7 @@
 							<type>MSI</type>
 							<icon>${project.basedir}/icon.ico</icon>
 							<winMenu>true</winMenu>
+							<winMenuGroup>Awidesky</winMenuGroup>
 							<winShortcut>true</winShortcut>
 							<winUpgradeUuid>1b1b47a8-7087-47cb-abae-9a4742636cfb</winUpgradeUuid>
 						</configuration>
@@ -140,7 +141,7 @@
 						<version>3.1.0</version>
 						<executions>
 							<execution>
-								<phase>prepare-package</phase>
+								<phase>validate</phase>
 								<goals>
 									<goal>exec</goal>
 								</goals>
@@ -170,61 +171,6 @@
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>3.6.0</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<outputDirectory>${build.dir}/Clipboard-dl_${project.version}</outputDirectory>
-					<archive>
-						<manifest>
-							<mainClass>io.github.awidesky.YoutubeClipboardAutoDownloader.Main</mainClass>
-						</manifest>
-					</archive>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-					<appendAssemblyId>false</appendAssemblyId>
-					<finalName>Clipboard-dl_${project.version}</finalName>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.panteleyev</groupId>
-				<artifactId>jpackage-maven-plugin</artifactId>
-				<version>1.6.5</version>
-
-				<configuration>
-					<input>${build.dir}/Clipboard-dl_${project.version}</input>
-					<destination>${build.dir}/jpackage</destination>
-					<mainJar>Clipboard-dl_${project.version}.jar</mainJar>
-					<mainClass>io.github.awidesky.YoutubeClipboardAutoDownloader.Main</mainClass>
-					<name>Clipboard-dl</name>
-					<vendor>Eugene Hong</vendor>
-					<appVersion>${project.version}</appVersion>
-					<licenseFile>${project.basedir}/LICENSE</licenseFile>
-					<copyright>Copyright (c) 2020-2023 Eugene Hong. All Rights Reserved.</copyright>
-					<aboutUrl>https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J</aboutUrl>
-					<addModules>${jre_modules}</addModules>
-				</configuration>
-
-				<executions>
-					<execution>
-						<id>jpackage-with-no-resource</id>
-						<phase>package</phase>
-						<goals>
-							<goal>jpackage</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>3.3.1</version>
@@ -286,6 +232,58 @@
 				</executions>
 			</plugin>
 
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>3.6.0</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<outputDirectory>${build.dir}/Clipboard-dl_${project.version}</outputDirectory>
+					<archive>
+						<manifest>
+							<mainClass>io.github.awidesky.YoutubeClipboardAutoDownloader.Main</mainClass>
+						</manifest>
+					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<appendAssemblyId>false</appendAssemblyId>
+					<finalName>Clipboard-dl_${project.version}</finalName>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.panteleyev</groupId>
+				<artifactId>jpackage-maven-plugin</artifactId>
+				<version>1.6.5</version>
+				<executions>
+					<execution>
+						<id>jpackage-with-no-resource</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jpackage</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<input>${build.dir}/Clipboard-dl_${project.version}</input>
+					<destination>${build.dir}/jpackage</destination>
+					<mainJar>Clipboard-dl_${project.version}.jar</mainJar>
+					<mainClass>io.github.awidesky.YoutubeClipboardAutoDownloader.Main</mainClass>
+					<name>Clipboard-dl</name>
+					<vendor>Eugene Hong</vendor>
+					<appVersion>${project.version}</appVersion>
+					<licenseFile>${project.basedir}/LICENSE</licenseFile>
+					<copyright>Copyright (c) 2020-2023 Eugene Hong. All Rights Reserved.</copyright>
+					<aboutUrl>https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J</aboutUrl>
+					<addModules>${jre_modules}</addModules>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>com.akathist.maven.plugins.launch4j</groupId>
 				<artifactId>launch4j-maven-plugin</artifactId>
