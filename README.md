@@ -1,7 +1,7 @@
 # Youtube-Clipboard-Auto-Downloader (a.k.a. Clipboard-dl)
 
 This program listens to user's clipboard and if you copied Youtube video link, it will download the video or audio automatically!
-Just copy link with `ctrl + v` of `command + c` and you'll get audio/video file in any format, in directory where you chose!
+Just copy link with `ctrl + c` of `command + c` and you'll get audio/video file in any format, in directory where you chose!
 
 ## COMMAND LINE USAGE
 ```
