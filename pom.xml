@@ -313,7 +313,7 @@
 							<chdir></chdir>
 							<priority>normal</priority>
 							<downloadUrl>https://adoptium.net/</downloadUrl>
-							<supportUrl></supportUrl>
+							<supportUrl>https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J</supportUrl>
 							<stayAlive>false</stayAlive>
 							<restartOnCrash>false</restartOnCrash>
 							<manifest></manifest>
