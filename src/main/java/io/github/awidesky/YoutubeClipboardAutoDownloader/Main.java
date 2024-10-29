@@ -54,7 +54,7 @@ public class Main {
 	
 	public static volatile AtomicBoolean audioMode = new AtomicBoolean(true);
 	
-	private static GUI gui = new GUI();
+	private static GUI gui;
 	private static Function<String, TaskLogger> taskLogGetter;
 	
 	private static volatile int taskNum = 0;
@@ -88,7 +88,7 @@ public class Main {
 				System.out.println(); System.out.println();
 				System.out.println("exit codes :");
 				Arrays.stream(ExitCodes.values()).forEach(code -> {
-					System.out.printf("\t%3d : %s\n", code.getCode(), code.getMsg());
+					System.out.printf("\t%4d : %s\n", code.getCode(), code.getMsg());
 				});
 				Main.kill(ExitCodes.SUCCESSFUL);
 			} else if ("--version".equals(arg)) {
@@ -113,7 +113,6 @@ public class Main {
 				System.err.println("If you want to find usage, use --help");
 				Main.kill(ExitCodes.INVALIDCOMMANDARGS);
 			}
-				
 		}
 		
 		SwingUtilities.invokeLater(() -> {
@@ -127,8 +126,6 @@ public class Main {
 		
 		prepareLogFile(verbose, datePrefix, logbyTask, logOnConsole);
 		setup();
-		
-		if(args.length == 0) return;
 		
 	}
 	
@@ -157,8 +154,11 @@ public class Main {
 		});
 
 		try {
-			SwingUtilities.invokeAndWait(gui::initLoadingFrame);
-			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.PREPARING_THREADS));
+			SwingUtilities.invokeAndWait(() -> {
+				gui = new GUI();
+				gui.initLoadingFrame();
+				gui.setLoadingStat(LoadingStatus.PREPARING_THREADS);
+			});
 			loggerThread.start();
 			TaskThreadPool.setup();
 			clipChecker = new ClipBoardListeningThread(OSUtil.isMac() ? 150 : -1); // A daemon thread that will keep checking clipboard
@@ -180,7 +180,6 @@ public class Main {
 			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.LOADING_WINDOW));
 			SwingUtilities.invokeAndWait(gui::initMainFrame);
 			clipChecker.start();
-
 		} catch (InterruptedException e1) {
 			logger.log("[init] EDT failed while loading application!");
 			e1.printStackTrace();
@@ -197,7 +196,6 @@ public class Main {
 	
 	
 	public static void submitDownload(String data) {
-
 		int num = taskNum++;
 		TaskLogger logTask = getTaskLogger("[Task" + num + "] ");
 		logTask.log("Received a link from your clipboard : " + data);
@@ -271,7 +269,6 @@ public class Main {
 			if (datePrefix) loggerThread.setDatePrefixAllChildren(new SimpleDateFormat("[kk:mm:ss.SSS]"));
 			SwingDialogs.setLogger(loggerThread.getLogger());
 		}
-		
 	}
 	
 	public static TaskLogger getTaskLogger(String prefix) {
