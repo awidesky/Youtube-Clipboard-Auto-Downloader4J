@@ -241,7 +241,7 @@ public class ResourceInstaller {
 
 	private static String stripVersionNumbers(URL url) {
 		try (Scanner scanner = new Scanner(url.openStream(), StandardCharsets.UTF_8.toString())) {
-			Pattern ptr = Pattern.compile(".*(\\d\\.\\d\\.\\d).*");
+			Pattern ptr = Pattern.compile(".*?(\\d\\.\\d(\\.\\d)?).*?");
 			while(scanner.hasNext()) {
 				String str = scanner.nextLine();
 				Matcher m = ptr.matcher(str);
