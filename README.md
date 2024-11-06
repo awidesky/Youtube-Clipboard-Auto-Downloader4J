@@ -5,7 +5,7 @@ Just copy link with `ctrl + c` of `command + c` and you'll get audio/video file 
 
 ## COMMAND LINE USAGE
 ```
-usage : java -jar Clipboard-dl_2.0.0.jar [options]
+Usage : java -jar Clipboard-dl_2.0.0.jar [options]
 
 Options :
 	--help : show this help info.
@@ -22,11 +22,11 @@ Options :
 
 
 exit codes :
-	  0 : Program exited successfully as user intended
-	100 : Unable to locate project root library("YoutubeClipboardAutoDownloader-resources" folder)
-	200 : Failed to find ffmpeg installation
-	300 : Failed to find yt-dlp installation
-	 -1 : Invalid command line argument(s)
-	 -2 : Task execution from GUI event dispatch thread has failed
+	   0 : Program exited successfully as user intended
+	 200 : Failed to find ffmpeg installation
+	 300 : Failed to find yt-dlp installation
+	  -1 : Invalid command line argument(s)
+	  -2 : Task execution from GUI event dispatch thread has failed
 	-100 : Unknown Error(e.g. unhandled Exception/JVM Error)
+
 ```
