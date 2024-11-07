@@ -341,13 +341,13 @@ public class Main {
 	 * Writes properties to log file.
 	 * This method should only invoked just before the termination of the program.
 	 * */
-	public static void writeProperties() {
+	private static void writeProperties() {
 
 		File cfg = new File(YoutubeClipboardAutoDownloader.getAppdataPath() + File.separator + "config.txt");
+		if (!cfg.exists()) cfg.getParentFile().mkdirs();
+		
 		/** Write <code>properties</code> */
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(cfg, false))) {
-
-			if (!cfg.exists()) cfg.createNewFile();
 
 			UnaryOperator<String> savP = s -> Config.getDefaultSaveto().equalsIgnoreCase(s) ? "%user.home%" : s;
 			
