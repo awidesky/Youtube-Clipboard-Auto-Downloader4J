@@ -250,7 +250,8 @@ public class ResourceInstaller {
 				}
 			}
 			
-			return "";
+			log.log("Unable to find pattern \"" + ptr.pattern() + "\" from url : " + url.toString());
+			return "Unknown";
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
