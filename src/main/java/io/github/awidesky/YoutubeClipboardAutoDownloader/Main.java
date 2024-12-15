@@ -107,7 +107,7 @@ public class Main {
 			} else if ("--logOnConsole".equals(arg)) {
 				logOnConsole = true;
 			} else if (arg.startsWith("--ytdlpArgs")) {
-				ytdlpAdditionalOptions = arg.split("=")[1].split(" ");
+				ytdlpAdditionalOptions = arg.substring(arg.indexOf("=") + 1).split(" ");
 			} else {
 				System.err.println("Invaild option : \"" + arg + "\"");
 				System.err.println("If you want to find usage, use --help");
