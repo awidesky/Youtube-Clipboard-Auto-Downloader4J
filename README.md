@@ -1,9 +1,12 @@
 # Youtube-Clipboard-Auto-Downloader (a.k.a. Clipboard-dl)
 
 This program listens to user's clipboard and if you copied Youtube video link, it will download the video or audio automatically!
-Just copy link with `ctrl + c` of `command + c` and you'll get audio/video file in any format, in directory where you chose!
+Just copy link with `ctrl + c` or `command + c` and you'll get audio/video file in any format, in directory where you chose!
 
 ## COMMAND LINE USAGE
+Installing native binaries from [release](https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J/releases) is recommended.
+If it doesn't work, use `.jar` file in shell instead.
+
 ```
 Usage : java -jar Clipboard-dl_2.0.0.jar [options]
 
