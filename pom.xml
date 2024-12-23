@@ -203,8 +203,25 @@
 						</configuration>
 					</execution>
 					<execution>
-						<id>copy-resources-for-launch4j</id>
+						<id>copy-jre</id>
 						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${build.dir}/launch4j/jre</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/jre</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-resources-for-launch4j</id>
+						<!-- Run after package phase -->
+						<!-- https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html#Lifecycle_Reference -->
+						<phase>pre-integration-test</phase> 
 						<goals>
 							<goal>copy-resources</goal>
 						</goals>
@@ -219,20 +236,11 @@
 										<include>LICENSE</include>
 									</includes>
 								</resource>
-							</resources>
-						</configuration>
-					</execution>
-					<execution>
-						<id>copy-jre</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${build.dir}/launch4j/jre</outputDirectory>
-							<resources>
 								<resource>
-									<directory>${basedir}/jre</directory>
+									<directory>${build.dir}/Clipboard-dl_${project.version}</directory>
+									<includes>
+										<include>Clipboard-dl_${project.version}.jar</include>
+									</includes>
 								</resource>
 							</resources>
 						</configuration>
@@ -272,7 +280,7 @@
 				<executions>
 					<execution>
 						<id>jpackage-with-no-resource</id>
-						<phase>package</phase>
+						<phase>install</phase>
 						<goals>
 							<goal>jpackage</goal>
 						</goals>
@@ -299,14 +307,14 @@
 				<executions>
 					<execution>
 						<id>launch4j-clui</id>
-						<phase>package</phase>
+						<phase>install</phase>
 						<goals>
 							<goal>launch4j</goal>
 						</goals>
 						<configuration>
-							<jar>${build.dir}/Clipboard-dl_${project.version}/Clipboard-dl_${project.version}.jar</jar>
+							<jar>Clipboard-dl_${project.version}.jar</jar>
 							<outfile>${build.dir}/launch4j/Clipboard-dl_${project.version}.exe</outfile>
-							<dontWrapJar>false</dontWrapJar>
+							<dontWrapJar>true</dontWrapJar>
 							<headerType>gui</headerType>
 							<errTitle></errTitle>
 							<cmdLine></cmdLine>
