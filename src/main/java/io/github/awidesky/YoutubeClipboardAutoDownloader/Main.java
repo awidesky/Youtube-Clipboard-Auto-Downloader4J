@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -293,7 +294,7 @@ public class Main {
 		
 		
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
-				YoutubeClipboardAutoDownloader.getAppdataPath() + File.separator + "config.txt")))) {
+				YoutubeClipboardAutoDownloader.getAppdataPath() + File.separator + "config.txt"), StandardCharsets.UTF_8))) {
 
 			UnaryOperator<String> read = str -> {
 				try {
@@ -347,7 +348,7 @@ public class Main {
 		if (!cfg.exists()) cfg.getParentFile().mkdirs();
 		
 		/** Write <code>properties</code> */
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(cfg, false))) {
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(cfg, StandardCharsets.UTF_8, false))) {
 
 			UnaryOperator<String> savP = s -> Config.getDefaultSaveto().equalsIgnoreCase(s) ? "%user.home%" : s;
 			
