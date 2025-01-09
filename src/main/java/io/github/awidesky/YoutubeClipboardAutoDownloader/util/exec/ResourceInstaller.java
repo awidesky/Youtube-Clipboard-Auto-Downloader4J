@@ -163,9 +163,6 @@ public class ResourceInstaller {
 		};
 	}
 	public static void getYtdlp() throws MalformedURLException, IOException, InterruptedException, ExecutionException {
-		Arrays.stream(Optional.ofNullable(new File(root + File.separator + "ffmpeg" + File.separator + "bin").listFiles()).orElse(new File[] {}))
-			.filter(File::isFile).filter(f -> f.getName().startsWith("yt-dlp")).forEach(File::delete);
-		
 		log.log("Installing yt-dlp...");
 		showProgress("Downloading yt-dlp");
 		if(isMac()) {
@@ -176,6 +173,9 @@ public class ResourceInstaller {
 			ProcessExecutor.runNow(upDiag.getLogger(), null, cmd);
 			upDiag.dispose();
 		} else {
+			Arrays.stream(Optional.ofNullable(new File(root + File.separator + "ffmpeg" + File.separator + "bin").listFiles()).orElse(new File[] {}))
+				.filter(File::isFile).filter(f -> f.getName().startsWith("yt-dlp")).forEach(File::delete);
+			
 			String url = YTDLP_URL;
 			if (isWindows()) url += ".exe";
 			else if (isLinux()) {
