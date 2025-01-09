@@ -50,6 +50,7 @@ import javax.swing.SwingUtilities;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.Main;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.YoutubeClipboardAutoDownloader;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.LogTextDialog;
 import io.github.awidesky.guiUtil.Logger;
 
 public class ResourceInstaller {
@@ -97,14 +98,16 @@ public class ResourceInstaller {
 			
 			Files.delete(Paths.get(root, "ffmpeg.zip"));
 			Files.delete(Paths.get(root, "ffmpeg", "bin", "ffplay.exe"));
-			Files.delete(Paths.get(root, "ffmpeg", "bin", "ffprobe.exe"));
+			Files.delete(Paths.get(root, "ffmpeg", "bin", "ffprobe.exe")); //TODO : do not remove
 			deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "doc"));
 			deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "presets"));
-
-			hideProgress();
 		} else if(isMac()) {
-			setLoadingFrameContent("Downloading ffmpeg via \"brew install ffmpeg\"... (Progress bar will stay in 0)", -1);
-			ProcessExecutor.runNow(log, null, "/bin/bash", "-c", "/opt/homebrew/bin/brew install ffmpeg");
+			String[] cmd = {"/bin/bash", "-c", "/opt/homebrew/bin/brew install ffmpeg"};
+			setLoadingFrameContent("Installing ffmpeg via \"brew install ffmpeg\"... (Progress bar will stay in 0)", -1);
+			LogTextDialog upDiag = new LogTextDialog(cmd, log);
+			upDiag.setVisible(true);
+			ProcessExecutor.runNow(upDiag.getLogger(), null, cmd);
+			upDiag.dispose();
 		} else if(isLinux()) {
 			deleteDirectoryRecursion(Paths.get(root, "ffmpeg"));
 			String arch = getArch();
@@ -131,10 +134,9 @@ public class ResourceInstaller {
 			Files.delete(Paths.get(root, "ffmpeg", "ffprobe"));
 			Files.delete(Paths.get(root, "ffmpeg", "qt-faststart"));
 			deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "manpages"));
-
-			hideProgress();
 		}
 
+		hideProgress();
 		log.log("ffmpeg installed!!");
 	}
 	
@@ -160,33 +162,42 @@ public class ResourceInstaller {
 		}
 		};
 	}
-	public static void getYtdlp() throws MalformedURLException, IOException {
+	public static void getYtdlp() throws MalformedURLException, IOException, InterruptedException, ExecutionException {
 		Arrays.stream(Optional.ofNullable(new File(root + File.separator + "ffmpeg" + File.separator + "bin").listFiles()).orElse(new File[] {}))
 			.filter(File::isFile).filter(f -> f.getName().startsWith("yt-dlp")).forEach(File::delete);
 		
 		log.log("Installing yt-dlp...");
 		showProgress("Downloading yt-dlp");
-		String url = YTDLP_URL;
-		if (isWindows()) url += ".exe";
-		else if (isMac()) url += "_macos";
-		else if (isLinux()) {
-			switch(getArch()) {
-			case "arm64":
-				url += "_linux_aarch64";
-				break;
-			case "amd64":
-				url += "_linux";
-				break;
-			default:
+		if(isMac()) {
+			String[] cmd = {"/bin/bash", "-c", "/opt/homebrew/bin/brew install yt-dlp"};
+			setLoadingFrameContent("Installing yt-dlp via \"brew install yt-dlp\"... (Progress bar will stay in 0)", -1);
+			LogTextDialog upDiag = new LogTextDialog(cmd, log);
+			upDiag.setVisible(true);
+			ProcessExecutor.runNow(upDiag.getLogger(), null, cmd);
+			upDiag.dispose();
+		} else {
+			String url = YTDLP_URL;
+			if (isWindows()) url += ".exe";
+			else if (isLinux()) {
+				switch(getArch()) {
+				case "arm64":
+					url += "_linux_aarch64";
+					break;
+				case "amd64":
+					url += "_linux";
+					break;
+				default:
+				}
 			}
+
+
+			long filesize = getFileSize(new URL(url));
+			log.log("Length of " + url + " : " + filesize);
+			String releaseURL = getRedirectedURL(new URL("https://github.com/yt-dlp/yt-dlp/releases/latest"));
+			setLoadingFrameContent("Downloading yt-dlp version " + releaseURL.substring(releaseURL.lastIndexOf('/') + 1), filesize);
+			download(new URL(url), new File(root + File.separator + "ffmpeg" + File.separator + "bin"  + File.separator + (isWindows() ? "yt-dlp.exe" : "yt-dlp")));
 		}
 		
-		
-		long filesize = getFileSize(new URL(url));
-		log.log("Length of " + url + " : " + filesize);
-		String releaseURL = getRedirectedURL(new URL("https://github.com/yt-dlp/yt-dlp/releases/latest"));
-		setLoadingFrameContent("Downloading yt-dlp version " + releaseURL.substring(releaseURL.lastIndexOf('/') + 1), filesize);
-		download(new URL(url), new File(root + File.separator + "ffmpeg" + File.separator + "bin"  + File.separator + (isWindows() ? "yt-dlp.exe" : "yt-dlp")));
 		hideProgress();
 		log.log("yt-dlp installed!!");
 	}

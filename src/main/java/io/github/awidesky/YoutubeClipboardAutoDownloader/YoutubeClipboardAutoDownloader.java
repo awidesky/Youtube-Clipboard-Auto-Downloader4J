@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
-import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.UpdateStatusDialog;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.LogTextDialog;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.ProcessExecutor;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.ResourceInstaller;
@@ -113,7 +113,7 @@ public class YoutubeClipboardAutoDownloader {
 						ResourceInstaller.getYtdlp();
 						log.log("yt-dlp installation success. re-checking yt-dlp...");
 						return checkYtdlp();
-					} catch (IOException e) {
+					} catch (IOException | InterruptedException | ExecutionException e) {
 						SwingDialogs.error("Failed to install yt-dlp! : " + e.getClass().getName(), "%e%", e, true);
 						return false;
 					}
@@ -159,7 +159,7 @@ public class YoutubeClipboardAutoDownloader {
 						if (ChronoUnit.DAYS.between(ytdlpDay, today) >= duration && SwingDialogs.confirm("Update yt-dlp?", "yt-dlp version is older than " + duration + "days.\nUpdate yt-dlp?")) { 
 							log.log("yt-dlp version is older than " + duration + "days. update process start...");
 							String[] updateCommands = getYtdlpUpdateCommands(ydlfile);
-							UpdateStatusDialog upDiag = new UpdateStatusDialog(updateCommands, Main.getLogger("[yt-dlp update] "));
+							LogTextDialog upDiag = new LogTextDialog(updateCommands, Main.getLogger("[yt-dlp update] "));
 							log.log("Update yt-dlp with : " + Arrays.stream(updateCommands).collect(Collectors.joining(" ")));
 							upDiag.setVisible(true);
 							try {

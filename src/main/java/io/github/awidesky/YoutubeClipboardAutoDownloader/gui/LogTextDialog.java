@@ -17,13 +17,13 @@ import javax.swing.SwingUtilities;
 import io.github.awidesky.guiUtil.AbstractLogger;
 import io.github.awidesky.guiUtil.Logger;
 
-public class UpdateStatusDialog extends JDialog {
+public class LogTextDialog extends JDialog {
 	
 	private static final long serialVersionUID = 449601573420880012L;
 	private final Logger log;
 	private final JTextArea text = new JTextArea();
 	
-	public UpdateStatusDialog(String[] updateCommands, Logger logger) {
+	public LogTextDialog(String[] updateCommands, Logger logger) {
 		this.log = new AbstractLogger() {
 			
 			@Override
@@ -55,7 +55,7 @@ public class UpdateStatusDialog extends JDialog {
 		this.add(panel);
 		add(panel);
 		setTitle(Arrays.stream(updateCommands).collect(Collectors.joining(" ")));
-		setAlwaysOnTop(true);
+		setAlwaysOnTop(true); //TODO : maybe false? check if it's hid when false
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		pack();
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
