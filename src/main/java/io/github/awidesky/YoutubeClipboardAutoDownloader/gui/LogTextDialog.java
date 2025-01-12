@@ -55,7 +55,6 @@ public class LogTextDialog extends JDialog {
 		this.add(panel);
 		add(panel);
 		setTitle(Arrays.stream(updateCommands).collect(Collectors.joining(" ")));
-		setAlwaysOnTop(true); //TODO : maybe false? check if it's hid when false
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		pack();
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
