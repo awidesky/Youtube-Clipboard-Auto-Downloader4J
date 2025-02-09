@@ -87,7 +87,7 @@ public class Main {
 				System.out.println("\t                           If your options contains space, wrap them with \"\"");
 				System.out.println("\t                           If you need multiple options, wrap them with \"\"");
 				System.out.println(); System.out.println();
-				System.out.println("exit codes :");
+				System.out.println("Exit codes :");
 				Arrays.stream(ExitCodes.values()).forEach(code -> {
 					System.out.printf("\t%4d : %s\n", code.getCode(), code.getMsg());
 				});
