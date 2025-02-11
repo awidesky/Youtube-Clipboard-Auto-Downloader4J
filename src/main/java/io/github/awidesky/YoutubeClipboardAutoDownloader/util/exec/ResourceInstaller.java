@@ -99,7 +99,6 @@ public class ResourceInstaller {
 			
 			Files.delete(Paths.get(root, "ffmpeg.zip"));
 			Files.delete(Paths.get(root, "ffmpeg", "bin", "ffplay.exe"));
-			Files.delete(Paths.get(root, "ffmpeg", "bin", "ffprobe.exe")); //TODO : do not remove
 			deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "doc"));
 			deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "presets"));
 		} else if(isMac()) {
@@ -132,7 +131,6 @@ public class ResourceInstaller {
 			new File(root + File.separator + "ffmpeg" + File.separator + "bin").mkdirs();
 			ff.renameTo(new File(ff.getParentFile().getAbsolutePath() + File.separator + "bin" + File.separator + "ffmpeg"));
 			Files.delete(Paths.get(root, "ffmpeg.tar.xz"));
-			Files.delete(Paths.get(root, "ffmpeg", "ffprobe"));
 			Files.delete(Paths.get(root, "ffmpeg", "qt-faststart"));
 			deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "manpages"));
 		}
