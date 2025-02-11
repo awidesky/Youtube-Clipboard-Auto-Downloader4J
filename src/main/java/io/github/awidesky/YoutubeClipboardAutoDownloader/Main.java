@@ -34,6 +34,7 @@ import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.ResourceInstaller;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.ClipBoardListeningThread;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.TaskThreadPool;
 import io.github.awidesky.guiUtil.Logger;
@@ -124,6 +125,8 @@ public class Main {
 				SwingDialogs.error("Cannot use native system look&feel", "%e%", e, false);
 			}
 		});
+		
+		new Thread(ResourceInstaller::ytdlpLatestReleaseDate).start();
 		
 		prepareLogFile(verbose, datePrefix, logbyTask, logOnConsole);
 		setup();

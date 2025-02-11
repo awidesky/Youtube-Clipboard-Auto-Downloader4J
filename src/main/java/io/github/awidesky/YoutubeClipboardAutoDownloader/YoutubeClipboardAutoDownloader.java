@@ -149,15 +149,8 @@ public class YoutubeClipboardAutoDownloader {
 						log.log("Found valid command to execute yt-dlp : \"" + ydlfile + "\"");
 						log.log("yt-dlp version : " + line);
 
-						DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-						LocalDate today = LocalDate.now();	
-						LocalDate ytdlpDay = LocalDate.parse(line, dateFormat);
-						
-						log.log("Today : " + dateFormat.format(today) + ", yt-dlp release day : " + dateFormat.format(ytdlpDay));
-						long duration = Config.getYtdlpUpdateDuration();
-						
-						if (ChronoUnit.DAYS.between(ytdlpDay, today) >= duration && SwingDialogs.confirm("Update yt-dlp?", "yt-dlp version is older than " + duration + "days.\nUpdate yt-dlp?")) { 
-							log.log("yt-dlp version is older than " + duration + "days. update process start...");
+						if (checkYtdlpUpdateReleased(line, log)) { 
+							log.log("yt-dlp update process start...");
 							String[] updateCommands = getYtdlpUpdateCommands(ydlfile);
 							LogTextDialog upDiag = new LogTextDialog(updateCommands, Main.getLogger("[yt-dlp update] "));
 							log.log("Update yt-dlp with : " + Arrays.stream(updateCommands).collect(Collectors.joining(" ")));
@@ -176,10 +169,7 @@ public class YoutubeClipboardAutoDownloader {
 								upDiag.dispose();
 							}
 							
-						} else {
-							log.log("yt-dlp version is not older than " + duration + "days, or user does not want to update it. update process skipped...");
 						}
-
 					} else {
 						SwingDialogs.error("Unexpected output from yt-dlp", line, null, true);
 					}
@@ -203,6 +193,40 @@ public class YoutubeClipboardAutoDownloader {
 
 	}
 	
+	private static boolean checkYtdlpUpdateReleased(String ytdlpVersion, Logger log) {
+		DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+		LocalDate today = LocalDate.now();	
+		LocalDate currentDay = LocalDate.parse(ytdlpVersion, dateFormat);
+		
+		log.log("Today : " + dateFormat.format(today) + ", current yt-dlp release day : " + ytdlpVersion);
+		
+		if(ChronoUnit.DAYS.between(currentDay, today) <= Config.getYtdlpUpdateDuration()) {
+			log.log("yt-dlp version is not older than " + Config.getYtdlpUpdateDuration() + "days. update process skipped...");
+			return false;
+		}
+		
+		String message = "yt-dlp version is older than " + Config.getYtdlpUpdateDuration() + "days.";
+		try {
+			String releaseDate = ResourceInstaller.ytdlpLatestReleaseDate();
+			log.log("Latest yt-dlp release date from github : " + releaseDate);
+			if (LocalDate.parse(releaseDate, dateFormat).isAfter(currentDay)) {
+				message = "Latest yt-dlp version " + releaseDate + " is found.";
+			} else {
+				log.log("Latest : " + releaseDate + ", current : " + ytdlpVersion + ". Update is not needed...");
+				return false;
+			}
+		} catch (Exception e) {
+			log.log("Cannot find latest release date of yt-dlp!");
+			log.log(e);
+		}
+
+		if(!SwingDialogs.confirm("Update yt-dlp?", message + "\nUpdate yt-dlp?")) {
+			log.log("User does not want to update it. update process skipped...");
+			return false;
+		}
+		return true;
+	}
+
 	private static String[] getYtdlpUpdateCommands(String ydlfile) {
 		if (ytdlpPath.contains("homebrew"))
 			return new String[] { "/bin/zsh", "-c", "brew update; brew upgrade yt-dlp" };

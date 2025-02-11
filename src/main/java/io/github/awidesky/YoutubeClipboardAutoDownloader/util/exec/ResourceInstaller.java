@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -193,8 +194,7 @@ public class ResourceInstaller {
 
 			long filesize = getFileSize(new URL(url));
 			log.log("Length of " + url + " : " + filesize);
-			String releaseURL = getRedirectedURL(new URL("https://github.com/yt-dlp/yt-dlp/releases/latest"));
-			setLoadingFrameContent("Downloading yt-dlp version " + releaseURL.substring(releaseURL.lastIndexOf('/') + 1), filesize);
+			setLoadingFrameContent("Downloading yt-dlp version " + ytdlpLatestReleaseDate(), filesize);
 			download(new URL(url), new File(root + File.separator + "ffmpeg" + File.separator + "bin"  + File.separator + (isWindows() ? "yt-dlp.exe" : "yt-dlp")));
 		}
 		
@@ -202,6 +202,28 @@ public class ResourceInstaller {
 		log.log("yt-dlp installed!!");
 	}
 
+	private static AtomicReference<String> ytdlpLatestReleaseDate = new AtomicReference<>();
+	public static String ytdlpLatestReleaseDate() {
+		String ret = ytdlpLatestReleaseDate.getOpaque();
+		if(ret != null) return ret;
+		
+		HttpURLConnection conn = null;
+		try {
+			conn = (HttpURLConnection) new URL("https://github.com/yt-dlp/yt-dlp/releases/latest").openConnection();
+			try(InputStream is = conn.getInputStream()) {}
+
+			ret = conn.getURL().toExternalForm();
+			ret = ret.substring(ret.lastIndexOf('/') + 1);
+			ytdlpLatestReleaseDate.setOpaque(ret);
+			return ret;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			if (conn != null) conn.disconnect();
+		}
+	}
+	
 	private static void download(URL url, File dest) throws IOException {
 		IOException ee = null;
 		if(dest.exists()) { dest.delete(); }
@@ -265,21 +287,6 @@ public class ResourceInstaller {
 			return "Unknown";
 		} catch (IOException e) {
 			throw new RuntimeException(e);
-		}
-	}
-	
-	private static String getRedirectedURL(URL url) {
-		HttpURLConnection conn = null;
-		try {
-			conn = (HttpURLConnection) url.openConnection();
-			InputStream is = conn.getInputStream();
-			String ret = conn.getURL().toExternalForm();
-			is.close();
-			return ret;
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} finally {
-			if (conn != null) conn.disconnect();
 		}
 	}
 
