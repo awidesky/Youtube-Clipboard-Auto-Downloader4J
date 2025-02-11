@@ -217,7 +217,7 @@ public class ResourceInstaller {
 			ytdlpLatestReleaseDate.setOpaque(ret);
 			return ret;
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.log(e);
 			return null;
 		} finally {
 			if (conn != null) conn.disconnect();

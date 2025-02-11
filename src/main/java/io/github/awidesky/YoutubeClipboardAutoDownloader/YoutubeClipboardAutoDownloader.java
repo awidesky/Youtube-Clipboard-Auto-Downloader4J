@@ -206,8 +206,8 @@ public class YoutubeClipboardAutoDownloader {
 		}
 		
 		String message = "yt-dlp version is older than " + Config.getYtdlpUpdateDuration() + "days.";
-		try {
-			String releaseDate = ResourceInstaller.ytdlpLatestReleaseDate();
+		String releaseDate = ResourceInstaller.ytdlpLatestReleaseDate();
+		if(releaseDate != null) {
 			log.log("Latest yt-dlp release date from github : " + releaseDate);
 			if (LocalDate.parse(releaseDate, dateFormat).isAfter(currentDay)) {
 				message = "Latest yt-dlp version " + releaseDate + " is found.";
@@ -215,10 +215,7 @@ public class YoutubeClipboardAutoDownloader {
 				log.log("Latest : " + releaseDate + ", current : " + ytdlpVersion + ". Update is not needed...");
 				return false;
 			}
-		} catch (Exception e) {
-			log.log("Cannot find latest release date of yt-dlp!");
-			log.log(e);
-		}
+		} else log.log("Cannot find latest release date of yt-dlp!");
 
 		if(!SwingDialogs.confirm("Update yt-dlp?", message + "\nUpdate yt-dlp?")) {
 			log.log("User does not want to update it. update process skipped...");

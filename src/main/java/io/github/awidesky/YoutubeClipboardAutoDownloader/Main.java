@@ -125,8 +125,9 @@ public class Main {
 				SwingDialogs.error("Cannot use native system look&feel", "%e%", e, false);
 			}
 		});
-		
-		new Thread(ResourceInstaller::ytdlpLatestReleaseDate).start();
+
+		//pre-fetch some values asynchronously for faster use later.
+		TaskThreadPool.submit(ResourceInstaller::ytdlpLatestReleaseDate);
 		
 		prepareLogFile(verbose, datePrefix, logbyTask, logOnConsole);
 		setup();
@@ -164,7 +165,7 @@ public class Main {
 				gui.setLoadingStat(LoadingStatus.PREPARING_THREADS);
 			});
 			loggerThread.start();
-			TaskThreadPool.setup();
+			
 			clipChecker = new ClipBoardListeningThread(OSUtil.isMac() ? 150 : -1); // A daemon thread that will keep checking clipboard
 			Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener(clipChecker::submit);
 			logger.newLine();

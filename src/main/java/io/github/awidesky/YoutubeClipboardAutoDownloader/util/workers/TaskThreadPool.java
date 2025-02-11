@@ -10,10 +10,9 @@ import io.github.awidesky.guiUtil.Logger;
 
 public class TaskThreadPool {
 
-	private static ExecutorService executorService; 
+	private static ExecutorService executorService = Executors.newCachedThreadPool(); 
 	private static Logger log = Main.getLogger("[TaskThreadPool] ");
 	
-	public static void setup() { executorService = Executors.newCachedThreadPool(); }
 	public static Future<?> submit(Runnable task) { return executorService.submit(task); }
 	public static void kill(long timeout) {
 		if (executorService != null && !executorService.isShutdown()) {
