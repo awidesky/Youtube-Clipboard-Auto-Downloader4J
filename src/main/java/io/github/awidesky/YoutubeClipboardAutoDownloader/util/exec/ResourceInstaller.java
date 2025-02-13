@@ -87,18 +87,7 @@ public class ResourceInstaller {
 			log.log("Length of " + url + " : " + filesize);
 			
 			setLoadingFrameContent("Downloading ffmpeg", filesize);
-			TaskThreadPool.submit(() -> {
-				String versionUrl = "https://www.gyan.dev/ffmpeg/builds/release-version";
-				try {
-					String str = "Downloading ffmpeg version " + stripVersionNumbers(new URL(versionUrl));
-					SwingUtilities.invokeLater(() -> {
-						loadingFrame.setTitle(str);
-					});
-				} catch (MalformedURLException e) {
-					log.log("Failed to get ffmpeg version from " + versionUrl);
-					log.log(e);
-				}
-			});
+			TaskThreadPool.submit(() -> fetchFfmpegVersion("https://www.gyan.dev/ffmpeg/builds/release-version"));
 			
 			download(new URL(url), new File(root + File.separator + "ffmpeg.zip"));
 			
@@ -133,18 +122,7 @@ public class ResourceInstaller {
 			log.log("Length of " + url + " : " + filesize);
 			
 			setLoadingFrameContent("Downloading ffmpeg", filesize);
-			TaskThreadPool.submit(() -> {
-				String versionUrl = "https://johnvansickle.com/ffmpeg/release-readme.txt";
-				try {
-					String str = "Downloading ffmpeg version " + stripVersionNumbers(new URL(versionUrl));
-					SwingUtilities.invokeLater(() -> {
-						loadingFrame.setTitle(str);
-					});
-				} catch (MalformedURLException e) {
-					log.log("Failed to get ffmpeg version from " + versionUrl);
-					log.log(e);
-				}
-			});
+			TaskThreadPool.submit(() -> fetchFfmpegVersion("https://johnvansickle.com/ffmpeg/release-readme.txt"));
 			
 			download(new URL(url), new File(root + File.separator + "ffmpeg.tar.xz"));
 			
@@ -303,21 +281,27 @@ public class ResourceInstaller {
 		}
 	}
 
-	private static String stripVersionNumbers(URL url) {
-		try (Scanner scanner = new Scanner(url.openStream(), StandardCharsets.UTF_8.toString())) {
+	private static void fetchFfmpegVersion(String url) {
+		try (Scanner scanner = new Scanner(new URL(url).openStream(), StandardCharsets.UTF_8.toString())) {
 			Pattern ptr = Pattern.compile(".*?(\\d\\.\\d(\\.\\d)?).*?");
 			while(scanner.hasNext()) {
 				String str = scanner.nextLine();
 				Matcher m = ptr.matcher(str);
 				if(m.find()) {
-					return m.group(1);
+					SwingUtilities.invokeLater(() -> {
+						loadingFrame.setTitle("Downloading ffmpeg version " + m.group(1));
+					});
+					return;
 				}
 			}
 			
 			log.log("Unable to find pattern \"" + ptr.pattern() + "\" from url : " + url.toString());
-			return "Unknown";
+			SwingUtilities.invokeLater(() -> {
+				loadingFrame.setTitle("Downloading ffmpeg (version unknown)");
+			});
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			log.log("Failed to get ffmpeg version from " + url);
+			log.log(e);
 		}
 	}
 
