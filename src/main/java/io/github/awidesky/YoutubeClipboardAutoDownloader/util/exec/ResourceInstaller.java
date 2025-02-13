@@ -52,6 +52,7 @@ import io.github.awidesky.YoutubeClipboardAutoDownloader.Main;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.YoutubeClipboardAutoDownloader;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.LogTextDialog;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.TaskThreadPool;
 import io.github.awidesky.guiUtil.Logger;
 
 public class ResourceInstaller {
@@ -75,7 +76,7 @@ public class ResourceInstaller {
 	}
 	
 	
-	public static void getFFmpeg() throws MalformedURLException, IOException, InterruptedException, ExecutionException {
+	public static void getFFmpeg() throws IOException, InterruptedException, ExecutionException {
 		log.log("Installing ffmpeg...");
 		showProgress("Downloading ffmpeg");
 		
@@ -85,10 +86,26 @@ public class ResourceInstaller {
 			long filesize = getFileSize(new URL(url));
 			log.log("Length of " + url + " : " + filesize);
 			
-			setLoadingFrameContent("Downloading ffmpeg version " + stripVersionNumbers(new URL("https://www.gyan.dev/ffmpeg/builds/release-version")), filesize);
-		
+			setLoadingFrameContent("Downloading ffmpeg", filesize);
+			TaskThreadPool.submit(() -> {
+				String versionUrl = "https://www.gyan.dev/ffmpeg/builds/release-version";
+				try {
+					String str = "Downloading ffmpeg version " + stripVersionNumbers(new URL(versionUrl));
+					SwingUtilities.invokeLater(() -> {
+						loadingFrame.setTitle(str);
+					});
+				} catch (MalformedURLException e) {
+					log.log("Failed to get ffmpeg version from " + versionUrl);
+					log.log(e);
+				}
+			});
+			
 			download(new URL(url), new File(root + File.separator + "ffmpeg.zip"));
 			
+			SwingUtilities.invokeLater(() -> {
+				loadingFrame.setTitle("Installing ffmpeg");
+				loadingStatus.setText("Unzipping ffmpeg.zip to : \n" + root);
+			});
 			unzipFolder(Paths.get(root, "ffmpeg.zip"), Paths.get(root));
 			
 			for(File ff : new File(root).listFiles(f -> f.getName().startsWith("ffmpeg"))) {
@@ -115,10 +132,26 @@ public class ResourceInstaller {
 			long filesize = getFileSize(new URL(url));
 			log.log("Length of " + url + " : " + filesize);
 			
-			setLoadingFrameContent("Downloading ffmpeg version " + stripVersionNumbers(new URL("https://johnvansickle.com/ffmpeg/release-readme.txt")), filesize);
-		
+			setLoadingFrameContent("Downloading ffmpeg", filesize);
+			TaskThreadPool.submit(() -> {
+				String versionUrl = "https://johnvansickle.com/ffmpeg/release-readme.txt";
+				try {
+					String str = "Downloading ffmpeg version " + stripVersionNumbers(new URL(versionUrl));
+					SwingUtilities.invokeLater(() -> {
+						loadingFrame.setTitle(str);
+					});
+				} catch (MalformedURLException e) {
+					log.log("Failed to get ffmpeg version from " + versionUrl);
+					log.log(e);
+				}
+			});
+			
 			download(new URL(url), new File(root + File.separator + "ffmpeg.tar.xz"));
 			
+			SwingUtilities.invokeLater(() -> {
+				loadingFrame.setTitle("Installing ffmpeg");
+				loadingStatus.setText("Unzipping ffmpeg.tar.xz to : \n" + root);
+			});
 			List<String> untar = new ArrayList<>();
 			if(!new File(root, "ffmpeg").mkdirs())
 				untar.addAll(List.of("mkdir", "ffmpeg;"));
@@ -385,9 +418,10 @@ public class ResourceInstaller {
 	 * */
     private static void unzipFolder(Path source, Path target) throws IOException {
 
+    	log.logVerbose("Unzip " + source.toAbsolutePath().toString() + " to " + target.toAbsolutePath().toString());
+    	
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(source.toFile()))) {
 
-        	log.logVerbose("Unzip " + source.toAbsolutePath().toString() + " to " + target.toAbsolutePath().toString());
             // list files in zip
             ZipEntry zipEntry = zis.getNextEntry();
 
