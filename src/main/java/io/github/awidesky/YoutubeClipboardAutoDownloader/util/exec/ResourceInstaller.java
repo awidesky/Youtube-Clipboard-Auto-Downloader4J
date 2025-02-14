@@ -89,13 +89,14 @@ public class ResourceInstaller {
 			setLoadingFrameContent("Downloading ffmpeg", filesize);
 			TaskThreadPool.submit(() -> fetchFfmpegVersion("https://www.gyan.dev/ffmpeg/builds/release-version"));
 			
-			download(new URL(url), new File(root + File.separator + "ffmpeg.zip"));
+			File downloadFile = new File(root + File.separator + "ffmpeg.zip");
+			download(new URL(url), downloadFile);
 			
 			SwingUtilities.invokeLater(() -> {
 				loadingFrame.setTitle("Installing ffmpeg");
-				loadingStatus.setText("Unzipping ffmpeg.zip to : \n" + root);
+				loadingStatus.setText("Unzipping " + downloadFile.getName() + " (" + formatFileSize(downloadFile.length()) + ")");
 			});
-			unzipFolder(Paths.get(root, "ffmpeg.zip"), Paths.get(root));
+			unzipFolder(downloadFile.toPath(), Paths.get(root));
 			
 			for(File ff : new File(root).listFiles(f -> f.getName().startsWith("ffmpeg"))) {
 				if(ff.isDirectory()) {
@@ -103,7 +104,7 @@ public class ResourceInstaller {
 				}
 			}
 			
-			Files.delete(Paths.get(root, "ffmpeg.zip"));
+			Files.delete(downloadFile.toPath());
 			Files.delete(Paths.get(root, "ffmpeg", "bin", "ffplay.exe"));
 			deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "doc"));
 			deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "presets"));
@@ -124,24 +125,25 @@ public class ResourceInstaller {
 			setLoadingFrameContent("Downloading ffmpeg", filesize);
 			TaskThreadPool.submit(() -> fetchFfmpegVersion("https://johnvansickle.com/ffmpeg/release-readme.txt"));
 			
-			download(new URL(url), new File(root + File.separator + "ffmpeg.tar.xz"));
+			File downloadFile = new File(root + File.separator + "ffmpeg.tar.xz");
+			download(new URL(url), downloadFile);
 			
 			SwingUtilities.invokeLater(() -> {
 				loadingFrame.setTitle("Installing ffmpeg");
-				loadingStatus.setText("Unzipping ffmpeg.tar.xz to : \n" + root);
+				loadingStatus.setText("Unzipping " + downloadFile.getName() + " (" + formatFileSize(downloadFile.length()) + ")");
 			});
 			List<String> untar = new ArrayList<>();
 			if(!new File(root, "ffmpeg").mkdirs())
 				untar.addAll(List.of("mkdir", "ffmpeg;"));
 			
-			untar.addAll(List.of("tar", "-xf", "ffmpeg.tar.xz", "-C", "ffmpeg", "--strip-components", "1"));
+			untar.addAll(List.of("tar", "-xf", downloadFile.getName(), "-C", "ffmpeg", "--strip-components", "1"));
 			log.log("Unzipping ffmpeg.tar.xz with : " + untar.stream().collect(Collectors.joining(" " )));
 			ProcessExecutor.runNow(log, new File(root), untar.toArray(String[]::new));
 			
 			File ff = new File(root + File.separator + "ffmpeg", "ffmpeg");
 			new File(root + File.separator + "ffmpeg" + File.separator + "bin").mkdirs();
 			ff.renameTo(new File(ff.getParentFile().getAbsolutePath() + File.separator + "bin" + File.separator + "ffmpeg"));
-			Files.delete(Paths.get(root, "ffmpeg.tar.xz"));
+			Files.delete(downloadFile.toPath());
 			Files.delete(Paths.get(root, "ffmpeg", "qt-faststart"));
 			deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "manpages"));
 		}
