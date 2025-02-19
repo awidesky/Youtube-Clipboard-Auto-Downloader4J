@@ -5,6 +5,13 @@
 Automatically grab Youtube video link from clipboard, and download in whatever format you want!  
 Just copy a link with `ctrl + c` or `command + c` and you'll get audio/video file in any format you chose!
 
+
+## Installation
+
+//TODO : Windows, mac, linux banner  
+Please refer to [release](https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J/releases/latest)
+
+
 ## Features
 
 * Automatic clipboard listening
