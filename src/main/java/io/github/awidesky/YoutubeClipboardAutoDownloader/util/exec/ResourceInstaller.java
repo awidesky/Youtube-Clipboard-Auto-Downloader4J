@@ -57,7 +57,6 @@ import io.github.awidesky.guiUtil.Logger;
 
 public class ResourceInstaller {
 
-	public static final String YTDLP_URL = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp"; 
 	private static final String root = YoutubeClipboardAutoDownloader.getAppdataPath();
 	
 	private static JLabel loadingStatus;
@@ -82,12 +81,14 @@ public class ResourceInstaller {
 		
 		if(isWindows()) {
 			deleteDirectoryRecursion(Paths.get(root, "ffmpeg"));
-			String url = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip";		
+			String url = "https://github.com/GyanD/codexffmpeg/releases/download/%s/ffmpeg-%s-essentials_build.zip";
+			String version = ffmpegLatestReleaseDate();
+			url = url.replace("%s", version);
+
 			long filesize = getFileSize(new URL(url));
 			log.log("Length of " + url + " : " + filesize);
 			
-			setLoadingFrameContent("Downloading ffmpeg", filesize);
-			TaskThreadPool.submit(() -> fetchFfmpegVersion("https://www.gyan.dev/ffmpeg/builds/release-version"));
+			setLoadingFrameContent("Downloading ffmpeg version " + version, filesize);
 			
 			File downloadFile = new File(root + File.separator + "ffmpeg.zip");
 			download(new URL(url), downloadFile);
@@ -188,7 +189,7 @@ public class ResourceInstaller {
 			Arrays.stream(Optional.ofNullable(new File(root + File.separator + "ffmpeg" + File.separator + "bin").listFiles()).orElse(new File[] {}))
 				.filter(File::isFile).filter(f -> f.getName().startsWith("yt-dlp")).forEach(File::delete);
 			
-			String url = YTDLP_URL;
+			String url = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp";
 			if (isWindows()) url += ".exe";
 			else if (isLinux()) {
 				switch(getArch()) {
@@ -214,18 +215,25 @@ public class ResourceInstaller {
 	}
 
 	private static AtomicReference<String> ytdlpLatestReleaseDate = new AtomicReference<>();
+	private static AtomicReference<String> ffmpegLatestReleaseDate = new AtomicReference<>();
 	public static String ytdlpLatestReleaseDate() {
-		String ret = ytdlpLatestReleaseDate.getOpaque();
+		return fetchGithubReleaseVersion("https://github.com/yt-dlp/yt-dlp/releases/latest", ytdlpLatestReleaseDate);
+	}
+	public static String ffmpegLatestReleaseDate() {
+		return fetchGithubReleaseVersion("https://github.com/GyanD/codexffmpeg/releases/latest", ffmpegLatestReleaseDate);
+	}
+	private static String fetchGithubReleaseVersion(String url, AtomicReference<String> holder) {
+		String ret = holder.getOpaque();
 		if(ret != null) return ret;
 		
 		HttpURLConnection conn = null;
 		try {
-			conn = (HttpURLConnection) new URL("https://github.com/yt-dlp/yt-dlp/releases/latest").openConnection();
+			conn = (HttpURLConnection) new URL(url).openConnection();
 			try(InputStream is = conn.getInputStream()) {}
 
 			ret = conn.getURL().toExternalForm();
 			ret = ret.substring(ret.lastIndexOf('/') + 1);
-			ytdlpLatestReleaseDate.setOpaque(ret);
+			holder.setOpaque(ret);
 			return ret;
 		} catch (IOException e) {
 			log.log(e);

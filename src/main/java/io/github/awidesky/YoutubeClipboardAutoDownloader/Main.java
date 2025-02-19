@@ -128,6 +128,7 @@ public class Main {
 
 		//pre-fetch some values asynchronously for faster use later.
 		TaskThreadPool.submit(ResourceInstaller::ytdlpLatestReleaseDate);
+		TaskThreadPool.submit(ResourceInstaller::ffmpegLatestReleaseDate);
 		
 		prepareLogFile(verbose, datePrefix, logbyTask, logOnConsole);
 		setup();
