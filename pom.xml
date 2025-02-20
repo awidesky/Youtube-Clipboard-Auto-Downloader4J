@@ -190,7 +190,7 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${build.dir}/Clipboard-dl_${project.version}/</outputDirectory>
+							<outputDirectory>${build.dir}/Clipboard-dl/</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${project.basedir}</directory>
@@ -237,9 +237,9 @@
 									</includes>
 								</resource>
 								<resource>
-									<directory>${build.dir}/Clipboard-dl_${project.version}</directory>
+									<directory>${build.dir}/Clipboard-dl</directory>
 									<includes>
-										<include>Clipboard-dl_${project.version}.jar</include>
+										<include>Clipboard-dl.jar</include>
 									</includes>
 								</resource>
 							</resources>
@@ -260,7 +260,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<outputDirectory>${build.dir}/Clipboard-dl_${project.version}</outputDirectory>
+					<outputDirectory>${build.dir}/Clipboard-dl</outputDirectory>
 					<archive>
 						<manifest>
 							<mainClass>io.github.awidesky.YoutubeClipboardAutoDownloader.Main</mainClass>
@@ -270,7 +270,7 @@
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
 					<appendAssemblyId>false</appendAssemblyId>
-					<finalName>Clipboard-dl_${project.version}</finalName>
+					<finalName>Clipboard-dl</finalName>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -287,9 +287,9 @@
 					</execution>
 				</executions>
 				<configuration>
-					<input>${build.dir}/Clipboard-dl_${project.version}</input>
+					<input>${build.dir}/Clipboard-dl</input>
 					<destination>${build.dir}/jpackage</destination>
-					<mainJar>Clipboard-dl_${project.version}.jar</mainJar>
+					<mainJar>Clipboard-dl.jar</mainJar>
 					<mainClass>io.github.awidesky.YoutubeClipboardAutoDownloader.Main</mainClass>
 					<name>Clipboard-dl</name>
 					<vendor>Eugene Hong</vendor>
@@ -312,8 +312,8 @@
 							<goal>launch4j</goal>
 						</goals>
 						<configuration>
-							<jar>Clipboard-dl_${project.version}.jar</jar>
-							<outfile>${build.dir}/launch4j/Clipboard-dl_${project.version}.exe</outfile>
+							<jar>Clipboard-dl.jar</jar>
+							<outfile>${build.dir}/launch4j/Clipboard-dl.exe</outfile>
 							<dontWrapJar>true</dontWrapJar>
 							<headerType>gui</headerType>
 							<errTitle></errTitle>
