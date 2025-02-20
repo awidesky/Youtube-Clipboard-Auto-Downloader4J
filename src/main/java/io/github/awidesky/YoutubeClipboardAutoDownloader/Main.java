@@ -173,7 +173,7 @@ public class Main {
 			logger.log("Listening clipboard...\n");
 
 			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.CHECKING_FFMPEG));
-			if (!YoutubeClipboardAutoDownloader.checkFfmpeg())
+			if (!YoutubeClipboardAutoDownloader.checkFFmpeg())
 				Main.kill(ExitCodes.FFMPEGNOTEXISTS);
 			
 			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.CHECKING_YTDLP));

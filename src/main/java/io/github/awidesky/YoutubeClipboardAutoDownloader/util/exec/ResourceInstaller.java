@@ -131,7 +131,7 @@ public class ResourceInstaller {
 			log.log("Length of " + url + " : " + filesize);
 			
 			setLoadingFrameContent("Downloading ffmpeg", filesize);
-			TaskThreadPool.submit(() -> fetchFfmpegVersion("https://johnvansickle.com/ffmpeg/release-readme.txt"));
+			TaskThreadPool.submit(() -> fetchFFmpegVersion("https://johnvansickle.com/ffmpeg/release-readme.txt"));
 			
 			File downloadFile = new File(root + File.separator + "ffmpeg.tar.xz");
 			download(new URL(url), downloadFile);
@@ -305,7 +305,7 @@ public class ResourceInstaller {
 		}
 	}
 
-	private static void fetchFfmpegVersion(String url) {
+	private static void fetchFFmpegVersion(String url) {
 		try (Scanner scanner = new Scanner(new URL(url).openStream(), StandardCharsets.UTF_8.toString())) {
 			Pattern ptr = Pattern.compile(".*?(\\d\\.\\d(\\.\\d)?).*?");
 			while(scanner.hasNext()) {

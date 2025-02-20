@@ -53,20 +53,20 @@ public class YoutubeClipboardAutoDownloader {
 	/**
 	 * @return <code>true</code> if ffmpeg is found
 	 * */
-	public static boolean checkFfmpeg() {
+	public static boolean checkFFmpeg() {
 		
 		/* check ffmpeg */
 		Logger log = Main.getLogger("[ffmepg check] ");
 
 		// start process
-		if (!checkFfmpegPath(ytdlpPath, log) && !checkFfmpegPath("", log)) {
+		if (!checkFFmpegPath(ytdlpPath, log) && !checkFFmpegPath("", log)) {
 			SwingDialogs.error("Error!", "no vaild ffmpeg installation in\n" + ytdlpPath + "\nor system %PATH%", null, true);
 			String installPrompt = OSUtil.isMac() ? "Install ffmpeg via \"brew install ffmpeg\"?" : "Install ffmpeg in app resource folder?";
 			if (ResourceInstaller.ffmpegAvailable() && SwingDialogs.confirm("ffmpeg installation invalid!", installPrompt)) {
 				try {
 					ResourceInstaller.getFFmpeg();
 					log.log("ffmpeg installation success. re-checking ffmpeg...");
-					return checkFfmpeg();
+					return checkFFmpeg();
 				} catch (Exception e1) {
 					SwingDialogs.error("Failed to install ffmpeg! : " + e1.getClass().getName(), "%e%", e1, true);
 					return false;
@@ -82,7 +82,7 @@ public class YoutubeClipboardAutoDownloader {
 		
 	}
 	
-	private static boolean checkFfmpegPath(String path, Logger log) {
+	private static boolean checkFFmpegPath(String path, Logger log) {
 		log.log("ffmpeg installation check command : \"" + path + "ffmpeg -version" + "\"");
 		try {
 			int ret = ProcessExecutor.runNow(log, null, path + "ffmpeg", "-version");
