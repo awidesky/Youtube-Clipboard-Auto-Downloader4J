@@ -54,6 +54,7 @@ import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.LogTextDialog;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.TaskThreadPool;
 import io.github.awidesky.guiUtil.Logger;
+import io.github.awidesky.guiUtil.SwingDialogs;
 
 public class ResourceInstaller {
 
@@ -105,10 +106,16 @@ public class ResourceInstaller {
 				}
 			}
 			
-			Files.delete(downloadFile.toPath());
-			Files.delete(Paths.get(root, "ffmpeg", "bin", "ffplay.exe"));
-			deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "doc"));
-			deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "presets"));
+			try {
+				Files.delete(downloadFile.toPath());
+				Files.delete(Paths.get(root, "ffmpeg", "bin", "ffplay.exe"));
+				deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "doc"));
+				deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "presets"));
+			} catch (IOException e) {
+				log.log("Failed to clean up files!");
+				log.log(e);
+				SwingDialogs.warning("Failed to clean up some files", "ffmpeg files might be corrupted...\n%e%", e, true);
+			}
 		} else if(isMac()) {
 			String[] cmd = {"/bin/bash", "-c", "/opt/homebrew/bin/brew install ffmpeg"};
 			setLoadingFrameContent("Installing ffmpeg via \"brew install ffmpeg\"... (Progress bar will stay in 0)", -1);
@@ -144,9 +151,16 @@ public class ResourceInstaller {
 			File ff = new File(root + File.separator + "ffmpeg", "ffmpeg");
 			new File(root + File.separator + "ffmpeg" + File.separator + "bin").mkdirs();
 			ff.renameTo(new File(ff.getParentFile().getAbsolutePath() + File.separator + "bin" + File.separator + "ffmpeg"));
-			Files.delete(downloadFile.toPath());
-			Files.delete(Paths.get(root, "ffmpeg", "qt-faststart"));
-			deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "manpages"));
+			
+			try {
+				Files.delete(downloadFile.toPath());
+				Files.delete(Paths.get(root, "ffmpeg", "qt-faststart"));
+				deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "manpages"));
+			} catch (IOException e) {
+				log.log("Failed to clean up files!");
+				log.log(e);
+				SwingDialogs.warning("Failed to clean up some files", "ffmpeg files might be corrupted...\n%e%", e, true);
+			}
 		}
 
 		hideProgress();
