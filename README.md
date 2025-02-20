@@ -1,4 +1,5 @@
-# Youtube-Clipboard-Auto-Downloader (a.k.a. Clipboard-dl)
+# Clipboard-dl [![](https://img.shields.io/github/v/release/awidesky/Youtube-Clipboard-Auto-Downloader4J?color=brightgreen&label=Download&style=flat-square)](https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J/releases/latest) [![](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
+
 
 ![](./screenshot.png)
 
@@ -8,8 +9,13 @@ Just copy a link with `ctrl + c` or `command + c` and you'll get audio/video fil
 
 ## Installation
 
-//TODO : Windows, mac, linux banner  
-Please refer to [release](https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J/releases/latest)
+Binaries can be found in [release](https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J/releases/latest).  
+
+Binary type|Supported OS
+:---|:---
+Native installer([jpackage](https://docs.oracle.com/en/java/javase/17/docs/specs/man/jpackage.html))|[![Windows](https://custom-icon-badges.demolab.com/badge/Windows-0078D6?logo=windows11&logoColor=white&style=flat-square)](https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J/releases/latest) [![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=F0F0F0&style=flat-square)](https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J/releases/latest) [![Linux/Debian](https://img.shields.io/badge/Linux/Debian-A81D33?logo=debian&logoColor=fff&style=flat-square)](https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J/releases/latest)
+Runnable Jar|[![Windows](https://custom-icon-badges.demolab.com/badge/Windows-0078D6?logo=windows11&logoColor=white&style=flat-square)](https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J/releases/latest) [![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=F0F0F0&style=flat-square)](https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J/releases/latest) [![Linux](https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=black)](https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J/releases/latest)
+[Launch4j](https://launch4j.sourceforge.net) executable|[![Windows](https://custom-icon-badges.demolab.com/badge/Windows-0078D6?logo=windows11&logoColor=white&style=flat-square)](https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J/releases/latest)
 
 
 ## Features
