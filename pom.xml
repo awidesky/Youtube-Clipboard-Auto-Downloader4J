@@ -239,7 +239,7 @@
 								<resource>
 									<directory>${build.dir}/Clipboard-dl</directory>
 									<includes>
-										<include>Clipboard-dl.jar</include>
+										<include>clipboard-dl.jar</include>
 									</includes>
 								</resource>
 							</resources>
@@ -270,7 +270,7 @@
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
 					<appendAssemblyId>false</appendAssemblyId>
-					<finalName>Clipboard-dl</finalName>
+					<finalName>clipboard-dl</finalName>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -289,7 +289,7 @@
 				<configuration>
 					<input>${build.dir}/Clipboard-dl</input>
 					<destination>${build.dir}/jpackage</destination>
-					<mainJar>Clipboard-dl.jar</mainJar>
+					<mainJar>clipboard-dl.jar</mainJar>
 					<mainClass>io.github.awidesky.YoutubeClipboardAutoDownloader.Main</mainClass>
 					<name>Clipboard-dl</name>
 					<vendor>Eugene Hong</vendor>
@@ -312,8 +312,8 @@
 							<goal>launch4j</goal>
 						</goals>
 						<configuration>
-							<jar>Clipboard-dl.jar</jar>
-							<outfile>${build.dir}/launch4j/Clipboard-dl.exe</outfile>
+							<jar>clipboard-dl.jar</jar>
+							<outfile>${build.dir}/launch4j/clipboard-dl.exe</outfile>
 							<dontWrapJar>true</dontWrapJar>
 							<headerType>gui</headerType>
 							<errTitle></errTitle>
