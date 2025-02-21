@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import io.github.awidesky.YoutubeClipboardAutoDownloader.Main;
-import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.TaskThreadPool;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.WorkerThreadPool;
 import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.SwingDialogs;
 
@@ -33,7 +33,7 @@ public class ProcessExecutor {
 		// start process
 		Process p = pb.directory(dir).start();
 		
-		Future<?> f1 = TaskThreadPool.submit(() -> {
+		Future<?> f1 = WorkerThreadPool.submit(() -> {
 			try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream(), Main.NATIVECHARSET))) {
 				stdout.accept(br);
 			} catch (IOException e) {
@@ -41,7 +41,7 @@ public class ProcessExecutor {
 						+ "\n%e%", e, false);
 			}
 		});
-		Future<?> f2 = TaskThreadPool.submit(() -> {
+		Future<?> f2 = WorkerThreadPool.submit(() -> {
 			try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream(), Main.NATIVECHARSET))) {
 				stderr.accept(br);
 			} catch (IOException e) {

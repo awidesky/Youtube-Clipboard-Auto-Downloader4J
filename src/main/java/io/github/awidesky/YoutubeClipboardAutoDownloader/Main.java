@@ -36,7 +36,7 @@ import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.ResourceInstaller;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.ClipBoardListeningThread;
-import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.TaskThreadPool;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.WorkerThreadPool;
 import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.LoggerThread;
 import io.github.awidesky.guiUtil.SwingDialogs;
@@ -127,8 +127,8 @@ public class Main {
 		});
 
 		//pre-fetch some values asynchronously for faster use later.
-		TaskThreadPool.submit(ResourceInstaller::ytdlpLatestReleaseDate);
-		TaskThreadPool.submit(ResourceInstaller::ffmpegLatestReleaseDate);
+		WorkerThreadPool.submit(ResourceInstaller::ytdlpLatestReleaseDate);
+		WorkerThreadPool.submit(ResourceInstaller::ffmpegLatestReleaseDate);
 		
 		prepareLogFile(verbose, datePrefix, logbyTask, logOnConsole);
 		setup();
@@ -225,7 +225,7 @@ public class Main {
 
 		TaskStatusModel.getinstance().addTask(t);
 		
-		t.setFuture(TaskThreadPool.submit(() -> {
+		t.setFuture(WorkerThreadPool.submit(() -> {
 
 			String url = YoutubeClipboardAutoDownloader.ytdlpQuote + data + YoutubeClipboardAutoDownloader.ytdlpQuote;
 			
@@ -407,7 +407,7 @@ public class Main {
 	 * This method can wait up to 5 seconds for <code>LoggerThread</code> and <code>executorService</code>(2.5seconds each) to terminated.
 	 * */
 	public static void kill(ExitCodes exitCode) {
-		TaskThreadPool.kill(2500);
+		WorkerThreadPool.kill(2500);
 		writeProperties();
 		if(logger != null) {
 			logger.log("Clipboard-dl exit code : " + exitCode.getCode());

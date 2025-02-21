@@ -52,7 +52,7 @@ import io.github.awidesky.YoutubeClipboardAutoDownloader.Main;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.YoutubeClipboardAutoDownloader;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.LogTextDialog;
-import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.TaskThreadPool;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.WorkerThreadPool;
 import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.SwingDialogs;
 
@@ -86,7 +86,7 @@ public class ResourceInstaller {
 			String version = ffmpegLatestReleaseDate();
 			url = url.replace("%s", version);
 
-			long filesize = getFileSize(url);
+			long filesize = getFileSize(new URL(url));
 			log.log("Length of " + url + " : " + filesize);
 			
 			setLoadingFrameContent("Downloading ffmpeg version " + version, filesize);
@@ -124,11 +124,11 @@ public class ResourceInstaller {
 			deleteDirectoryRecursion(Paths.get(root, "ffmpeg"));
 			String arch = getArch();
 			String url = "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-" + arch + "-static.tar.xz";		
-			long filesize = getFileSize(url);
+			long filesize = getFileSize(new URL(url));
 			log.log("Length of " + url + " : " + filesize);
 			
 			setLoadingFrameContent("Downloading ffmpeg", filesize);
-			TaskThreadPool.submit(() -> fetchFFmpegVersion("https://johnvansickle.com/ffmpeg/release-readme.txt"));
+			WorkerThreadPool.submit(() -> fetchFFmpegVersion("https://johnvansickle.com/ffmpeg/release-readme.txt"));
 			
 			File downloadFile = new File(root + File.separator + "ffmpeg.tar.xz");
 			download(new URL(url), downloadFile);
@@ -291,10 +291,10 @@ public class ResourceInstaller {
 		log.log("Successfully downloaded " + url.toString());
 	}
 	
-	private static long getFileSize(String url) throws IOException {
+	private static long getFileSize(URL url) throws IOException {
 		HttpURLConnection conn = null;
 		try {
-			conn = (HttpURLConnection) new URL(url).openConnection();
+			conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("HEAD");
 			return conn.getContentLengthLong();
 		} catch(IOException  e) {

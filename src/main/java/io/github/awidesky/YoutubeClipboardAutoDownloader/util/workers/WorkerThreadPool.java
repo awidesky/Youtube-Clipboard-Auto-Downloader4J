@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.Main;
 import io.github.awidesky.guiUtil.Logger;
 
-public class TaskThreadPool {
+public class WorkerThreadPool {
 
 	private static ExecutorService executorService = Executors.newCachedThreadPool(); 
 	private static Logger log = Main.getLogger("[TaskThreadPool] ");
