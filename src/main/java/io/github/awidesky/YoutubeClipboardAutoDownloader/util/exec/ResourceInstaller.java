@@ -86,7 +86,7 @@ public class ResourceInstaller {
 			String version = ffmpegLatestReleaseDate();
 			url = url.replace("%s", version);
 
-			long filesize = getFileSize(new URL(url));
+			long filesize = getFileSize(url);
 			log.log("Length of " + url + " : " + filesize);
 			
 			setLoadingFrameContent("Downloading ffmpeg version " + version, filesize);
@@ -100,11 +100,8 @@ public class ResourceInstaller {
 			});
 			unzipFolder(downloadFile.toPath(), Paths.get(root));
 			
-			for(File ff : new File(root).listFiles(f -> f.getName().startsWith("ffmpeg"))) {
-				if(ff.isDirectory()) {
-					ff.renameTo(new File(ff.getParentFile().getAbsolutePath() + File.separator + "ffmpeg"));
-				}
-			}
+			new File(root, url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf(".")))
+				.renameTo(new File(root, "ffmpeg"));
 			
 			try {
 				Files.delete(downloadFile.toPath());
@@ -117,7 +114,7 @@ public class ResourceInstaller {
 				SwingDialogs.warning("Failed to clean up some files", "ffmpeg files might be corrupted...\n%e%", e, true);
 			}
 		} else if(isMac()) {
-			String[] cmd = {"/bin/bash", "-c", "/opt/homebrew/bin/brew install ffmpeg"};
+			String[] cmd = {"/bin/zsh", "-c", "brew install ffmpeg"};
 			setLoadingFrameContent("Installing ffmpeg via \"brew install ffmpeg\"... (Progress bar will stay in 0)", -1);
 			LogTextDialog upDiag = new LogTextDialog(cmd, log);
 			upDiag.setVisible(true);
@@ -127,7 +124,7 @@ public class ResourceInstaller {
 			deleteDirectoryRecursion(Paths.get(root, "ffmpeg"));
 			String arch = getArch();
 			String url = "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-" + arch + "-static.tar.xz";		
-			long filesize = getFileSize(new URL(url));
+			long filesize = getFileSize(url);
 			log.log("Length of " + url + " : " + filesize);
 			
 			setLoadingFrameContent("Downloading ffmpeg", filesize);
@@ -294,12 +291,16 @@ public class ResourceInstaller {
 		log.log("Successfully downloaded " + url.toString());
 	}
 	
-	private static long getFileSize(URL url) throws IOException {
+	private static long getFileSize(String url) throws IOException {
 		HttpURLConnection conn = null;
 		try {
-			conn = (HttpURLConnection) url.openConnection();
+			conn = (HttpURLConnection) new URL(url).openConnection();
 			conn.setRequestMethod("HEAD");
 			return conn.getContentLengthLong();
+		} catch(IOException  e) {
+			log.log("Failed to get length of " + url);
+			log.log(e);
+			return -1;
 		} finally {
 			if(conn != null) conn.disconnect();
 		}
