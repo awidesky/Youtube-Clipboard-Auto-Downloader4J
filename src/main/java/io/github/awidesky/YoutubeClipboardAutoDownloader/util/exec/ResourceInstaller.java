@@ -104,7 +104,7 @@ public class ResourceInstaller {
 			
 			try {
 				Files.delete(downloadFile.toPath());
-				Files.delete(Paths.get(root, "ffmpeg", "bin", "ffplay.exe"));
+				Files.delete(Paths.get(root, "ffmpeg", "bin", "ffplay.exe")); //TODO : maybe renamed files cannot be removed. Remove before rename?
 				deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "doc"));
 				deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "presets"));
 			} catch (IOException e) {
@@ -391,12 +391,12 @@ public class ResourceInstaller {
 		if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
 			try (DirectoryStream<Path> entries = Files.newDirectoryStream(path)) {
 				for (Path entry : entries) {
-					if(entry.toFile().isFile()) { entry.toFile().delete(); continue; }
-					if(entry.toFile().exists()) deleteDirectoryRecursion(entry);
+					if(Files.isRegularFile(entry)) { Files.delete(entry); }
+					else if(Files.isDirectory(entry)) deleteDirectoryRecursion(entry);
 				}
 			}
 		}
-		if(path.toFile().exists()) Files.delete(path);
+		if(Files.exists(path)) Files.delete(path);
 	}
 	
 	private static String formatFileSize(long fileSize) {
