@@ -27,11 +27,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
@@ -105,7 +107,7 @@ public class ResourceInstaller {
 			try {
 				Files.delete(downloadFile.toPath());
 				Files.delete(Paths.get(root, "ffmpeg", "bin", "ffplay.exe")); //TODO : maybe renamed files cannot be removed. Remove before rename?
-				deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "doc"));
+				deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "doc"));   //TODO : or maybe zip output folder itself have strange permission
 				deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "presets"));
 			} catch (IOException e) {
 				log.log("Failed to clean up files!");
@@ -145,7 +147,7 @@ public class ResourceInstaller {
 			ProcessExecutor.runNow(log, new File(root), untar.toArray(String[]::new));
 			
 			File ff = new File(root + File.separator + "ffmpeg", "ffmpeg");
-			new File(root + File.separator + "ffmpeg" + File.separator + "bin").mkdirs();
+			new File(root + File.separator + "ffmpeg" + File.separator + "bin").mkdirs(); //TODO
 			ff.renameTo(new File(ff.getParentFile().getAbsolutePath() + File.separator + "bin" + File.separator + "ffmpeg"));
 			
 			try {
@@ -448,7 +450,7 @@ public class ResourceInstaller {
                 Path newPath = zipSlipProtect(zipEntry, target);
 
                 if (isDirectory) {
-                    Files.createDirectories(newPath);
+                	Files.createDirectories(newPath);
                 } else {
 
                     // example 1.2
@@ -475,7 +477,9 @@ public class ResourceInstaller {
                 }
 
                 zipEntry = zis.getNextEntry();
-
+                System.out.println("Create entry : " + newPath);
+            	System.out.printf("r : %s, w : %s, x : %s, owner : %s\n\n", Files.isReadable(newPath), Files.isWritable(newPath), Files.isExecutable(newPath), Files.getOwner(newPath));
+            	//Files.setPosixFilePermissions(newPath, Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_WRITE));
             }
             zis.closeEntry();
 
