@@ -1,11 +1,20 @@
-﻿$builds = ".\target\builds"
+﻿Set-Location $PSScriptRoot
 
-Get-ChildItem -Path "$builds\jpackage" | Rename-Item -NewName {($_.Basename -replace "[\-_]\d\.\d\.\d","") + $_.extension}
+$builds = ".\target\builds"
+$githubRelease = ".\target\builds\githubRelease"
 
-Compress-Archive -DestinationPath "$builds\Clipboard-dl.zip" -Path "$builds\Clipboard-dl\*"
+New-Item -Path $githubRelease -ItemType Directory -Force | Out-Null
 
-Compress-Archive -DestinationPath "$builds\Clipboard-dl_launch4j_jre.zip" -Path "$builds\launch4j\*"
+Get-ChildItem -Path "$builds\jpackage" | ForEach-Object {
+    $newName = $_.Name -replace '[\-_]\d\.\d\.\d',''
+    Copy-Item -Path $_.FullName -Destination (Join-Path $githubRelease $Newname) -Force
+}
 
-Remove-Item -Path $builds\launch4j\jre -Force -Recurse
+Compress-Archive -DestinationPath "$githubRelease\Clipboard-dl.zip" -Path "$builds\Clipboard-dl\*" -Force
 
-Compress-Archive -DestinationPath "$builds\Clipboard-dl_launch4j.zip" -Path "$builds\launch4j\*"
+Compress-Archive -DestinationPath "$githubRelease\Clipboard-dl_launch4j_jre.zip" -Path "$builds\launch4j\*" -Force
+
+$excludeJRE = Get-ChildItem -Path "$builds\launch4j" -Exclude "jre"
+Compress-Archive -DestinationPath "$githubRelease\Clipboard-dl_launch4j.zip" -Path $excludeJRE -Force
+
+Pause
