@@ -100,8 +100,7 @@ public class ResourceInstaller {
 			});
 			unzipFolder(downloadFile.toPath(), Paths.get(root));
 			
-			new File(root, url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf(".")))
-				.renameTo(new File(root, "ffmpeg"));
+			Files.move(Paths.get(root, url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("."))), Paths.get(root, "ffmpeg"));
 			
 			try {
 				Files.delete(downloadFile.toPath());
