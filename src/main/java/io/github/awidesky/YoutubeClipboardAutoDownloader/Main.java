@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
@@ -126,9 +127,7 @@ public class Main {
 			}
 		});
 
-		//pre-fetch some values asynchronously for faster use later.
-		WorkerThreadPool.submit(ResourceInstaller::ytdlpLatestReleaseDate);
-		WorkerThreadPool.submit(ResourceInstaller::ffmpegLatestReleaseDate);
+		preRunTasks();
 		
 		prepareLogFile(verbose, datePrefix, logbyTask, logOnConsole);
 		setup();
@@ -389,6 +388,25 @@ public class Main {
 		logTo.log(status + Config.status());
 	}
 
+
+	/* pre-run some tasks asynchronously for faster use later. */
+	private static void preRunTasks() {
+		Function<List<String>, Runnable> runProc = l -> {
+			return () -> {
+				try {
+					new ProcessBuilder(l).start();
+				} catch (IOException e) {}
+			};
+		};
+		
+		WorkerThreadPool.submit(runProc.apply(List.of("ffmpeg", "-version")));
+		WorkerThreadPool.submit(runProc.apply(List.of(YoutubeClipboardAutoDownloader.getYtdlpPath() + "ffmpeg", "-version")));
+		WorkerThreadPool.submit(runProc.apply(List.of("yt-dlp", "--version")));
+		WorkerThreadPool.submit(runProc.apply(List.of(YoutubeClipboardAutoDownloader.getYtdlpPath() + "yt-dlp", "--version")));
+		
+		WorkerThreadPool.submit(ResourceInstaller::ytdlpLatestReleaseDate);
+		WorkerThreadPool.submit(ResourceInstaller::ffmpegLatestReleaseDate);		
+	}
 	
 	public static void clearTasks() {
 		try {
