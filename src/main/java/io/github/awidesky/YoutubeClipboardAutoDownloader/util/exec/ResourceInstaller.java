@@ -20,6 +20,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -27,13 +28,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
@@ -146,9 +145,7 @@ public class ResourceInstaller {
 			log.log("Unzipping ffmpeg.tar.xz with : " + untar.stream().collect(Collectors.joining(" " )));
 			ProcessExecutor.runNow(log, new File(root), untar.toArray(String[]::new));
 			
-			File ff = new File(root + File.separator + "ffmpeg", "ffmpeg");
-			new File(root + File.separator + "ffmpeg" + File.separator + "bin").mkdirs(); //TODO
-			ff.renameTo(new File(ff.getParentFile().getAbsolutePath() + File.separator + "bin" + File.separator + "ffmpeg"));
+			Files.move(Paths.get(root, "ffmpeg", "ffmpeg"), Files.createDirectories(Paths.get(root, "ffmpeg", "bin")).resolve("ffmpeg"));
 			
 			try {
 				Files.delete(downloadFile.toPath());
