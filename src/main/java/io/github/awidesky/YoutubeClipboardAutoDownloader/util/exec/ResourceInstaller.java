@@ -20,7 +20,6 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.AccessDeniedException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -105,8 +104,8 @@ public class ResourceInstaller {
 			
 			try {
 				Files.delete(downloadFile.toPath());
-				Files.delete(Paths.get(root, "ffmpeg", "bin", "ffplay.exe")); //TODO : maybe renamed files cannot be removed. Remove before rename?
-				deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "doc"));   //TODO : or maybe zip output folder itself have strange permission
+				Files.delete(Paths.get(root, "ffmpeg", "bin", "ffplay.exe"));
+				deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "doc"));
 				deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "presets"));
 			} catch (IOException e) {
 				log.log("Failed to clean up files!");
