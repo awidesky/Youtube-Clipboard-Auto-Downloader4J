@@ -54,6 +54,7 @@ public class OSUtil {
 	
 	
 	private static boolean addWindowsPermission(Path file, Logger log, AclEntryPermission... perm) {
+		log.newLine();
 		List<AclEntryPermission> addPerm = Arrays.asList(perm);
 		try {
 			UserPrincipal user = file.getFileSystem().getUserPrincipalLookupService().lookupPrincipalByName(System.getProperty("user.name"));
@@ -102,10 +103,13 @@ public class OSUtil {
 			log.log("Failed to add permission \"%s\""
 					.formatted(addPerm.stream().map(AclEntryPermission::toString).collect(Collectors.joining(", "))));
 			return false;
+		} finally {
+			log.newLine();
 		}
 	}
 
 	private static boolean addPosixPermission(Path file, Logger log, PosixFilePermission... perms) {
+		log.newLine();
 		List<PosixFilePermission> toAdd = Arrays.asList(perms);
 		try {
 			Set<PosixFilePermission> permSet = Files.getPosixFilePermissions(file);
@@ -128,6 +132,8 @@ public class OSUtil {
 			log.log("Failed to add posix permission(s) \"%s\"".formatted(
 					toAdd.stream().map(PosixFilePermission::toString).collect(Collectors.joining(", "))));
 			return false;
+		} finally {
+			log.newLine();
 		}
 	}
 
