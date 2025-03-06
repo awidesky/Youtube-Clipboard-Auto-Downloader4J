@@ -3,7 +3,6 @@ package io.github.awidesky.YoutubeClipboardAutoDownloader;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.AccessDeniedException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -70,16 +69,15 @@ public class YoutubeClipboardAutoDownloader {
 					ResourceInstaller.getFFmpeg();
 					log.log("ffmpeg installation success. re-checking ffmpeg...");
 					return checkFFmpeg();
-				} catch (AccessDeniedException ade) {
-					log.log("Error when installing ffmpeg : Access Denied!");
-					log.log(ade);
-					if(SwingDialogs.confirm("Error when installing ffmpeg : Access Denied!", "Change permission and try again?\n" + ade.toString())) {
-						Path dir = Paths.get(appDataPath);
-						log.log("Retry after change permission of : " + dir);
-						return OSUtil.addDeletePermissionRecursive(dir, log) && checkFFmpeg();
-					} else return false;
-				} catch (Exception e1) {
-					SwingDialogs.error("Failed to install ffmpeg! : " + e1.getClass().getName(), "%e%", e1, true);
+				} catch (Exception e) {
+					if(e.getMessage().contains("denied")) { // "Permission denied" | "Access is denied"
+						if(SwingDialogs.confirm("Error when installing ffmpeg : Access Denied!", "Change permission and try again?\n" + e.getLocalizedMessage())) {
+							Path dir = Paths.get(appDataPath);
+							log.log("Retry after change permission of : " + dir);
+							return OSUtil.addDeletePermissionRecursive(dir, log) && checkFFmpeg();
+						} else return false;
+					}
+					SwingDialogs.error("Failed to install ffmpeg! : " + e.toString(), "%e%", e, true);
 					return false;
 				}
 			} else {
@@ -99,17 +97,17 @@ public class YoutubeClipboardAutoDownloader {
 			int ret = ProcessExecutor.runNow(log, null, path + "ffmpeg", "-version");
 			log.log("ffmpeg installation check command terminated with exit code : " + ret);
 			return ret == 0;
-		} catch(AccessDeniedException ade) {
-			log.log("Error when checking ffmpeg : Access Denied!");
-			log.log(ade);
-			if(SwingDialogs.confirm("Error when checking ffmpeg : Access Denied!", "Change permission and try again?\n" + ade.toString())) {
-				log.log("Retry after changing executable permission...");
-				OSUtil.addExecutePermission(Paths.get(path, "ffmpeg"), log);
-				return checkFFmpegPath(path, log);
-			} else return false;
 		} catch (Exception e) {
 			log.log("Error when checking ffmpeg : " + e.getClass().getName());
 			log.log(e);
+			
+			if(e.getMessage().contains("denied")) { // "Permission denied" | "Access is denied"
+				if(SwingDialogs.confirm("Error when checking ffmpeg : Access Denied!", "Change permission and try again?\n" + e.getLocalizedMessage())) {
+					log.log("Retry after changing executable permission...");
+					OSUtil.addExecutePermission(Paths.get(path, "ffmpeg"), log);
+					return checkFFmpegPath(path, log);
+				} else return false;
+			}
 			return false;
 		} finally { log.newLine(); }
 	}
@@ -205,16 +203,17 @@ public class YoutubeClipboardAutoDownloader {
 			log.log("yt-dlp installation check command terminated with exit code : " + ret);
 			if(!stderr.isEmpty()) SwingDialogs.error("yt-dlp Error! code : " + ret, stderr.toString(), null, false);
 			return ret == 0;
-		} catch(AccessDeniedException ade) {
-			log.log("Error when checking yt-dlp : Access Denied!");
-			log.log(ade);
-			if(SwingDialogs.confirm("Error when checking yt-dlp : Access Denied!", "Change permission and try again?\n" + ade.toString())) {
-				log.log("Retry after changing executable permission...");
-				OSUtil.addExecutePermission(Paths.get(ydlfile), log);
-				return checkYtdlpPath(ydlfile, log);
-			} else return false;
 		} catch (InterruptedException | IOException | ExecutionException e) {
 			log.log("Error when checking yt-dlp : " + e.getClass().getName() + "\n" + e.getMessage());
+			log.log(e);
+			
+			if(e.getMessage().contains("denied")) { // "Permission denied" | "Access is denied"
+				if(SwingDialogs.confirm("Error when checking yt-dlp : Access Denied!", "Change permission and try again?\n" + e.getLocalizedMessage())) {
+					log.log("Retry after changing executable permission...");
+					OSUtil.addExecutePermission(Paths.get(ydlfile), log);
+					return checkYtdlpPath(ydlfile, log);
+				} else return false;
+			}
 			return false;
 		} finally { log.newLine(); }
 
