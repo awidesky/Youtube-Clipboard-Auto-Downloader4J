@@ -473,9 +473,6 @@ public class ResourceInstaller {
                 }
 
                 zipEntry = zis.getNextEntry();
-                System.out.println("Create entry : " + newPath);
-            	System.out.printf("r : %s, w : %s, x : %s, owner : %s\n\n", Files.isReadable(newPath), Files.isWritable(newPath), Files.isExecutable(newPath), Files.getOwner(newPath));
-            	//Files.setPosixFilePermissions(newPath, Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_WRITE));
             }
             zis.closeEntry();
 
