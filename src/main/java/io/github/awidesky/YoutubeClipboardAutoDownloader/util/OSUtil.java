@@ -81,6 +81,8 @@ public class OSUtil {
 						Set<AclEntryPermission> permissions = entryOfThePrincipal.permissions();
 						if(permissions.containsAll(addPerm)) {
 							//this user already has the permission, check the owner.
+							log.log("User : \"%s\" already has permission : \"%s\""
+									.formatted(principal, addPerm.stream().map(AclEntryPermission::toString).collect(Collectors.joining(", "))));
 							return false;
 						}
 
@@ -100,7 +102,7 @@ public class OSUtil {
 			
 			result.ifPresentOrElse(
 							u -> log.log("Execute permission added for user :" + u),
-							() -> log.log("Failed to add execute permission!")
+							() -> log.log("Permission is not added!")
 							);
 
 			printACL(file, log);
@@ -124,6 +126,12 @@ public class OSUtil {
 			log.log("Current user : " + file.getFileSystem().getUserPrincipalLookupService().lookupPrincipalByName(System.getProperty("user.name")));
 			log.log("Permission of " + file + " : " + PosixFilePermissions.toString(permSet));
 			log.log("Owner : " + Files.getOwner(file));
+			
+			if(permSet.containsAll(toAdd)) {
+				log.log("Permission : \"%s\" is already granted!"
+						.formatted(toAdd.stream().map(PosixFilePermission::toString).collect(Collectors.joining(", "))));
+				return true;
+			}
 
 			permSet.addAll(toAdd);
 			Files.setPosixFilePermissions(file, permSet);
