@@ -34,14 +34,21 @@ public class OSUtil {
 		if(isWindows()) {
 			addWindowsPermission(file, log, AclEntryPermission.EXECUTE);
 		} else {
-			addPosixPermission(file, log, PosixFilePermission.OWNER_EXECUTE);
+			PosixFilePermission[] permList = new PosixFilePermission[] {PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.GROUP_EXECUTE, PosixFilePermission.OTHERS_EXECUTE};
+			try {
+				if(Files.getOwner(file).equals(file.getFileSystem().getUserPrincipalLookupService().lookupPrincipalByName(System.getProperty("user.name")))) {
+					permList = new PosixFilePermission[] {PosixFilePermission.OWNER_EXECUTE};
+				}
+			} catch (IOException e) {}
+			
+			addPosixPermission(file, log, permList);
 		}
 	}
 	public static boolean addDeletePermissionRecursive(Path dir, Logger log) {
 		Predicate<Path> addPerm = isWindows() ?
 			d -> addWindowsPermission(d, log, AclEntryPermission.DELETE_CHILD, AclEntryPermission.WRITE_DATA)
 			:
-			d -> addPosixPermission(d, log, 
+			d -> addPosixPermission(d, log, /** giving permission 777 is bad. so given owner permission only. */
 					PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE);
 		try {
 			return Files.walk(dir).filter(Files::isDirectory).allMatch(addPerm);
