@@ -52,6 +52,7 @@ import io.github.awidesky.YoutubeClipboardAutoDownloader.Main;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.YoutubeClipboardAutoDownloader;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.LogTextDialog;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.WorkerThreadPool;
 import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.SwingDialogs;
@@ -91,19 +92,19 @@ public class ResourceInstaller {
 			
 			setLoadingFrameContent("Downloading ffmpeg version " + version, filesize);
 			
-			File downloadFile = new File(root + File.separator + "ffmpeg.zip");
+			Path downloadFile = Paths.get(root,"ffmpeg.zip");
 			download(new URL(url), downloadFile);
 			
 			SwingUtilities.invokeLater(() -> {
 				loadingFrame.setTitle("Installing ffmpeg");
-				loadingStatus.setText("Unzipping " + downloadFile.getName() + " (" + formatFileSize(downloadFile.length()) + ")");
+				loadingStatus.setText("Unzipping " + downloadFile.getFileName() + " (" + formatFileSize(downloadFile.toFile().length()) + ")");
 			});
-			unzipFolder(downloadFile.toPath(), Paths.get(root));
+			unzipFolder(downloadFile, Paths.get(root));
 			
 			Files.move(Paths.get(root, url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("."))), Paths.get(root, "ffmpeg"));
 			
 			try {
-				Files.delete(downloadFile.toPath());
+				Files.delete(downloadFile);
 				Files.delete(Paths.get(root, "ffmpeg", "bin", "ffplay.exe"));
 				deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "doc"));
 				deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "presets"));
@@ -129,25 +130,25 @@ public class ResourceInstaller {
 			setLoadingFrameContent("Downloading ffmpeg", filesize);
 			WorkerThreadPool.submit(() -> fetchFFmpegVersion("https://johnvansickle.com/ffmpeg/release-readme.txt"));
 			
-			File downloadFile = new File(root + File.separator + "ffmpeg.tar.xz");
+			Path downloadFile = Paths.get(root, "ffmpeg.tar.xz");
 			download(new URL(url), downloadFile);
 			
 			SwingUtilities.invokeLater(() -> {
 				loadingFrame.setTitle("Installing ffmpeg");
-				loadingStatus.setText("Unzipping " + downloadFile.getName() + " (" + formatFileSize(downloadFile.length()) + ")");
+				loadingStatus.setText("Unzipping " + downloadFile.getFileName() + " (" + formatFileSize(downloadFile.toFile().length()) + ")");
 			});
 			List<String> untar = new ArrayList<>();
 			if(!new File(root, "ffmpeg").mkdirs())
 				untar.addAll(List.of("mkdir", "ffmpeg;"));
 			
-			untar.addAll(List.of("tar", "-xf", downloadFile.getName(), "-C", "ffmpeg", "--strip-components", "1"));
+			untar.addAll(List.of("tar", "-xf", downloadFile.toString(), "-C", "ffmpeg", "--strip-components", "1"));
 			log.log("Unzipping ffmpeg.tar.xz with : " + untar.stream().collect(Collectors.joining(" " )));
 			ProcessExecutor.runNow(log, new File(root), untar.toArray(String[]::new));
 			
 			Files.move(Paths.get(root, "ffmpeg", "ffmpeg"), Files.createDirectories(Paths.get(root, "ffmpeg", "bin")).resolve("ffmpeg"));
 			
 			try {
-				Files.delete(downloadFile.toPath());
+				Files.delete(downloadFile);
 				Files.delete(Paths.get(root, "ffmpeg", "qt-faststart"));
 				deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "manpages"));
 			} catch (IOException e) {
@@ -215,7 +216,9 @@ public class ResourceInstaller {
 			long filesize = getFileSize(new URL(url));
 			log.log("Length of " + url + " : " + filesize);
 			setLoadingFrameContent("Downloading yt-dlp version " + ytdlpLatestReleaseDate(), filesize);
-			download(new URL(url), new File(root + File.separator + "ffmpeg" + File.separator + "bin"  + File.separator + (isWindows() ? "yt-dlp.exe" : "yt-dlp")));
+			Path ytdlpFile = Paths.get(root, "ffmpeg", "bin", (isWindows() ? "yt-dlp.exe" : "yt-dlp"));
+			download(new URL(url), ytdlpFile);
+			OSUtil.addExecutePermission(ytdlpFile, log);
 		}
 		
 		hideProgress();
@@ -251,17 +254,15 @@ public class ResourceInstaller {
 		}
 	}
 	
-	private static void download(URL url, File dest) throws IOException {
-		IOException ee = null;
-		if(dest.exists()) { dest.delete(); }
-		dest.getParentFile().mkdirs();
-		dest.createNewFile();
-		if(!dest.canExecute()) dest.setExecutable(true);
+	private static void download(URL url, Path dest) throws IOException {
+		Files.deleteIfExists(dest);
+		Files.createDirectories(dest.getParent());
+		Files.createFile(dest);
 		
 		try (ReadableByteChannel in = Channels.newChannel(url.openStream());
-				FileChannel out = FileChannel.open(dest.toPath(), StandardOpenOption.WRITE)) {
+				FileChannel out = FileChannel.open(dest, StandardOpenOption.WRITE)) {
 
-			log.log("Downloading from " + url.toString() + " to " + dest.getAbsolutePath());
+			log.log("Downloading from " + url.toString() + " to " + dest);
 			log.log("Buffer size : " + formatFileSize(BUFFER_SIZE));
 			
 			ByteBuffer bytebuf = ByteBuffer.allocateDirect(BUFFER_SIZE);
@@ -281,9 +282,7 @@ public class ResourceInstaller {
 				updateUI(written, total);
 				if(eof && (bytebuf.remaining() == bytebuf.capacity())) break;
 			}
-		} catch (IOException e) { ee = e; }
-		
-		if(ee != null) throw ee;
+		}
 		
 		log.log("Successfully downloaded " + url.toString());
 	}
