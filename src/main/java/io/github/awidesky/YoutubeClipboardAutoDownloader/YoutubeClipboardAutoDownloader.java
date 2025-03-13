@@ -474,7 +474,7 @@ public class YoutubeClipboardAutoDownloader {
 		if(!"best".equals(Config.getQuality())) {
 			height = "[height<=" + Config.getQuality().replace("p", "") + "]";
 		}
-		return "\"" + "bv" + video + height + "+ba" + audio + "/b" + video + height + " / bv*+ba/b" + "\"";
+		return "bv" + video + height + "+ba" + audio + "/b" + video + height + " / bv*+ba/b";
 	}
 
 }
