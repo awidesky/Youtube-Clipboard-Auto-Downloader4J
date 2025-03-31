@@ -1,5 +1,7 @@
 package io.github.awidesky.YoutubeClipboardAutoDownloader;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Objects;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -123,7 +125,19 @@ public class TaskData {
 	public void setProcess(Process p) { this.p = p;	}
 
 	@Override
-	public String toString() { return "Task : " + taskNum + ", dest : " + dest + ", video url : " + url; }
+	public String toString() {
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		pw.println("Task #" + taskNum);
+		pw.println("URL : " + url.get());
+		pw.println("Status : " + status.get());
+		pw.println("Progress : " + progress.get() + "%");
+		pw.println("Destination : " + dest.get());
+		if(totalNumOfVideo.get() > 1) pw.println("playlist index : " + videoNum.get() + " of " + totalNumOfVideo.get());
+		pw.println("Download mode : " + (audioMode.get() ? "audio only" : "video"));
+		pw.flush(); pw.close();
+		return sw.toString();
+	}
 
 	@Override
 	public boolean equals(Object obj) {

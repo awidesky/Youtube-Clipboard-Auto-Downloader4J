@@ -57,6 +57,10 @@ public class TaskStatusModel extends AbstractTableModel {
 		return null; // this should not happen!
 	}
 
+	public TaskData getTaskData(int rowIndex) {
+		return rows.get(rowIndex);
+	}
+	
 	@Override
 	public Class<?> getColumnClass(int column) {  return (column == TableColumnEnum.CHECKBOX.getIndex()) ? Boolean.class : (getValueAt(0, column).getClass()); }
 	
@@ -142,19 +146,19 @@ public class TaskStatusModel extends AbstractTableModel {
 
 	public String getProgressToolTip(int row) { return rows.get(row).getProgressToolTip(); }
 
-	public boolean isTaskExists(TaskData t) {
+	public TaskData isTaskExists(TaskData t) {
 		if (EventQueue.isDispatchThread()) {
-			return rows.contains(t);
+			return rows.contains(t) ? rows.get(rows.indexOf(t)) : null;
 		} else {
-			final AtomicReference<Boolean> result = new AtomicReference<>();
+			final AtomicReference<TaskData> result = new AtomicReference<>();
 			try {
-				SwingUtilities.invokeAndWait(() -> { result.set(rows.contains(t)); });
+				SwingUtilities.invokeAndWait(() -> { result.set(isTaskExists(t)); });
 				return result.get();
 			} catch (Exception e) {
 				log.log("Exception when checking existing Task(s)");
 				log.log(e);
 			}
-			return false;
+			return null;
 		}
 	}
 	
@@ -162,7 +166,7 @@ public class TaskStatusModel extends AbstractTableModel {
 	 * Is same task exists in the table, and the status Strings are identical?
 	 * */
 	public boolean isTaskExistsSameStatus(TaskData t) {
-		if(!isTaskExists(t)) { return false; }
+		if(isTaskExists(t) != null) { return false; }
 		if (EventQueue.isDispatchThread()) {
 			return rows.get(rows.indexOf(t)).getStatus().equals(t.getStatus());
 		} else {
