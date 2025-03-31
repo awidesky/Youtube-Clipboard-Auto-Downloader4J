@@ -6,10 +6,12 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Taskbar;
+import java.awt.Taskbar.Feature;
 import java.awt.Toolkit;
 import java.awt.Window;
-import java.awt.Taskbar.Feature;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -29,10 +31,12 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
@@ -363,6 +367,18 @@ public class GUI {
 			}
 		};
 		
+		table.addMouseListener(new MouseAdapter() {
+		    public void mousePressed(MouseEvent mouseEvent) {
+		        Point point = mouseEvent.getPoint();
+		        int row = table.rowAtPoint(point);
+		        if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1 && row != -1) {
+		        	JTextArea ta = new JTextArea(TaskStatusModel.getinstance().getTaskData(table.convertRowIndexToModel(row)).toString());
+		        	ta.setEditable(false);
+		        	//TODO : add retry button?
+		        	JOptionPane.showMessageDialog(null, ta, "Task info", JOptionPane.INFORMATION_MESSAGE);
+		        }
+		    }
+		});
 		table.setModel(TaskStatusModel.getinstance());
 		table.setAutoCreateColumnsFromModel(false);
 		table.getColumn("Progress").setCellRenderer(new ProgressRenderer());

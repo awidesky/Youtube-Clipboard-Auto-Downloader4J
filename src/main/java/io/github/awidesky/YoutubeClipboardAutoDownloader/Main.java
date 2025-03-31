@@ -212,7 +212,8 @@ public class Main {
 		t.setDest(gui.getSavePath());
 		t.setStatus("Validating...");
 		
-		if(TaskStatusModel.getinstance().isTaskExists(t) && !t.isFailed()) {
+		TaskData other = TaskStatusModel.getinstance().isTaskExists(t);
+		if(other != null && !other.isFailed()) {
 			// if duplicate task is also "Validating...", it is very likely that clipboard input was duplicated(e.g. long pressing the ctrl + c)
 			if(TaskStatusModel.getinstance().isTaskExistsSameStatus(t)) return; 
 
@@ -223,14 +224,17 @@ public class Main {
 		}
 
 		TaskStatusModel.getinstance().addTask(t);
-		
+		submitTask(t);
+	}
+	
+	private static void submitTask(TaskData t) {
 		t.setFuture(WorkerThreadPool.submit(() -> {
 
-			String url = YoutubeClipboardAutoDownloader.ytdlpQuote + data + YoutubeClipboardAutoDownloader.ytdlpQuote;
+			String url = YoutubeClipboardAutoDownloader.ytdlpQuote + t.getUrl() + YoutubeClipboardAutoDownloader.ytdlpQuote;
 			
 			PlayListOption p = Config.getPlaylistOption();
 			
-			if (p == PlayListOption.ASK && data.contains("list=")) {
+			if (p == PlayListOption.ASK && t.getUrl().contains("list=")) {
 				p = (SwingDialogs.confirm("Download entire Playlist?", "PlayList Link : " + url)) ? PlayListOption.YES : PlayListOption.NO;
 			}
 					

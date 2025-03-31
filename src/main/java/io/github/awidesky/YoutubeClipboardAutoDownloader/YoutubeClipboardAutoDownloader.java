@@ -278,14 +278,21 @@ public class YoutubeClipboardAutoDownloader {
 			ProcessExecutor.ProcessHandle p1 = ProcessExecutor.run(args, null, br -> {
 				try {
 					String name = br.readLine();
+					task.logger.log("[validating] yt-dlp stdout : " + name);
 					if (playListOption == PlayListOption.YES) {
-						name = "\"" + name + "\" and whole playlist";
 						int vdnum = 1;
-						while (br.readLine() != null)
+						String str;
+						while ((str = br.readLine()) != null) {
+							task.logger.log("[validating] yt-dlp stdout : " + str);							
 							vdnum++;
-						task.setTotalNumVideo(vdnum);
+						}
+						
+						if(vdnum > 1) {
+							name = "\"" + name + "\" and whole playlist";// check numbers instead
+							task.setTotalNumVideo(vdnum);
+						}
 					}
-					task.setVideoName(name);
+					task.setVideoName(String.valueOf(name));
 				} catch (IOException e) {
 					SwingDialogs.error("Error when getting video name", "[Task" + task.getTaskNum() + "|validating] " + e.getClass().getName() + " : %e%", e, true);
 				}
