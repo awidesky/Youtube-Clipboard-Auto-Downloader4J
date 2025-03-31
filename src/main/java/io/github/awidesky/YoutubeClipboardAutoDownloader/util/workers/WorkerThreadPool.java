@@ -10,7 +10,7 @@ import io.github.awidesky.guiUtil.Logger;
 
 public class WorkerThreadPool {
 
-	private static ExecutorService executorService = Executors.newCachedThreadPool(); 
+	private static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()); 
 	private static Logger log = Main.getLogger("[TaskThreadPool] ");
 	
 	public static Future<?> submit(Runnable task) { return executorService.submit(task); }
