@@ -335,7 +335,6 @@ public class YoutubeClipboardAutoDownloader {
 		Main.logProperties(task.logger, "[preparing] Current properties :");
 
 		/* download video */
-		Instant startTime = Instant.now();
 		LinkedList<String> arguments = new LinkedList<>(Arrays.asList(
 				ytdlpPath + "yt-dlp", "--newline", "--force-overwrites", playListOption.toCommandArgm(), "--ffmpeg-location", ytdlpPath, "--output", ytdlpQuote + Config.getFileNameFormat() + ytdlpQuote));
 		
@@ -445,21 +444,28 @@ public class YoutubeClipboardAutoDownloader {
 			SwingDialogs.error("Error [" + task.getVideoName() + "]", "[Task" + task.getTaskNum() + "|downloading] Couldn't start yt-dlp : " + e1.getClass().getName() + "\n%e%" , e1, true);
 			return;
 		}
-		
+		Instant starttime = p.getProcess().info().startInstant().orElseGet(Instant::now);
+		p.getProcess().info().commandLine().ifPresent(line -> 
+			task.logger.log("[process info] Executed process command : \"" + line + "\""));
 		task.setProcess(p.getProcess());
 		task.setStatus("Initiating download");
 		task.setProgress(0);
 		
 		try {
 			int errorCode = p.wait_all();
-			Duration diff = Duration.between(startTime, Instant.now());
+			task.logger.log("[process info] Process exit code : " + errorCode);
+			p.getProcess().info().totalCpuDuration()
+					.ifPresent(cputime -> task.logger.log("[process info] Process cpu time : " + String.format("%d min %d.%03d sec",
+									cputime.toMinutes(), cputime.toSecondsPart(), cputime.toMillisPart())));
+			
+			Duration diff = Duration.between(starttime, Instant.now());
 			if(errorCode != 0) { 
 				SwingDialogs.error("Error in yt-dlp", "[Task" + task.getTaskNum() + "|downloading] yt-dlp has ended with error code : " + errorCode, null, true);
 				task.logger.log("[downloading] elapsed time in downloading(failed) : " + String.format("%d min %d.%03d sec",
 						diff.toMinutes(), diff.toSecondsPart(), diff.toMillisPart()));
 				task.failed();
 				return;
-			} else {
+			} else { 
 				task.logger.log("[downloaded] elapsed time in working(succeed) : " + String.format("%d min %d.%03d sec",
 						diff.toMinutes(), diff.toSecondsPart(), diff.toMillisPart()));
 				task.logger.log("[finished] Finished!\n");
