@@ -53,7 +53,7 @@ import io.github.awidesky.YoutubeClipboardAutoDownloader.YoutubeClipboardAutoDow
 import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.LogTextDialog;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil;
-import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.WorkerThreadPool;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.ProcessIOThreadPool;
 import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.SwingDialogs;
 
@@ -128,7 +128,7 @@ public class ResourceInstaller {
 			log.log("Length of " + url + " : " + filesize);
 			
 			setLoadingFrameContent("Downloading ffmpeg", filesize);
-			WorkerThreadPool.submit(() -> fetchFFmpegVersion("https://johnvansickle.com/ffmpeg/release-readme.txt"));
+			ProcessIOThreadPool.submit(() -> fetchFFmpegVersion("https://johnvansickle.com/ffmpeg/release-readme.txt"));
 			
 			Path downloadFile = Paths.get(root, "ffmpeg.tar.xz");
 			download(new URL(url), downloadFile);

@@ -8,10 +8,10 @@ import java.util.concurrent.TimeUnit;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.Main;
 import io.github.awidesky.guiUtil.Logger;
 
-public class WorkerThreadPool {
+public class DownloadThreadPool {
 
-	private static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()); 
-	private static Logger log = Main.getLogger("[TaskThreadPool] ");
+	private static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()); // TODO : download pool size 
+	private static Logger log = Main.getLogger("[DownloadThreadPool] ");
 	
 	public static Future<?> submit(Runnable task) { return executorService.submit(task); }
 	public static void kill(long timeout) {

@@ -37,7 +37,8 @@ import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.ResourceInstaller;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.ClipBoardListeningThread;
-import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.WorkerThreadPool;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.DownloadThreadPool;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.ProcessIOThreadPool;
 import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.LoggerThread;
 import io.github.awidesky.guiUtil.SwingDialogs;
@@ -228,7 +229,7 @@ public class Main {
 	}
 	
 	private static void submitTask(TaskData t) {
-		t.setFuture(WorkerThreadPool.submit(() -> {
+		t.setFuture(DownloadThreadPool.submit(() -> {
 
 			String url = YoutubeClipboardAutoDownloader.ytdlpQuote + t.getUrl() + YoutubeClipboardAutoDownloader.ytdlpQuote;
 			
@@ -403,13 +404,13 @@ public class Main {
 			};
 		};
 		
-		WorkerThreadPool.submit(runProc.apply(List.of("ffmpeg", "-version")));
-		WorkerThreadPool.submit(runProc.apply(List.of(YoutubeClipboardAutoDownloader.getYtdlpPath() + "ffmpeg", "-version")));
-		WorkerThreadPool.submit(runProc.apply(List.of("yt-dlp", "--version")));
-		WorkerThreadPool.submit(runProc.apply(List.of(YoutubeClipboardAutoDownloader.getYtdlpPath() + "yt-dlp", "--version")));
+		ProcessIOThreadPool.submit(runProc.apply(List.of("ffmpeg", "-version")));
+		ProcessIOThreadPool.submit(runProc.apply(List.of(YoutubeClipboardAutoDownloader.getYtdlpPath() + "ffmpeg", "-version")));
+		ProcessIOThreadPool.submit(runProc.apply(List.of("yt-dlp", "--version")));
+		ProcessIOThreadPool.submit(runProc.apply(List.of(YoutubeClipboardAutoDownloader.getYtdlpPath() + "yt-dlp", "--version")));
 		
-		WorkerThreadPool.submit(ResourceInstaller::ytdlpLatestReleaseDate);
-		WorkerThreadPool.submit(ResourceInstaller::ffmpegLatestReleaseDate);		
+		ProcessIOThreadPool.submit(ResourceInstaller::ytdlpLatestReleaseDate);
+		ProcessIOThreadPool.submit(ResourceInstaller::ffmpegLatestReleaseDate);		
 	}
 	
 	public static void clearTasks() {
@@ -429,7 +430,8 @@ public class Main {
 	 * This method can wait up to 5 seconds for <code>LoggerThread</code> and <code>executorService</code>(2.5seconds each) to terminated.
 	 * */
 	public static void kill(ExitCodes exitCode) {
-		WorkerThreadPool.kill(2500);
+		DownloadThreadPool.kill(2500);
+		ProcessIOThreadPool.kill(2500);
 		writeProperties();
 		if(logger != null) {
 			logger.log("Clipboard-dl exit code : " + exitCode.getCode());
