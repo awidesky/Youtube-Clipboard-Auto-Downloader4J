@@ -59,8 +59,8 @@ public class Config {
 	public static String getAcceptedLinkStr(String delimiter) { return acceptableLinks.stream().collect(Collectors.joining(delimiter)); }
 	
 	public static String status() {
-		return String.format("\n\tdownloadpath-%s\n\tformat-%s\n\tquality-%s\n\tplaylistoption-%s\n\tfilenameformat-%s\n\tclipboardListenOption-%s\n\tyt-dlp update period(days)-%s\n\tAccepted links starts by :\n\t    %s\n",//TODO : remove accepted links
-				Config.saveto, Config.format, Config.quality, Config.playlistOption, Config.fileNameFormat, Config.clipboardListenOption.getString(), Config.ytdlpUpdateDuration, Config.getAcceptedLinkStr(System.lineSeparator() + "\t    "));
+		return String.format("\n\tdownloadpath-%s\n\tformat-%s\n\tquality-%s\n\tplaylistoption-%s\n\tfilenameformat-%s\n\tclipboardListenOption-%s\n\tyt-dlp update period(days)-%s\n",
+				Config.saveto, Config.format, Config.quality, Config.playlistOption, Config.fileNameFormat, Config.clipboardListenOption.getString(), Config.ytdlpUpdateDuration);
 	}
 	
 	
