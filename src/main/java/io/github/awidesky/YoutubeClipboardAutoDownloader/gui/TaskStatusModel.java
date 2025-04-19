@@ -145,6 +145,7 @@ public class TaskStatusModel extends AbstractTableModel {
 	}
 
 	public String getProgressToolTip(int row) { return rows.get(row).getProgressToolTip(); }
+	public String getStatusToolTip(int row) { return rows.get(row).getStatusToolTip(); }
 
 	public TaskData isTaskExists(TaskData t) {
 		if (EventQueue.isDispatchThread()) {

@@ -28,6 +28,8 @@ public class TaskData {
 	private AtomicInteger videoNum = new AtomicInteger(1);
 	private AtomicBoolean audioMode = new AtomicBoolean(true);
 	
+	private AtomicReference<String> err = new AtomicReference<String>(null);
+	
 	/** Is this task finished or failed? */
 	private Status st = Status.RUNNING;
 	
@@ -90,6 +92,7 @@ public class TaskData {
 		kill();
 		setStatus("ERROR");
 		setProgress(-1);
+		setVideoName(url.get());
 		fu = null;
 		p = null;
 		logger.close();
@@ -107,6 +110,7 @@ public class TaskData {
 
 	public boolean isAudioMode() { return audioMode.get(); }
 
+	public void addErrorMessage(String errorMessage) { err.set(errorMessage); }
 
 	public void kill() {
 		if(!isFinished()) {
@@ -118,6 +122,10 @@ public class TaskData {
 
 	public String getProgressToolTip() {
 		return progress + "%" + ( (totalNumOfVideo.get() > 1) ? " (" + videoNum.get() + "/" + totalNumOfVideo.get() + ")" : "" );
+	}
+	public String getStatusToolTip() {
+		String e = err.get();
+		return e == null ? status.get() : err.get();
 	}
 
 	public void setFuture(Future<?> submit) { fu = submit; }
@@ -135,6 +143,13 @@ public class TaskData {
 		pw.println("Destination : " + dest.get());
 		if(totalNumOfVideo.get() > 1) pw.println("playlist index : " + videoNum.get() + " of " + totalNumOfVideo.get());
 		pw.println("Download mode : " + (audioMode.get() ? "audio only" : "video"));
+		
+		if(err.get() != null) {
+			pw.println();
+			pw.println("yt-dlp error :");
+			pw.println(err.get());
+		}
+		
 		pw.flush(); pw.close();
 		return sw.toString();
 	}
@@ -152,4 +167,5 @@ public class TaskData {
 	}
 	
 	private static enum Status { RUNNING, DONE, FAILED; }
+
 }

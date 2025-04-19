@@ -305,7 +305,10 @@ public class YoutubeClipboardAutoDownloader {
 						(l.startsWith("WARNING") ? warning : error).append(l).append("\n");
 					});
 					if(!warning.isEmpty()) SwingDialogs.warning("Warning when getting video name", "[Task" + task.getTaskNum() + "|validating]\n" + warning.toString(), null, true);
-					if(!error.isEmpty()) SwingDialogs.error("Error when getting video name", "[Task" + task.getTaskNum() + "|validating]\n" + error.toString(), null, true);
+					if(!error.isEmpty()) {
+						task.addErrorMessage(error.toString().strip());
+						SwingDialogs.error("Error when getting video name", "[Task" + task.getTaskNum() + "|validating]\n" + error.toString(), null, true);
+					}
 				} catch (UncheckedIOException e1) {
 					IOException e = e1.getCause();
 					SwingDialogs.error("Error when getting video name", "[Task" + task.getTaskNum() + "|validating] " + e.getClass().getName() + " :  %e%", e, true);
