@@ -64,7 +64,7 @@ public class Main {
 	private static volatile int taskNum = 0;
 	private static String[] ytdlpAdditionalOptions = new String[0];
 	
-	public static final String version = "v2.0.1";//TODO : Version
+	public static final String version = "v2.1.0";
 
 	public static void main(String[] args) {
 		
@@ -72,7 +72,7 @@ public class Main {
 		for (String arg : args) {
 			if ("--help".equals(arg)) {
 				System.out.println("Youtube Clipboard Auto Downloader (a.k.a. Clipboard-dl) " + version);
-				System.out.println("Copyright (c) 2020-2024. Eugene Hong. All Rights Reserved.");
+				System.out.println("Copyright (c) 2020-2025. Eugene Hong. All Rights Reserved.");
 				System.out.println();
 				System.out.println("Usage : java -jar " + Optional.ofNullable(JarPath.getJarName(Main.class))
 										.orElse("Clipboard-dl_" + version + ".jar") + " [options]");

@@ -9,7 +9,7 @@
 		<name>awidesky</name>
 		<url>https://github.com/awidesky</url>
 	</organization>
-	<version>2.0.0</version>
+	<version>2.1.0</version>
 	<name>YoutubeClipboardAutoDownloader</name>
 	<description>Downloads audio/video from Youtube by automaticly get link from your clipboard.</description>
 	<url>https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J</url>
