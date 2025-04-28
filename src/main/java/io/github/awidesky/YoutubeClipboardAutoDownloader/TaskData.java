@@ -98,7 +98,7 @@ public class TaskData {
 		logger.close();
 	}
 
-	public boolean isFinished() { return st == Status.DONE; } //TODO : future.wait to see exceptions
+	public boolean isFinished() { return st == Status.DONE; }
 	public boolean isRunning() { return st == Status.RUNNING; }
 	public boolean isFailed() { return st == Status.FAILED; }
 

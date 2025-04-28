@@ -225,38 +225,41 @@ public class Main {
 		}
 
 		TaskStatusModel.getinstance().addTask(t);
-		submitTask(t);
+		t.setFuture(DownloadThreadPool.submit(getDownloadTask(t)));
 	}
 	
-	private static void submitTask(TaskData t) {
-		t.setFuture(DownloadThreadPool.submit(() -> {
+	private static Runnable getDownloadTask(TaskData t) {
+		return () -> {
+			try {
+				String url = YoutubeClipboardAutoDownloader.ytdlpQuote + t.getUrl() + YoutubeClipboardAutoDownloader.ytdlpQuote;
 
-			String url = YoutubeClipboardAutoDownloader.ytdlpQuote + t.getUrl() + YoutubeClipboardAutoDownloader.ytdlpQuote;
-			
-			PlayListOption p = Config.getPlaylistOption();
-			
-			if (p == PlayListOption.ASK && t.getUrl().contains("list=")) {
-				p = (SwingDialogs.confirm("Download entire Playlist?", "PlayList Link : " + url)) ? PlayListOption.YES : PlayListOption.NO;
-			}
-					
-			if (YoutubeClipboardAutoDownloader.validateAndSetName(url, t, p)) {
-				t.setStatus("Preparing...");
-				String save = t.getDest();
-				File file = new File(save);
-				if((file.exists() || file.mkdirs()) && file.isDirectory()) {
-					Config.setSaveto(save);
+				PlayListOption p = Config.getPlaylistOption();
+
+				if (p == PlayListOption.ASK && t.getUrl().contains("list=")) {
+					p = (SwingDialogs.confirm("Download entire Playlist?", "PlayList Link : " + url)) ? PlayListOption.YES : PlayListOption.NO;
+				}
+
+				if (YoutubeClipboardAutoDownloader.validateAndSetName(url, t, p)) {
+					t.setStatus("Preparing...");
+					String save = t.getDest();
+					File file = new File(save);
+					if((file.exists() || file.mkdirs()) && file.isDirectory()) {
+						Config.setSaveto(save);
+					} else {
+						t.failed();
+						SwingDialogs.error("Download Path is invalid!", "Invalid path : " + save, null, false);
+						return;
+					}
+					YoutubeClipboardAutoDownloader.download(url, t, p, ytdlpAdditionalOptions);
 				} else {
 					t.failed();
-					SwingDialogs.error("Download Path is invalid!", "Invalid path : " + save, null, false);
 					return;
 				}
-				YoutubeClipboardAutoDownloader.download(url, t, p, ytdlpAdditionalOptions);
-			} else {
+			} catch(Exception e) {
 				t.failed();
-				return;
+				SwingDialogs.error("Download Failed!", "%e%", e, false);
 			}
-
-		}));
+		};
 	}
 	
 	private static void prepareLogFile(boolean verbose, boolean datePrefix, boolean logbyTask, boolean logOnConsole) {
