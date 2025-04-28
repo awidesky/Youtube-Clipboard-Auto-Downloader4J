@@ -6,7 +6,8 @@ $githubRelease = ".\target\builds\githubRelease"
 New-Item -Path $githubRelease -ItemType Directory -Force | Out-Null
 
 Get-ChildItem -Path "$builds\jpackage" | ForEach-Object {
-    $newName = $_.Name -replace '[\-_]\d\.\d\.\d',''
+    $newName = $_.Name -replace '\-\d{6}.\d{4}', '' -replace '[\-_]\d\.\d\.\d', ''
+    Write-Host $_.Name, $newName -Separator " -> "
     Copy-Item -Path $_.FullName -Destination (Join-Path $githubRelease $Newname) -Force
 }
 
