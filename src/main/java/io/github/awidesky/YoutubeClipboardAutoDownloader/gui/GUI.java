@@ -289,14 +289,14 @@ public class GUI {
 			Main.audioMode.set(false);
 			cb_format.setModel(videoFormatCBoxModel);
 			cb_quality.setModel(videoQualityCBoxModel);
-			quality.setText("Video Quality :");
+			quality.setText("\uD83C\uDF9E Video Quality :");
 			modeSwitch.setText("<-> download audio");
 		} else {
 			Main.audioMode.set(true);
 			cb_format.setModel(audioFormatCBoxModel);
 			cb_quality.setModel(audioQualityCBoxModel);
-			quality.setText("Audio Quality :");
-			modeSwitch.setText(" <-> download video ");
+			quality.setText("\uD83C\uDFB5 Audio Quality :");
+			modeSwitch.setText("<-> download video");
 		}
 
 		cb_quality.setSelectedIndex(0);
