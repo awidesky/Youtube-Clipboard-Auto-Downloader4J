@@ -268,8 +268,8 @@ public class Main {
 				loggerThread.setLogDestination(System.out, true);
 			} else {
 				File logFolder = new File(UserDataPath.appLocalFolder("awidesky", "YoutubeClipboardAutoDownloader", "logs"));
-				File logFile = new File(logFolder.getAbsolutePath() + File.separator + "log-" + new SimpleDateFormat("yyyy-MM-dd-kk-mm-ss").format(new Date()) + ".txt");
-				logFolder.mkdirs(); //TODO : when not exist only!
+				File logFile = new File(logFolder.getAbsolutePath(), "log-" + new SimpleDateFormat("yyyy-MM-dd-kk-mm-ss").format(new Date()) + ".txt");
+				if(!logFolder.exists()) logFolder.mkdirs();
 				logFile.createNewFile();
 				loggerThread.setLogDestination(new FileOutputStream(logFile), true);
 			}
@@ -306,10 +306,10 @@ public class Main {
 		
 		
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
-				YoutubeClipboardAutoDownloader.getAppdataPath() + File.separator + "config.txt"), StandardCharsets.UTF_8))) {
+				YoutubeClipboardAutoDownloader.getAppdataPath(), "config.txt"), StandardCharsets.UTF_8))) {
 
 			System.out.println(new File(
-				YoutubeClipboardAutoDownloader.getAppdataPath() + File.separator + "config.txt").getAbsolutePath());
+				YoutubeClipboardAutoDownloader.getAppdataPath(), "config.txt").getAbsolutePath());
 			UnaryOperator<String> read = str -> {
 				try {
 					return br.readLine().split(Pattern.quote("="))[1];
@@ -329,7 +329,7 @@ public class Main {
 			
 			String s;
 			while((s = br.readLine()) != null) {
-				if(s.equals("") || s.startsWith("#") || Config.isLinkAcceptable(s)) continue; //ignore if a line is empty, a comment or already registered
+				if(s.isBlank() || s.startsWith("#") || Config.isLinkAcceptable(s)) continue; //ignore if a line is empty, a comment or already registered
 				Config.addAcceptableList(s);
 			}
 			System.out.println(Config.getAcceptedLinkStr("\n"));
@@ -359,8 +359,11 @@ public class Main {
 	 * */
 	private static void writeProperties() {
 
-		File cfg = new File(YoutubeClipboardAutoDownloader.getAppdataPath() + File.separator + "config.txt");
-		if (!cfg.exists()) cfg.getParentFile().mkdirs();
+		File cfg = new File(YoutubeClipboardAutoDownloader.getAppdataPath(), "config.txt");
+		if (!cfg.exists()) {
+			logger.log("Config file not exist : " + cfg.getAbsolutePath());
+			new File(YoutubeClipboardAutoDownloader.getAppdataPath()).mkdirs();
+		}
 		
 		/** Write <code>properties</code> */
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(cfg, StandardCharsets.UTF_8, false))) {
