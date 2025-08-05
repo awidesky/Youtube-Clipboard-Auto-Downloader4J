@@ -218,7 +218,7 @@ public class Main {
 			// if duplicate task is also "Validating...", it is very likely that clipboard input was duplicated(e.g. long pressing the ctrl + c)
 			if(TaskStatusModel.getinstance().isTaskExistsSameStatus(t)) return; 
 
-			if(!SwingDialogs.confirm("Download same file in same directory?", data + "\nis already downloading/downloaded(by another Task) in\n" + Config.getSaveto() + "\ndownload anyway?")) {
+			if(!SwingDialogs.confirm("Download same file in same directory?", data + "\nis already downloading/downloaded(by another Task) in\n" + other.getDest() + "\ndownload anyway?")) {
 				logTask.log(data + " is canceled because same task exists.");
 				return;
 			}
@@ -269,7 +269,7 @@ public class Main {
 			} else {
 				File logFolder = new File(UserDataPath.appLocalFolder("awidesky", "YoutubeClipboardAutoDownloader", "logs"));
 				File logFile = new File(logFolder.getAbsolutePath() + File.separator + "log-" + new SimpleDateFormat("yyyy-MM-dd-kk-mm-ss").format(new Date()) + ".txt");
-				logFolder.mkdirs();
+				logFolder.mkdirs(); //TODO : when not exist only!
 				logFile.createNewFile();
 				loggerThread.setLogDestination(new FileOutputStream(logFile), true);
 			}
@@ -308,6 +308,8 @@ public class Main {
 		try (BufferedReader br = new BufferedReader(new FileReader(new File(
 				YoutubeClipboardAutoDownloader.getAppdataPath() + File.separator + "config.txt"), StandardCharsets.UTF_8))) {
 
+			System.out.println(new File(
+				YoutubeClipboardAutoDownloader.getAppdataPath() + File.separator + "config.txt").getAbsolutePath());
 			UnaryOperator<String> read = str -> {
 				try {
 					return br.readLine().split(Pattern.quote("="))[1];
@@ -330,6 +332,7 @@ public class Main {
 				if(s.equals("") || s.startsWith("#") || Config.isLinkAcceptable(s)) continue; //ignore if a line is empty, a comment or already registered
 				Config.addAcceptableList(s);
 			}
+			System.out.println(Config.getAcceptedLinkStr("\n"));
 			
 		} catch (FileNotFoundException e1) {
 			SwingDialogs.warning("config.txt not exists!","%e%\nWill make one with default values later...", e1, false);

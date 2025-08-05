@@ -16,17 +16,18 @@ import io.github.awidesky.guiUtil.TaskLogger;
 public class TaskData {
 	
 	public final TaskLogger logger;
+
+	private AtomicReference<String> url = new AtomicReference<String>("null");
+	private AtomicReference<String> dest = new AtomicReference<String>("");
+	private AtomicBoolean audioMode = new AtomicBoolean(true);
 	
 	private AtomicReference<String> videoName = new AtomicReference<String>("null"); 
-	private AtomicReference<String> url = new AtomicReference<String>("null");
 	private AtomicReference<String> status = new AtomicReference<String>("");
 	private AtomicInteger progress = new AtomicInteger(0);
-	private AtomicReference<String> dest = new AtomicReference<String>("");
 	private AtomicBoolean checked = new AtomicBoolean(false);
 	private AtomicInteger taskNum = new AtomicInteger();
 	private AtomicInteger totalNumOfVideo = new AtomicInteger(1);
 	private AtomicInteger videoNum = new AtomicInteger(1);
-	private AtomicBoolean audioMode = new AtomicBoolean(true);
 	
 	private AtomicReference<String> err = new AtomicReference<String>(null);
 	

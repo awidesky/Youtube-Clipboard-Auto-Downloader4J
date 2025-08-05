@@ -362,7 +362,7 @@ public class YoutubeClipboardAutoDownloader {
 		// start process
 		ProcessExecutor.ProcessHandle p = null;
 		try {
-			p = ProcessExecutor.run(arguments, new File(Config.getSaveto()), br -> {
+			p = ProcessExecutor.run(arguments, new File(task.getDest()), br -> {
 				try {
 					String line = null;
 					boolean downloadVideoAndAudioSeparately = false, videoDownloadDone = false;
