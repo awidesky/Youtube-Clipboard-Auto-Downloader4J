@@ -291,6 +291,8 @@ public class Main {
 		return loggerThread.getLogger(prefix);
 	}
 	
+	
+	private static final File configFile = new File(YoutubeClipboardAutoDownloader.getAppdataPath(), "config.txt");
 	/**
 	 * note - this method should be Exception-proof.
 	 * */
@@ -305,11 +307,14 @@ public class Main {
 		String u = Long.toString(Config.getDefaultYtdlpUpdateDuration()); 
 		
 		
-		try (BufferedReader br = new BufferedReader(new FileReader(new File(
-				YoutubeClipboardAutoDownloader.getAppdataPath(), "config.txt"), StandardCharsets.UTF_8))) {
+		if (!configFile.exists()) {
+			logger.log("Config file does not exist : " + configFile.getAbsolutePath());
+			new File(YoutubeClipboardAutoDownloader.getAppdataPath()).mkdirs();
+		}
+		
+		
+		try (BufferedReader br = new BufferedReader(new FileReader(configFile, StandardCharsets.UTF_8))) {
 
-			System.out.println(new File(
-				YoutubeClipboardAutoDownloader.getAppdataPath(), "config.txt").getAbsolutePath());
 			UnaryOperator<String> read = str -> {
 				try {
 					return br.readLine().split(Pattern.quote("="))[1];
@@ -359,14 +364,13 @@ public class Main {
 	 * */
 	private static void writeProperties() {
 
-		File cfg = new File(YoutubeClipboardAutoDownloader.getAppdataPath(), "config.txt");
-		if (!cfg.exists()) {
-			logger.log("Config file not exist : " + cfg.getAbsolutePath());
+		if (!configFile.exists()) {
+			logger.log("Config file not exist : " + configFile.getAbsolutePath());
 			new File(YoutubeClipboardAutoDownloader.getAppdataPath()).mkdirs();
 		}
 		
 		/** Write <code>properties</code> */
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(cfg, StandardCharsets.UTF_8, false))) {
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(configFile, StandardCharsets.UTF_8, false))) {
 
 			UnaryOperator<String> savP = s -> Config.getDefaultSaveto().equalsIgnoreCase(s) ? "%user.home%" : s;
 			
