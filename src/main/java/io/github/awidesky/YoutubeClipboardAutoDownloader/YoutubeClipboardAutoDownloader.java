@@ -252,7 +252,7 @@ public class YoutubeClipboardAutoDownloader {
 
 	private static String[] getYtdlpUpdateCommands(String ydlfile) {
 		if (ytdlpPath.contains("homebrew"))
-			return new String[] { "/bin/zsh", "-c", "/opt/homebrew/bin/brew update; /opt/homebrew/bin/brew upgrade yt-dlp" };
+			return new String[] { "/bin/zsh", "-c", "/opt/homebrew/bin/brew upgrade yt-dlp" };
 		else
 			return new String[] { ydlfile, "--update" };
 	}
