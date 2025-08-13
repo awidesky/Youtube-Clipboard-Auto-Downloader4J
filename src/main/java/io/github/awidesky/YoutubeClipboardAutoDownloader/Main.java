@@ -337,7 +337,6 @@ public class Main {
 				if(s.isBlank() || s.startsWith("#") || Config.isLinkAcceptable(s)) continue; //ignore if a line is empty, a comment or already registered
 				Config.addAcceptableList(s);
 			}
-			System.out.println(Config.getAcceptedLinkStr("\n"));
 			
 		} catch (FileNotFoundException e1) {
 			SwingDialogs.warning("config.txt not exists!","%e%\nWill make one with default values later...", e1, false);
