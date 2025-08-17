@@ -68,7 +68,7 @@ public class GUI {
 
 	private JFrame mainFrame;
 	private JButton browse, cleanCompleted, removeSwitch, nameFormatHelp, openAppFolder, modeSwitch, openSaveDir;
-	private JLabel format, quality, path, nameFormat, playList;
+	private JLabel format, quality_icon, quality, path, nameFormat, playList;
 	private JTextField pathField, nameFormatField;
 	private JComboBox<String> cb_format, cb_quality, cb_playList, cb_clipboardOption;
 	private DefaultComboBoxModel<String> audioFormatCBoxModel = new DefaultComboBoxModel<>(new String[] { "mp3", "best", "aac", "flac", "m4a", "opus", "vorbis", "wav" });
@@ -200,6 +200,7 @@ public class GUI {
 	private void setLabels() {
 		
 		format = new JLabel("Format :");
+		quality_icon = new JLabel("\uD83C\uDFB5\u0020");
 		quality = new JLabel("Audio Quality :");
 		path = new JLabel("Save to :");
 		nameFormat = new JLabel("Filename Format : ");
@@ -289,13 +290,15 @@ public class GUI {
 			Main.audioMode.set(false);
 			cb_format.setModel(videoFormatCBoxModel);
 			cb_quality.setModel(videoQualityCBoxModel);
-			quality.setText("\uD83C\uDF9E Video Quality :");
+			quality_icon.setText("\uD83C\uDF9E\u0020");
+			quality.setText("Video Quality :");
 			modeSwitch.setText("<-> download audio");
 		} else {
 			Main.audioMode.set(true);
 			cb_format.setModel(audioFormatCBoxModel);
 			cb_quality.setModel(audioQualityCBoxModel);
-			quality.setText("\uD83C\uDFB5 Audio Quality :");
+			quality_icon.setText("\uD83C\uDFB5\u0020");
+			quality.setText("Audio Quality :");
 			modeSwitch.setText("<-> download video");
 		}
 
@@ -404,6 +407,7 @@ public class GUI {
 		formats.add(format);
 		formats.add(cb_format);
 		formats.add(Box.createHorizontalStrut(15));
+		formats.add(quality_icon);
 		formats.add(quality);
 		formats.add(cb_quality);
 		root.add(formats, BorderLayout.WEST);
