@@ -43,10 +43,10 @@ public class Config {
 	public static synchronized void setFileNameFormat(String fileNameFormat) { Config.fileNameFormat = fileNameFormat; }
 
 	public static ClipBoardOption getClipboardListenOption() { return clipboardListenOption; }
-	public static void setClipboardListenOption(String clipboardListenOption) { Config.clipboardListenOption = ClipBoardOption.get(clipboardListenOption); }
+	public static synchronized void setClipboardListenOption(String clipboardListenOption) { Config.clipboardListenOption = ClipBoardOption.get(clipboardListenOption); }
 
 	public static long getYtdlpUpdateDuration() { return ytdlpUpdateDuration; }
-	public static void setYtdlpUpdateDuration(String ytdlpUpdateDuration) {
+	public static synchronized void setYtdlpUpdateDuration(String ytdlpUpdateDuration) {
 		try {
 			Config.ytdlpUpdateDuration = Long.parseLong(ytdlpUpdateDuration);
 		} catch (NumberFormatException e) {
