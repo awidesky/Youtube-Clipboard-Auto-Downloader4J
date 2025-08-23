@@ -185,6 +185,7 @@ public class GUI {
 		mainFrame.pack();
 		mainFrame.setLocation(dim.width/2-mainFrame.getSize().width/2, dim.height/2-mainFrame.getSize().height/2);
 
+		initProgress.setValue(100);
 		disposeLoadingFrame();
 
 		mainFrame.setVisible(true);

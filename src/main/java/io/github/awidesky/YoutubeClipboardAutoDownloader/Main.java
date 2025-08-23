@@ -160,32 +160,43 @@ public class Main {
 		});
 
 		try {
+			Long[] times = new Long[6];
+			long t = System.currentTimeMillis();
 			SwingUtilities.invokeAndWait(() -> {
 				gui = new GUI();
 				gui.initLoadingFrame();
 				gui.setLoadingStat(LoadingStatus.PREPARING_THREADS);
 			});
+			times[0] = System.currentTimeMillis() - t; t = System.currentTimeMillis();
 			loggerThread.start();
 			
 			clipChecker = new ClipBoardListeningThread(OSUtil.isMac() ? 150 : -1); // A daemon thread that will keep checking clipboard
 			Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener(clipChecker::submit);
 			logger.newLine();
 			logger.log("Listening clipboard...\n");
-
+			
+			times[1] = System.currentTimeMillis() - t; t = System.currentTimeMillis();
+			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.READING_PROPERTIES));
+			readProperties();
+			
+			times[2] = System.currentTimeMillis() - t; t = System.currentTimeMillis();
 			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.CHECKING_FFMPEG));
 			if (!YoutubeClipboardAutoDownloader.checkFFmpeg())
 				Main.kill(ExitCodes.FFMPEGNOTEXISTS);
 			
+			times[3] = System.currentTimeMillis() - t; t = System.currentTimeMillis();
 			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.CHECKING_YTDLP));
 			if (!YoutubeClipboardAutoDownloader.checkYtdlp())
 				Main.kill(ExitCodes.YOUTUBEDNOTEXISTS);
 
-			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.READING_PROPERTIES));
-			readProperties();
-
+			times[4] = System.currentTimeMillis() - t; t = System.currentTimeMillis();
 			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.LOADING_WINDOW));
 			SwingUtilities.invokeAndWait(gui::initMainFrame);
 			clipChecker.start();
+			
+			times[5] = System.currentTimeMillis() - t; t = System.currentTimeMillis();
+			logger.log("Initiating GUI : %dms, PREPARING_THREADS : %dms, READING_PROPERTIES : %dms, CHECKING_FFMPEG : %dms, CHECKING_YTDLP : %dms, LOADING_WINDOW : %dms"
+					.formatted((Object[])times));
 		} catch (InterruptedException e1) {
 			logger.log("[init] EDT failed while loading application!");
 			e1.printStackTrace();
@@ -349,6 +360,7 @@ public class Main {
 			Config.setPlaylistOption(l);
 			Config.setFileNameFormat(n);
 			Config.setClipboardListenOption(c);
+			Config.setYtdlpUpdateDuration(u);
 			
 			logger.newLine();
 			logProperties(logger, "Initial properties :");
