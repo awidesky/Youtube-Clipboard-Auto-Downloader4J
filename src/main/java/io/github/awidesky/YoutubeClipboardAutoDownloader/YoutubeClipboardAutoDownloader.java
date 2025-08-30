@@ -226,7 +226,7 @@ public class YoutubeClipboardAutoDownloader {
 		
 		log.log("Today : " + dateFormat.format(today) + ", current yt-dlp release day : " + ytdlpVersion);
 		
-		if(ChronoUnit.DAYS.between(currentDay, today) <= Config.getYtdlpUpdateDuration()) {
+		if(ChronoUnit.DAYS.between(currentDay, today) < Config.getYtdlpUpdateDuration()) {
 			log.log("yt-dlp version is not older than " + Config.getYtdlpUpdateDuration() + "days. update process skipped...");
 			return false;
 		}
