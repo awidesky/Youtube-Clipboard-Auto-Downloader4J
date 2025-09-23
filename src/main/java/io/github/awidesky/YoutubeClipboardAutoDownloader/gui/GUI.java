@@ -312,6 +312,7 @@ public class GUI {
 			modeSwitch.setText("<-> download video");
 		}
 
+		cb_format.setSelectedIndex(0);
 		cb_quality.setSelectedIndex(0);
 	}
 
