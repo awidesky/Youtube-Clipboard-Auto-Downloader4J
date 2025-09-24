@@ -9,7 +9,16 @@ Just copy a link with `ctrl + c` or `command + c` and you'll get audio/video fil
 
 ## Installation
 
-Binaries can be found in [release](https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J/releases/latest).  
+Binaries can be found in [release](https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J/releases/latest).    
+File|Description
+:---|:---
+[Clipboard-dl.zip](https://github.com/awidesky/Youtube-Audio-Auto-Downloader4J/releases/latest/download/Clipboard-dl.zip)|Cross-platform executable jar file
+[Clipboard-dl.msi](https://github.com/awidesky/Youtube-Audio-Auto-Downloader4J/releases/latest/download/Clipboard-dl.msi)|Windows installer
+[Clipboard-dl.pkg](https://github.com/awidesky/Youtube-Audio-Auto-Downloader4J/releases/latest/download/Clipboard-dl.pkg)|MacOS installer
+[clipboard-dl_amd64.deb](https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J/releases/latest/download/clipboard-dl_amd64.deb)|Linux debian installer
+[Clipboard-dl_launch4j.zip](https://github.com/awidesky/Youtube-Audio-Auto-Downloader4J/releases/latest/download/Clipboard-dl_launch4j.zip)|Windows standalone exe packaged by [launch4j](https://launch4j.sourceforge.net/)
+[Clipboard-dl_launch4j_jre.zip](https://github.com/awidesky/Youtube-Audio-Auto-Downloader4J/releases/latest/download/Clipboard-dl_launch4j_jre.zip)|Windows standalone exe **including JRE** packaged by [launch4j](https://launch4j.sourceforge.net/)
+
 
 Binary type|Supported OS
 :---|:---
