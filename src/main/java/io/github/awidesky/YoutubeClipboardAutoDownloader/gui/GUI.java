@@ -203,13 +203,13 @@ public class GUI {
 	private void setLabels() {
 		format = new JLabel("Format :");
 		quality_icon = new JLabel("\uD83C\uDFB5\u0020");
-		if(quality_icon.getFont().canDisplayUpTo("\uD83C\uDF9E\uD83C\uDFB5") != -1) {
-			if(OSUtil.isWindows()) quality_icon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, new JLabel().getFont().getSize()));
-			else if(OSUtil.isLinux()) quality_icon.setFont(new Font("Noto Color Emoji", Font.PLAIN, new JLabel().getFont().getSize()));
-			else if(OSUtil.isMac()) quality_icon.setFont(new Font("Apple Color Emoji", Font.PLAIN, new JLabel().getFont().getSize()));
-			else Arrays.stream(GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts())
-					.filter(f -> f.canDisplayUpTo("\uD83C\uDF9E\uD83C\uDFB5") == -1).findFirst()
-					.ifPresent(quality_icon::setFont);
+		if(OSUtil.isWindows()) quality_icon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, new JLabel().getFont().getSize()));
+		else if(OSUtil.isMac()) quality_icon.setFont(new Font("Apple Color Emoji", Font.PLAIN, new JLabel().getFont().getSize()));
+		else if(OSUtil.isLinux()) quality_icon.setFont(new Font("Noto Color Emoji", Font.PLAIN, new JLabel().getFont().getSize()));
+		if("Dialog".equals(quality_icon.getFont().getFontName()) || quality_icon.getFont().canDisplayUpTo("\uD83C\uDF9E\uD83C\uDFB5") != -1) {
+			Arrays.stream(GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts())
+				.filter(f -> f.canDisplayUpTo("\uD83C\uDF9E\uD83C\uDFB5") == -1).findFirst()
+				.ifPresent(quality_icon::setFont);
 		}
 		quality = new JLabel("Audio Quality :");
 		path = new JLabel("Save to :");
