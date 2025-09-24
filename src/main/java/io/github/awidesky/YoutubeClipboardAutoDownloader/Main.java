@@ -330,7 +330,7 @@ public class Main {
 				try {
 					return br.readLine().split(Pattern.quote("="))[1];
 				} catch(Exception e) {
-					SwingDialogs.warning("Exception occurred when reading config.txt", "%e%\nInitiate as default value : " + str, e, false);
+					SwingDialogs.warning("Exception occurred when reading config.txt", "%e%\nInitiate as default value : " + str, e, true);
 					return str;
 				}
 			};
@@ -350,9 +350,9 @@ public class Main {
 			}
 			
 		} catch (FileNotFoundException e1) {
-			SwingDialogs.warning("config.txt not exists!","%e%\nWill make one with default values later...", e1, false);
+			SwingDialogs.warning("config.txt not exists!","%e%\nDon't worry, we'll make one with default configuration values for you later...", e1, true);
 		} catch (Exception e) {
-			SwingDialogs.error("Exception occurred when reading config.txt", "%e%\nInitiate as default values..", e, false);
+			SwingDialogs.error("Exception occurred when reading config.txt", "%e%\nWill use default configuration..", e, true);
 		} finally {
 			Config.setSaveto(p);
 			Config.setFormat(f);
