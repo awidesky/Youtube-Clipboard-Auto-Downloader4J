@@ -149,6 +149,7 @@
 									<executable>jlink</executable>
 									<workingDirectory>${project.basedir}</workingDirectory>
 									<arguments>
+										<argument>--verbose</argument>
 										<argument>--output</argument>
 										<argument>jre</argument>
 										<argument>--compress=2</argument>
@@ -280,7 +281,7 @@
 				<executions>
 					<execution>
 						<id>jpackage-with-no-resource</id>
-						<phase>install</phase>
+						<phase>package</phase>
 						<goals>
 							<goal>jpackage</goal>
 						</goals>
@@ -307,7 +308,7 @@
 				<executions>
 					<execution>
 						<id>launch4j-clui</id>
-						<phase>install</phase>
+						<phase>package</phase>
 						<goals>
 							<goal>launch4j</goal>
 						</goals>
