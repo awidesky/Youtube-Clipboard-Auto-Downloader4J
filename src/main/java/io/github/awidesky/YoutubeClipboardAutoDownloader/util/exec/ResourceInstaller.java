@@ -37,6 +37,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -228,7 +229,14 @@ public class ResourceInstaller {
 	private static AtomicReference<String> ytdlpLatestReleaseDate = new AtomicReference<>();
 	private static AtomicReference<String> ffmpegLatestReleaseDate = new AtomicReference<>();
 	public static String ytdlpLatestReleaseDate() {
-		return fetchGithubReleaseVersion("https://github.com/yt-dlp/yt-dlp/releases/latest", ytdlpLatestReleaseDate);
+		String ret = fetchGithubReleaseVersion("https://github.com/yt-dlp/yt-dlp/releases/latest", ytdlpLatestReleaseDate);
+		log.log("Latest yt-dlp release date from github : " + ret);
+		
+		if (OSUtil.isMac()) {
+			ret = fetchBrewYtdlpVersion(ytdlpLatestReleaseDate);
+			log.log("Latest yt-dlp release date from brew   : " + ret);
+		}
+		return  ret;
 	}
 	public static String ffmpegLatestReleaseDate() {
 		return fetchGithubReleaseVersion("https://github.com/GyanD/codexffmpeg/releases/latest", ffmpegLatestReleaseDate);
@@ -252,6 +260,29 @@ public class ResourceInstaller {
 		} finally {
 			if (conn != null) conn.disconnect();
 		}
+	}
+	
+	private static String fetchBrewYtdlpVersion(AtomicReference<String> holder) {
+		final String url = "https://formulae.brew.sh/api/formula/yt-dlp.json";
+		try (Scanner scanner = new Scanner(new URL(url).openStream(), StandardCharsets.UTF_8.toString())) {
+			Pattern ptr = Pattern.compile("\"versions\"\\s*:\\s*\\{\\s*\"stable\"\\s*:\\s*\"(\\d{4})\\.(\\d{1,2})\\.(\\d{1,2})\"");
+			while(scanner.hasNext()) {
+		        Matcher m = ptr.matcher(scanner.nextLine());
+		        if (m.find()) {
+		            String date = "%04d.%02d.%02d".formatted(
+		            		Stream.of(m.group(1), m.group(2), m.group(3)).map(Integer::parseInt).toArray()
+		            	);
+		            holder.setOpaque(date);
+		            return date;
+		        }
+			}
+			
+			log.log("Unable to find pattern \"" + ptr.pattern() + "\" from url : " + url);
+		} catch (IOException e) {
+			log.log("Failed to get homebrew yt-dlp version from " + url);
+			log.log(e);
+		}
+		return null;
 	}
 	
 	private static void download(URL url, Path dest) throws IOException {
