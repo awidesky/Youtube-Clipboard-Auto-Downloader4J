@@ -435,6 +435,7 @@ public class Main {
 		
 		ProcessIOThreadPool.submit(ResourceInstaller::ytdlpLatestReleaseDate);
 		ProcessIOThreadPool.submit(ResourceInstaller::ffmpegLatestReleaseDate);		
+		ProcessIOThreadPool.submit(ResourceInstaller::denoLatestReleaseDate);		
 	}
 	
 	public static void clearTasks() {

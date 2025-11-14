@@ -166,26 +166,15 @@ public class YoutubeClipboardAutoDownloader {
 						log.log("Found valid command to execute yt-dlp : \"" + ydlfile + "\"");
 						log.log("yt-dlp version : " + line);
 
-						if (checkYtdlpUpdateReleased(line, log)) { 
-							log.log("yt-dlp update process start...");
-							String[] updateCommands = getYtdlpUpdateCommands(ydlfile);
-							LogTextDialog upDiag = new LogTextDialog(updateCommands, Main.getLogger("[yt-dlp update] "));
-							log.log("Update yt-dlp with : " + Arrays.stream(updateCommands).collect(Collectors.joining(" ")));
-							upDiag.setVisible(true);
-							try {
-								int e;
-								if ((e = ProcessExecutor.runNow(upDiag.getLogger(), null, updateCommands)) != 0)
-									throw new Exception("Error code : " + e);
-							} catch (Exception e) {
-								SwingDialogs.warning("Failed to update yt-dlp : " + e.getClass().getName(), "%e%\nCannot update yt-dlp!\nUsing version " + line + " instead...",
-										e, true);
-							} finally {
-								try { Thread.sleep(3000); } catch (InterruptedException e) {
-									e.printStackTrace();
-								}
-								upDiag.dispose();
+						if (checkYtdlpUpdateReleased(line, log)) {
+							if (ytdlpPath.contains("homebrew")) {
+								updateExecutable(log, new String[] { "/bin/zsh", "-c", "/opt/homebrew/bin/brew upgrade yt-dlp deno" }, "yt-dlp & deno");
+								
+							} else {
+								updateExecutable(log, new String[] { ydlfile, "--update" }, "yt-dlp");
+								updateExecutable(log, new String[] { ydlfile.substring(0, ydlfile.lastIndexOf(File.separator) + 1)
+										+ (OSUtil.isWindows() ? "deno.exe" : "deno"), "upgrade", "--no-color" }, "deno");
 							}
-							
 						}
 					} else {
 						SwingDialogs.error("Unexpected output from yt-dlp", line, null, true);
@@ -217,6 +206,25 @@ public class YoutubeClipboardAutoDownloader {
 			return false;
 		} finally { log.newLine(); }
 
+	}
+	
+	private static void updateExecutable(Logger log, String[] updateCommands, String name) {
+		log.log(name + " update process start...");
+		LogTextDialog upDiag = new LogTextDialog(updateCommands, Main.getLogger("[" + name + " update] "));
+		log.log("Update " + name + " with : " + Arrays.stream(updateCommands).collect(Collectors.joining(" ")));
+		upDiag.setVisible(true);
+		try {
+			int e;
+			if ((e = ProcessExecutor.runNow(upDiag.getLogger(), null, updateCommands)) != 0)
+				throw new Exception("Error code : " + e);
+		} catch (Exception e) {
+			SwingDialogs.warning("Failed to update " + name, "%e%", e, true);
+		} finally {
+			try { Thread.sleep(3000); } catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			upDiag.dispose();
+		}
 	}
 	
 	private static boolean checkYtdlpUpdateReleased(String ytdlpVersion, Logger log) {
@@ -254,13 +262,6 @@ public class YoutubeClipboardAutoDownloader {
 			log.log(e);
 			return false;
 		}
-	}
-
-	private static String[] getYtdlpUpdateCommands(String ydlfile) {
-		if (ytdlpPath.contains("homebrew"))
-			return new String[] { "/bin/zsh", "-c", "/opt/homebrew/bin/brew upgrade yt-dlp" };
-		else
-			return new String[] { ydlfile, "--update" };
 	}
 
 	public static String getYtdlpPath() { return ytdlpPath; }

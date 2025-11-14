@@ -189,8 +189,8 @@ public class ResourceInstaller {
 		log.log("Installing yt-dlp...");
 		showProgress("Downloading yt-dlp");
 		if(isMac()) {
-			String[] cmd = {"/bin/bash", "-c", "/opt/homebrew/bin/brew install yt-dlp"};
-			setLoadingFrameContent("Installing yt-dlp via \"brew install yt-dlp\"... (Progress bar will stay in 0)", -1);
+			String[] cmd = {"/bin/bash", "-c", "/opt/homebrew/bin/brew install yt-dlp deno"};
+			setLoadingFrameContent("Installing yt-dlp via \"" + cmd[2] + "\"... (Progress bar will stay in 0)", -1);
 			LogTextDialog upDiag = new LogTextDialog(cmd, log);
 			upDiag.setVisible(true);
 			ProcessExecutor.runNow(upDiag.getLogger(), null, cmd);
@@ -199,27 +199,44 @@ public class ResourceInstaller {
 			Arrays.stream(Optional.ofNullable(new File(root + File.separator + "ffmpeg" + File.separator + "bin").listFiles()).orElse(new File[] {}))
 				.filter(File::isFile).filter(f -> f.getName().startsWith("yt-dlp")).forEach(File::delete);
 			
-			String url = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp";
-			if (isWindows()) url += ".exe";
-			else if (isLinux()) {
+			String ytdlpURL = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp";
+			String denoURL  = "https://github.com/denoland/deno/releases/latest/download/deno";
+			if (isWindows()) {
+				ytdlpURL += ".exe";
+				denoURL += "-x86_64-pc-windows-msvc.zip";
+			} else if (isLinux()) {
 				switch(getArch()) {
 				case "arm64":
-					url += "_linux_aarch64";
+					ytdlpURL += "_linux_aarch64";
+					denoURL += "-aarch64-unknown-linux-gnu.zip";
 					break;
 				case "amd64":
-					url += "_linux";
+					ytdlpURL += "_linux";
+					denoURL += "-x86_64-unknown-linux-gnu.zip";
 					break;
 				default:
 				}
 			}
 
 
-			long filesize = getFileSize(new URL(url));
-			log.log("Length of " + url + " : " + filesize);
+			long filesize = getFileSize(new URL(ytdlpURL));
+			log.log("Length of " + ytdlpURL + " : " + filesize);
 			setLoadingFrameContent("Downloading yt-dlp version " + ytdlpLatestReleaseDate(), filesize);
 			Path ytdlpFile = Paths.get(root, "ffmpeg", "bin", (isWindows() ? "yt-dlp.exe" : "yt-dlp"));
-			download(new URL(url), ytdlpFile);
+			download(new URL(ytdlpURL), ytdlpFile);
 			OSUtil.addExecutePermission(ytdlpFile, log);
+			
+			hideProgress();
+			showProgress("Downloading deno");
+			log.log("yt-dlp installed. Now Deno...");
+			filesize = getFileSize(new URL(denoURL));
+			log.log("Length of " + denoURL + " : " + filesize);
+			setLoadingFrameContent("Downloading deno version " + denoLatestReleaseDate(), filesize);
+			Path denoFile = Paths.get(root, "ffmpeg", "bin", "deno.zip");
+			download(new URL(denoURL), denoFile);
+			unzipFolder(denoFile, denoFile.getParent());
+			Files.delete(denoFile);
+			OSUtil.addExecutePermission(denoFile.getParent().resolve(isWindows() ? "deno.exe" : "deno"), log);
 		}
 		
 		hideProgress();
@@ -228,6 +245,7 @@ public class ResourceInstaller {
 
 	private static AtomicReference<String> ytdlpLatestReleaseDate = new AtomicReference<>();
 	private static AtomicReference<String> ffmpegLatestReleaseDate = new AtomicReference<>();
+	private static AtomicReference<String> denoLatestReleaseDate = new AtomicReference<>();
 	public static String ytdlpLatestReleaseDate() {
 		String ret = fetchGithubReleaseVersion("https://github.com/yt-dlp/yt-dlp/releases/latest", ytdlpLatestReleaseDate);
 		log.log("Latest yt-dlp release date from github : " + ret);
@@ -240,6 +258,9 @@ public class ResourceInstaller {
 	}
 	public static String ffmpegLatestReleaseDate() {
 		return fetchGithubReleaseVersion("https://github.com/GyanD/codexffmpeg/releases/latest", ffmpegLatestReleaseDate);
+	}
+	public static String denoLatestReleaseDate() {
+		return fetchGithubReleaseVersion("https://github.com/denoland/deno/releases/latest", denoLatestReleaseDate);
 	}
 	private static String fetchGithubReleaseVersion(String url, AtomicReference<String> holder) {
 		String ret = holder.getOpaque();
