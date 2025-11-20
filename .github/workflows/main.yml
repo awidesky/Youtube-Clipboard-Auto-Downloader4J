@@ -31,7 +31,7 @@ jobs:
 
           cd jpackage
           file=$(ls *.deb)
-          clean=$(echo "$file" | sed -E 's/-[0-9]{6}\.[0-9]{4}//')
+          clean=$(echo "$file" | sed -E 's/_[0-9]\.[0-9]\.[0-9]-[0-9]{6}\.[0-9]{4}//')
           cp -v "$file" "../${clean}"
           cd ..
 
