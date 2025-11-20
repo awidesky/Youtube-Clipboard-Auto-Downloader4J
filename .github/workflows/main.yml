@@ -32,7 +32,7 @@ jobs:
           cd jpackage
           file=$(ls *.deb)
           clean=$(echo "$file" | sed -E 's/-[0-9]{6}\.[0-9]{4}//')
-          cp "$file" "../${clean}"
+          cp -v "$file" "../${clean}"
           cd ..
 
       - uses: actions/upload-artifact@v4
@@ -69,7 +69,7 @@ jobs:
           Set-Location jpackage
           $file = Get-ChildItem *.msi | Select-Object -Expand Name
           $clean = $file -replace '[\-_]\d\.\d\.\d', ''
-          Copy-Item $file ("../" + $clean)
+          Copy-Item -Verbose $file ("../" + $clean) 
 
       - uses: actions/upload-artifact@v4
         with:
@@ -97,7 +97,7 @@ jobs:
           cd target/builds/jpackage
           file=$(ls *.pkg)
           clean=$(echo "$file" | sed -E 's/[-_][0-9]\.[0-9]\.[0-9]//')
-          cp "$file" "../${clean}"
+          cp -v "$file" "../${clean}"
 
       - uses: actions/upload-artifact@v4
         with:
