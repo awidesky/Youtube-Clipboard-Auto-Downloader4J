@@ -9,7 +9,7 @@
 		<name>awidesky</name>
 		<url>https://github.com/awidesky</url>
 	</organization>
-	<version>2.1.2</version>
+	<version>2.1.3</version>
 	<name>YoutubeClipboardAutoDownloader</name>
 	<description>Downloads audio/video from Youtube by automaticly get link from your clipboard.</description>
 	<url>https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J</url>
@@ -181,75 +181,6 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.3.1</version>
-				<executions>
-					<execution>
-						<id>copy-resources-for-jar</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${build.dir}/Clipboard-dl/</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${project.basedir}</directory>
-									<includes>
-										<include>icon.png</include>
-										<include>LICENSE</include>
-									</includes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-					<execution>
-						<id>copy-jre</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${build.dir}/launch4j/jre</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${basedir}/jre</directory>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-					<execution>
-						<id>copy-resources-for-launch4j</id>
-						<!-- Run after package phase -->
-						<!-- https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html#Lifecycle_Reference -->
-						<phase>pre-integration-test</phase> 
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>
-								${build.dir}/launch4j</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${project.basedir}</directory>
-									<includes>
-										<include>icon.png</include>
-										<include>LICENSE</include>
-									</includes>
-								</resource>
-								<resource>
-									<directory>${build.dir}/Clipboard-dl</directory>
-									<includes>
-										<include>clipboard-dl.jar</include>
-									</includes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>3.6.0</version>
 				<executions>
@@ -338,6 +269,72 @@
 								<requiresJdk>false</requiresJdk>
 								<requires64Bit>false</requires64Bit>
 							</jre>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.3.1</version>
+				<executions>
+					<execution>
+						<id>copy-resources-for-jar</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${build.dir}/Clipboard-dl/</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}</directory>
+									<includes>
+										<include>icon.png</include>
+										<include>LICENSE</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-jre</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${build.dir}/launch4j/jre</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/jre</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-resources-for-launch4j</id>
+						<phase>package</phase> 
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>
+								${build.dir}/launch4j</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}</directory>
+									<includes>
+										<include>icon.png</include>
+										<include>LICENSE</include>
+									</includes>
+								</resource>
+								<resource>
+									<directory>${build.dir}/Clipboard-dl</directory>
+									<includes>
+										<include>clipboard-dl.jar</include>
+									</includes>
+								</resource>
+							</resources>
 						</configuration>
 					</execution>
 				</executions>
