@@ -1,0 +1,118 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build
+        run: mvn -B package
+
+      - name: Prepare Linux artifacts
+        run: |
+          cd target/builds
+
+          zip -r Clipboard-dl.zip Clipboard-dl/
+
+          cd jpackage
+          file=$(ls *.deb)
+          clean=$(echo "$file" | sed -E 's/-[0-9]{6}\.[0-9]{4}//')
+          cp "$file" "../${clean}"
+          cd ..
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-artifacts
+          path: |
+            target/builds/Clipboard-dl.zip
+            target/builds/*.deb
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build
+        run: mvn -B package
+
+      - name: Prepare Windows artifacts
+        shell: pwsh
+        run: |
+          cd target/builds
+
+          Compress-Archive -Path "launch4j/*" -DestinationPath "Clipboard-dl_launch4j_jre.zip" -Force
+
+          $excludeJRE = Get-ChildItem "launch4j" -Exclude "jre"
+          Compress-Archive -Path $excludeJRE -DestinationPath "Clipboard-dl_launch4j.zip" -Force
+
+          Set-Location jpackage
+          $file = Get-ChildItem *.msi | Select-Object -Expand Name
+          $clean = $file -replace '[\-_]\d\.\d\.\d', ''
+          Copy-Item $file ("../" + $clean)
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-artifacts
+          path: |
+            target/builds/*.zip
+            target/builds/*.msi
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build
+        run: mvn -B package
+        
+      - name: Prepare macOS artifacts
+        run: |
+          cd target/builds/jpackage
+          file=$(ls *.pkg)
+          clean=$(echo "$file" | sed -E 's/[-_][0-9]\.[0-9]\.[0-9]//')
+          cp "$file" "../${clean}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-artifacts
+          path: |
+            target/builds/*.pkg
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [build-linux, build-windows, build-macos]
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*.*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
