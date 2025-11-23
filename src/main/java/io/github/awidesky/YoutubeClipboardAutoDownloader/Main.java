@@ -23,7 +23,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
-import java.util.regex.Pattern;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -311,6 +310,7 @@ public class Main {
 
 		String p = Config.getDefaultSaveto();
 		String f = Config.getDefaultFormat();
+		String e = Config.getDefaultExtension();
 		String q = Config.getDefaultQuality();
 		String l = Config.getDefaultPlaylistOption().toCommandArgm();
 		String n = Config.getDefaultFileNameFormat(); 
@@ -328,15 +328,17 @@ public class Main {
 
 			UnaryOperator<String> read = str -> {
 				try {
-					return br.readLine().split(Pattern.quote("="))[1];
-				} catch(Exception e) {
-					SwingDialogs.warning("Exception occurred when reading config.txt", "%e%\nInitiate as default value : " + str, e, true);
+					String s = br.readLine();
+					return s.substring(s.indexOf('=') + 1);
+				} catch(Exception excp) {
+					SwingDialogs.warning("Exception occurred when reading config.txt", "%e%\nInitiate as default value : " + str, excp, true);
 					return str;
 				}
 			};
 			
 			p = read.apply(p); p = "%user.home%".equalsIgnoreCase(p) ? Config.getDefaultSaveto() : p;
 			f = read.apply(f);
+			e = read.apply(e);
 			q = read.apply(q);
 			l = read.apply(l);
 			n = read.apply(n);
@@ -349,13 +351,14 @@ public class Main {
 				Config.addAcceptableList(s);
 			}
 			
-		} catch (FileNotFoundException e1) {
-			SwingDialogs.warning("config.txt not exists!","%e%\nDon't worry, we'll make one with default configuration values for you later...", e1, true);
-		} catch (Exception e) {
-			SwingDialogs.error("Exception occurred when reading config.txt", "%e%\nWill use default configuration..", e, true);
+		} catch (FileNotFoundException ex1) {
+			SwingDialogs.warning("config.txt not exists!","%e%\nDon't worry, we'll make one with default configuration values for you later...", ex1, true);
+		} catch (Exception ex) {
+			SwingDialogs.error("Exception occurred when reading config.txt", "%e%\nWill use default configuration..", ex, true);
 		} finally {
 			Config.setSaveto(p);
 			Config.setFormat(f);
+			Config.setExtension(e);
 			Config.setQuality(q);
 			Config.setPlaylistOption(l);
 			Config.setFileNameFormat(n);
@@ -387,6 +390,7 @@ public class Main {
 			
 			bw.write("SavePath=" +	 savP.apply(Optional.ofNullable(Config.getSaveto())					.orElse(Config.getDefaultSaveto()))); 							bw.newLine();
 			bw.write("Format=" + 				Optional.ofNullable(Config.getFormat())					.orElse(Config.getDefaultFormat()));							bw.newLine();
+			bw.write("Extension=" + 			Optional.ofNullable(Config.getExtension())				.orElse(Config.getDefaultExtension()));							bw.newLine();
 			bw.write("Quality=" +				Optional.ofNullable(Config.getQuality())				.orElse(Config.getDefaultQuality()));							bw.newLine();
 			bw.write("Playlist=" + 				Optional.ofNullable(Config.getPlaylistOption())			.orElse(Config.getDefaultPlaylistOption()).toComboBox());		bw.newLine();
 			bw.write("FileNameFormat=" + 		Optional.ofNullable(Config.getFileNameFormat())			.orElse(Config.getDefaultFileNameFormat()));					bw.newLine();

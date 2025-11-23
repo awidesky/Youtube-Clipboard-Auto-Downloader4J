@@ -15,6 +15,7 @@ public class Config {
 	
 	private static String saveto = getDefaultSaveto();
 	private static String format = getDefaultFormat();
+	private static String extension = getDefaultExtension();
 	private static String quality = getDefaultQuality();
 	private static PlayListOption playlistOption = getDefaultPlaylistOption();
 	private static String fileNameFormat = getDefaultFileNameFormat();
@@ -26,7 +27,10 @@ public class Config {
 	public static synchronized void setSaveto(String saveto) { Config.saveto = saveto; }
 	
 	public static String getFormat() { return format; }
-	public static synchronized void setFormat(String extension) { Config.format = extension; }
+	public static synchronized void setFormat(String format) { Config.format = format; }
+	
+	public static String getExtension() { return extension; }
+	public static synchronized void setExtension(String extension) { Config.extension = extension; }
 	
 	public static String getQuality() { return quality; }
 	public static synchronized void setQuality(String quality) {
@@ -59,17 +63,25 @@ public class Config {
 	public static String getAcceptedLinkStr(String delimiter) { return acceptableLinks.stream().collect(Collectors.joining(delimiter)); }
 	
 	public static String status() {
-		return String.format("\n\tdownloadpath-%s\n\tformat-%s\n\tquality-%s\n\tplaylistoption-%s\n\tfilenameformat-%s\n\tclipboardListenOption-%s\n\tyt-dlp update period(days)-%s\n",
-				Config.saveto, Config.format, Config.quality, Config.playlistOption, Config.fileNameFormat, Config.clipboardListenOption.getString(), Config.ytdlpUpdateDuration);
+		return String.format("\n\tdownloadpath-%s\n\tformat-%s\n\textension-%s\\n\\tquality-%s\n\tplaylistoption-%s\n\tfilenameformat-%s\n\tclipboardListenOption-%s\n\tyt-dlp update period(days)-%s\n",
+				Config.saveto, Config.format, Config.extension, Config.quality, Config.playlistOption, Config.fileNameFormat, Config.clipboardListenOption.getString(), Config.ytdlpUpdateDuration);
 	}
 	
 	
 	// Default config values
 	public static String getDefaultSaveto() { return System.getProperty("user.home"); }
-	public static String getDefaultFormat() { return "mp3"; }
+	public static String getDefaultFormat() { return "bv[ext=mp4]/bv*+ba/b"; }
+	public static String getDefaultExtension() { return "mp3"; }
 	public static String getDefaultQuality() { return "0"; }
 	public static PlayListOption getDefaultPlaylistOption() { return PlayListOption.NO; }
 	public static String getDefaultFileNameFormat() { return "%(title)s.%(ext)s"; }
 	public static ClipBoardOption getDefaultClipboardListenOption() { return ClipBoardOption.AUTOMATIC; }
 	public static long getDefaultYtdlpUpdateDuration() { return 10; }
+	
+	
+	/** Does not saved into config file */
+	private static boolean isFormatSelectionManual = false;
+	public static boolean isFormatSelectionManual() { return isFormatSelectionManual; }
+	public static synchronized void isFormatSelectionManual(boolean isFormatSelectionManual) { Config.isFormatSelectionManual = isFormatSelectionManual; }
+
 }

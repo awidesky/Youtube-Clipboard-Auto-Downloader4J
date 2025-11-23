@@ -28,6 +28,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -70,9 +71,10 @@ public class GUI {
 
 	private JFrame mainFrame;
 	private JButton browse, cleanCompleted, removeSwitch, nameFormatHelp, openAppFolder, modeSwitch, openSaveDir;
-	private JLabel format, quality_icon, quality, path, nameFormat, playList;
-	private JTextField pathField, nameFormatField;
+	private JLabel format, quality_icon, path, nameFormat, playList;
+	private JTextField manualFormatField, pathField, nameFormatField;
 	private JComboBox<String> cb_format, cb_quality, cb_playList, cb_clipboardOption;
+	private JCheckBox chb_editFormat;
 	private DefaultComboBoxModel<String> audioFormatCBoxModel = new DefaultComboBoxModel<>(new String[] { "mp3", "best", "aac", "flac", "m4a", "opus", "vorbis", "wav" });
 	private DefaultComboBoxModel<String> videoFormatCBoxModel = new DefaultComboBoxModel<>(new String[] { "mp4", "webm", "3gp", "flv" });
 	private DefaultComboBoxModel<String> audioQualityCBoxModel = new DefaultComboBoxModel<>(new String[] { "0(best)", "1", "2", "3", "4", "5", "6", "7", "8", "9(worst)" });
@@ -165,6 +167,7 @@ public class GUI {
 		setTextFields();
 		setButtons();
 		setComboBoxes();
+		setCheckBoxes();
 		setTable();
 		
 		final int strutBetweenPanels = 10;
@@ -211,13 +214,11 @@ public class GUI {
 				.filter(f -> f.canDisplayUpTo("\uD83C\uDF9E\uD83C\uDFB5") == -1).findFirst()
 				.ifPresent(quality_icon::setFont);
 		}
-		quality = new JLabel("Audio Quality :");
 		path = new JLabel("Save to :");
-		nameFormat = new JLabel("Filename Format : ");
-		playList = new JLabel("Download Playlist? : ");
+		nameFormat = new JLabel("Output : ");
+		playList = new JLabel("Playlist : ");
 		
 		format.setSize(format.getPreferredSize().width, format.getPreferredSize().height);
-		quality.setSize(quality.getPreferredSize().width, quality.getPreferredSize().height);
 		path.setSize(path.getPreferredSize().width, path.getPreferredSize().height);
 		nameFormat.setSize(nameFormat.getPreferredSize().width, nameFormat.getPreferredSize().height);
 		playList.setSize(playList.getPreferredSize().width, playList.getPreferredSize().height);
@@ -225,33 +226,26 @@ public class GUI {
 	
 	private void setTextFields() {
 		
+		manualFormatField = new JTextField(Config.getFormat());
+		nameFormatField = new JTextField(Config.getFileNameFormat());
 		pathField = new JTextField(Config.getSaveto());
-		nameFormatField =  new JTextField(Config.getFileNameFormat());
 		
+		manualFormatField.setEnabled(false);
 		nameFormatField.setColumns(10);
 		
-		pathField.getDocument().addDocumentListener(new DocumentListener() {
-			public void changedUpdate(DocumentEvent e) { changed(); }
-			public void removeUpdate(DocumentEvent e) {	changed(); }
-			public void insertUpdate(DocumentEvent e) { changed(); }
-			public void changed() {
-				String str = pathField.getText();
-				File f = new File(str);
-				if (f.isDirectory() && f.exists()) Config.setSaveto(str);
-				int w = pathField.getPreferredSize().width - pathField.getWidth();
-				if(w <= 0) return;
-				w = mainFrame.getX() - w / 2;
-				w = w > 0 ? w : 0;
-				mainFrame.pack();
-				mainFrame.setLocation(dim.width / 2 - mainFrame.getSize().width / 2, mainFrame.getLocation().y);
-			}
-		});
-		nameFormatField.getDocument().addDocumentListener(new DocumentListener() {
-			public void changedUpdate(DocumentEvent e) { changed(); }
-			public void removeUpdate(DocumentEvent e) {	changed(); }
-			public void insertUpdate(DocumentEvent e) { changed(); }
-			public void changed() { Config.setFileNameFormat(nameFormatField.getText()); }
-		});
+		manualFormatField.getDocument().addDocumentListener(new DocumentChangeListener(() -> Config.setFormat(manualFormatField.getText())));
+		nameFormatField.getDocument().addDocumentListener(new DocumentChangeListener(() -> Config.setFileNameFormat(nameFormatField.getText())));
+		pathField.getDocument().addDocumentListener(new DocumentChangeListener(() -> {
+			String str = pathField.getText();
+			File f = new File(str);
+			if (f.isDirectory() && f.exists()) Config.setSaveto(str);
+			int w = pathField.getPreferredSize().width - pathField.getWidth();
+			if(w <= 0) return;
+			w = mainFrame.getX() - w / 2;
+			w = w > 0 ? w : 0;
+			mainFrame.pack();
+			mainFrame.setLocation(dim.width / 2 - mainFrame.getSize().width / 2, mainFrame.getLocation().y);
+		}));
 
 	}
 	
@@ -262,7 +256,7 @@ public class GUI {
 		removeSwitch = new JButton("remove selected");
 		nameFormatHelp = new JButton("<= help?");
 		openAppFolder = new JButton("open app folder");
-		modeSwitch = new JButton(" <-> download video ");
+		modeSwitch = new JButton("Mode : Video");
 		openSaveDir = new JButton("open");
 		
 		browse.addActionListener((e) -> {
@@ -291,6 +285,8 @@ public class GUI {
 		modeSwitch.setSize(modeSwitch.getPreferredSize().width, modeSwitch.getPreferredSize().height);
 		openSaveDir.setSize(openSaveDir.getPreferredSize().width, openSaveDir.getPreferredSize().height);
 		
+		modeSwitch.setFont(modeSwitch.getFont().deriveFont(Font.ITALIC));
+		
 		removeSwitch(false);
 		
 	}
@@ -301,15 +297,13 @@ public class GUI {
 			cb_format.setModel(videoFormatCBoxModel);
 			cb_quality.setModel(videoQualityCBoxModel);
 			quality_icon.setText("\uD83C\uDF9E\u0020");
-			quality.setText("Video Quality :");
-			modeSwitch.setText("<-> download audio");
+			modeSwitch.setText("Mode : Video");
 		} else {
 			Main.audioMode.set(true);
 			cb_format.setModel(audioFormatCBoxModel);
 			cb_quality.setModel(audioQualityCBoxModel);
 			quality_icon.setText("\uD83C\uDFB5\u0020");
-			quality.setText("Audio Quality :");
-			modeSwitch.setText("<-> download video");
+			modeSwitch.setText("Mode : Audio");
 		}
 
 		cb_format.setSelectedIndex(0);
@@ -331,7 +325,7 @@ public class GUI {
 			swapMode();
 			cb_quality.setSelectedItem(Config.getQuality());
 		}
-		cb_format.setSelectedItem(Config.getFormat());
+		cb_format.setSelectedItem(Config.getExtension());
 		cb_playList.setSelectedItem(Config.getPlaylistOption().toComboBox());
 		cb_clipboardOption.setSelectedItem(Config.getClipboardListenOption().toString());
 
@@ -340,18 +334,18 @@ public class GUI {
 		((JTextComponent) cb_format.getEditor().getEditorComponent()).getDocument()
 		.addDocumentListener(new DocumentListener() {
 			@Override
-			public void removeUpdate(DocumentEvent e) {  Config.setFormat(cb_format.getEditor().getItem().toString()); }
+			public void removeUpdate(DocumentEvent e) {  Config.setExtension(cb_format.getEditor().getItem().toString()); }
 			@Override
-			public void insertUpdate(DocumentEvent e) { Config.setFormat(cb_format.getEditor().getItem().toString()); }
+			public void insertUpdate(DocumentEvent e) { Config.setExtension(cb_format.getEditor().getItem().toString()); }
 			@Override
-			public void changedUpdate(DocumentEvent e) { Config.setFormat(cb_format.getEditor().getItem().toString()); }
+			public void changedUpdate(DocumentEvent e) { Config.setExtension(cb_format.getEditor().getItem().toString()); }
 		});
  
 		cb_format.addActionListener((e) -> { 
 	        if(cb_format.getSelectedIndex() >= 0) {
-	        	Config.setFormat(cb_format.getEditor().getItem().toString());
+	        	Config.setExtension(cb_format.getEditor().getItem().toString());
 			} else if("comboBoxEdited".equals(e.getActionCommand())) {
-				Config.setFormat(cb_format.getEditor().getItem().toString());
+				Config.setExtension(cb_format.getEditor().getItem().toString());
 	        }
 		});
 		cb_quality.addActionListener((e) -> { Config.setQuality(cb_quality.getSelectedItem().toString()); });
@@ -365,6 +359,20 @@ public class GUI {
 		
 	}
 	
+	private void setCheckBoxes() {
+		
+		chb_editFormat = new JCheckBox("Override");
+		chb_editFormat.addActionListener(e -> {
+			boolean checked = chb_editFormat.isSelected();
+			
+			manualFormatField.setEnabled(checked);
+			cb_format.setEnabled(!checked);
+			cb_quality.setEnabled(!checked);
+			
+			Config.isFormatSelectionManual(checked);
+		});
+		
+	}
 	private void setTable() {
 		
 		table = new JTable() {
@@ -415,16 +423,23 @@ public class GUI {
 		JPanel root = new JPanel(new BorderLayout());
 		JPanel formats = new JPanel();
 		formats.add(Box.createHorizontalStrut(5));
+		formats.add(quality_icon);
 		formats.add(format);
 		formats.add(cb_format);
-		formats.add(Box.createHorizontalStrut(15));
-		formats.add(quality_icon);
-		formats.add(quality);
 		formats.add(cb_quality);
 		root.add(formats, BorderLayout.WEST);
-		JPanel mode = new JPanel();
-		mode.add(modeSwitch);
-		root.add(mode, BorderLayout.EAST);
+		
+        
+		JPanel manual = new JPanel(new GridBagLayout());
+		manual.add(Box.createHorizontalStrut(15));
+		manual.add(chb_editFormat, new GridBagConstraints());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        manual.add(Box.createHorizontalStrut(5));
+        manual.add(manualFormatField, gbc);
+        manual.add(Box.createHorizontalStrut(10));
+		root.add(manual, BorderLayout.CENTER);
 		return root;
 	}
 	
@@ -459,17 +474,16 @@ public class GUI {
 		nameForm.add(Box.createHorizontalStrut(5));
 		nameForm.add(nameFormat);
 		nameForm.add(nameFormatField);
-		nameForm.add(Box.createHorizontalStrut(5));
 		nameForm.add(nameFormatHelp);
-		
-		JPanel playListOpt = new JPanel();
-		playListOpt.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 5));
-		playListOpt.add(playList);
-		playListOpt.add(cb_playList);
-		playListOpt.add(Box.createHorizontalStrut(5));
+		nameForm.add(Box.createHorizontalStrut(5));
+		nameForm.add(playList);
+		nameForm.add(cb_playList);
+
+		JPanel mode = new JPanel();
+		mode.add(modeSwitch);
 		
 		root.add(nameForm, BorderLayout.WEST);
-		root.add(playListOpt, BorderLayout.EAST);
+		root.add(mode, BorderLayout.EAST);
 		return root;
 	}
 	

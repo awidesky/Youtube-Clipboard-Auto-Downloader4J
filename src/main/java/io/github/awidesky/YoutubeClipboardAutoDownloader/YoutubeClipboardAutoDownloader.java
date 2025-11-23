@@ -274,7 +274,7 @@ public class YoutubeClipboardAutoDownloader {
 			Instant startTime = Instant.now();
 			
 			LinkedList<String> args = new LinkedList<>(Arrays.asList(new String[] { ytdlpPath + "yt-dlp", "--ffmpeg-location", ytdlpPath, "--get-filename", "-o",
-					ytdlpQuote + Config.getFileNameFormat().replace("%(ext)s", Config.getFormat()) + ytdlpQuote, url }));
+					ytdlpQuote + Config.getFileNameFormat().replace("%(ext)s", Config.getExtension()) + ytdlpQuote, url }));
 			if(playListOption.toCommandArgm() != null) args.add(1, playListOption.toCommandArgm());
 			
 			// retrieve command line argument
@@ -351,12 +351,12 @@ public class YoutubeClipboardAutoDownloader {
 		if(task.isAudioMode()) {
 			arguments.add("--extract-audio");
 			arguments.add("--audio-format");
-			arguments.add(Config.getFormat());
+			arguments.add(Config.getExtension());
 			arguments.add("--audio-quality");
 			arguments.add(Config.getQuality());
 		} else {
 			arguments.add("-f");
-			arguments.add(getVideoFormat(task, url));
+			arguments.add(getVideoFormat());
 		}
 		arguments.add(url);
 		
@@ -489,9 +489,11 @@ public class YoutubeClipboardAutoDownloader {
 	}
 
 
-	private static String getVideoFormat(TaskData task, String url) {
-		String  height = "", video = "[ext=" + Config.getFormat() + "]", audio = "";
-		if("mp4".equals(Config.getFormat())) {
+	private static String getVideoFormat() {
+		if(Config.isFormatSelectionManual()) return Config.getFormat();
+		
+		String  height = "", video = "[ext=" + Config.getExtension() + "]", audio = "";
+		if("mp4".equals(Config.getExtension())) {
 			audio = "[ext=m4a]";
 		}
 		if(!"best".equals(Config.getQuality())) {
