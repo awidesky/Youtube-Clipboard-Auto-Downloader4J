@@ -273,7 +273,7 @@ public class YoutubeClipboardAutoDownloader {
 		try {
 			Instant startTime = Instant.now();
 			
-			LinkedList<String> args = new LinkedList<>(Arrays.asList(new String[] { ytdlpPath + "yt-dlp", "--ffmpeg-location", ytdlpPath, "--get-filename", "-o",
+			LinkedList<String> args = new LinkedList<>(Arrays.asList(new String[] { ytdlpPath + "yt-dlp", "--ffmpeg-location", ytdlpPath, "--js-runtimes", "deno:" + ytdlpPath + "deno", "--get-filename", "-o",
 					ytdlpQuote + Config.getFileNameFormat().replace("%(ext)s", Config.getFormat()) + ytdlpQuote, url }));
 			if(playListOption.toCommandArgm() != null) args.add(1, playListOption.toCommandArgm());
 			
@@ -345,19 +345,10 @@ public class YoutubeClipboardAutoDownloader {
 		Main.logProperties(task.logger, "[preparing] Current properties :");
 
 		/* download video */
-		LinkedList<String> arguments = new LinkedList<>(Arrays.asList(
-				ytdlpPath + "yt-dlp", "--newline", "--force-overwrites", playListOption.toCommandArgm(), "--ffmpeg-location", ytdlpPath, "--output", ytdlpQuote + Config.getFileNameFormat() + ytdlpQuote));
+		LinkedList<String> arguments = new LinkedList<>(Arrays.asList( //TODO : denopath?
+				ytdlpPath + "yt-dlp", "--newline", "--force-overwrites", playListOption.toCommandArgm(), "--ffmpeg-location", ytdlpPath, "--js-runtimes", "deno:" + ytdlpPath + "deno", "--output", ytdlpQuote + Config.getFileNameFormat() + ytdlpQuote));
 		
-		if(task.isAudioMode()) {
-			arguments.add("--extract-audio");
-			arguments.add("--audio-format");
-			arguments.add(Config.getFormat());
-			arguments.add("--audio-quality");
-			arguments.add(Config.getQuality());
-		} else {
-			arguments.add("-f");
-			arguments.add(getVideoFormat(task, url));
-		}
+		Main.getFormatSelecter().getFormat(task.isAudioMode(), arguments);
 		arguments.add(url);
 		
 		if(additianalOptions.length != 0) arguments.addAll(arguments.size() - 1, Arrays.asList(additianalOptions));
@@ -488,16 +479,5 @@ public class YoutubeClipboardAutoDownloader {
 		
 	}
 
-
-	private static String getVideoFormat(TaskData task, String url) {
-		String  height = "", video = "[ext=" + Config.getFormat() + "]", audio = "";
-		if("mp4".equals(Config.getFormat())) {
-			audio = "[ext=m4a]";
-		}
-		if(!"best".equals(Config.getQuality())) {
-			height = "[height<=" + Config.getQuality().replace("p", "") + "]";
-		}
-		return "bv" + video + height + "+ba" + audio + "/b" + video + height + " / bv*+ba/b";
-	}
 
 }

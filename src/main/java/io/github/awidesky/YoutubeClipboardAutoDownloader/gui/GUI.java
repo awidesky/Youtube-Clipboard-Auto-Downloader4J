@@ -3,8 +3,6 @@ package io.github.awidesky.YoutubeClipboardAutoDownloader.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -26,7 +24,6 @@ import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -44,7 +41,6 @@ import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.JTextComponent;
 
 import io.github.awidesky.YoutubeClipboardAutoDownloader.Config;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.Main;
@@ -70,13 +66,9 @@ public class GUI {
 
 	private JFrame mainFrame;
 	private JButton browse, cleanCompleted, removeSwitch, nameFormatHelp, openAppFolder, modeSwitch, openSaveDir;
-	private JLabel format, quality_icon, quality, path, nameFormat, playList;
+	private JLabel path, nameFormat, playList;
 	private JTextField pathField, nameFormatField;
-	private JComboBox<String> cb_format, cb_quality, cb_playList, cb_clipboardOption;
-	private DefaultComboBoxModel<String> audioFormatCBoxModel = new DefaultComboBoxModel<>(new String[] { "mp3", "best", "aac", "flac", "m4a", "opus", "vorbis", "wav" });
-	private DefaultComboBoxModel<String> videoFormatCBoxModel = new DefaultComboBoxModel<>(new String[] { "mp4", "webm", "3gp", "flv" });
-	private DefaultComboBoxModel<String> audioQualityCBoxModel = new DefaultComboBoxModel<>(new String[] { "0(best)", "1", "2", "3", "4", "5", "6", "7", "8", "9(worst)" });
-	private DefaultComboBoxModel<String> videoQualityCBoxModel = new DefaultComboBoxModel<>(new String[] { "best", "240p", "360p", "360p", "480p", "720p", "1080p", "1440p", "2160p" });
+	private JComboBox<String> cb_playList, cb_clipboardOption;
 	private JFileChooser jfc = new JFileChooser();
 	private JTable table;
 	
@@ -171,7 +163,7 @@ public class GUI {
 		JPanel configPanel = new JPanel();
 		configPanel.setLayout(new BoxLayout(configPanel, BoxLayout.Y_AXIS));
 		configPanel.add(Box.createVerticalStrut(strutBetweenPanels));
-		configPanel.add(formatPanel());
+		configPanel.add(Main.getFormatSelecter().getPanel());
 		configPanel.add(Box.createVerticalStrut(strutBetweenPanels));
 		configPanel.add(savetoPanel());
 		configPanel.add(Box.createVerticalStrut(strutBetweenPanels));
@@ -201,23 +193,10 @@ public class GUI {
 	}
 	
 	private void setLabels() {
-		format = new JLabel("Format :");
-		quality_icon = new JLabel("\uD83C\uDFB5\u0020");
-		if(OSUtil.isWindows()) quality_icon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, new JLabel().getFont().getSize()));
-		else if(OSUtil.isMac()) quality_icon.setFont(new Font("Apple Color Emoji", Font.PLAIN, new JLabel().getFont().getSize()));
-		else if(OSUtil.isLinux()) quality_icon.setFont(new Font("Noto Color Emoji", Font.PLAIN, new JLabel().getFont().getSize()));
-		if("Dialog".equals(quality_icon.getFont().getFontName()) || quality_icon.getFont().canDisplayUpTo("\uD83C\uDF9E\uD83C\uDFB5") != -1) {
-			Arrays.stream(GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts())
-				.filter(f -> f.canDisplayUpTo("\uD83C\uDF9E\uD83C\uDFB5") == -1).findFirst()
-				.ifPresent(quality_icon::setFont);
-		}
-		quality = new JLabel("Audio Quality :");
 		path = new JLabel("Save to :");
-		nameFormat = new JLabel("Filename Format : ");
-		playList = new JLabel("Download Playlist? : ");
+		nameFormat = new JLabel("Output : ");
+		playList = new JLabel("Playlist : ");
 		
-		format.setSize(format.getPreferredSize().width, format.getPreferredSize().height);
-		quality.setSize(quality.getPreferredSize().width, quality.getPreferredSize().height);
 		path.setSize(path.getPreferredSize().width, path.getPreferredSize().height);
 		nameFormat.setSize(nameFormat.getPreferredSize().width, nameFormat.getPreferredSize().height);
 		playList.setSize(playList.getPreferredSize().width, playList.getPreferredSize().height);
@@ -262,7 +241,7 @@ public class GUI {
 		removeSwitch = new JButton("remove selected");
 		nameFormatHelp = new JButton("<= help?");
 		openAppFolder = new JButton("open app folder");
-		modeSwitch = new JButton(" <-> download video ");
+		modeSwitch = new JButton("Mode : Video");
 		openSaveDir = new JButton("open");
 		
 		browse.addActionListener((e) -> {
@@ -280,7 +259,7 @@ public class GUI {
 		cleanCompleted.addActionListener((e) -> { TaskStatusModel.getinstance().clearDone(); });
 		nameFormatHelp.addActionListener((e) -> { Main.webBrowse("https://github.com/yt-dlp/yt-dlp#output-template"); });
 		openAppFolder.addActionListener((e) -> { Main.openAppFolder(); });
-		modeSwitch.addActionListener((e) -> { swapMode(); });
+		modeSwitch.addActionListener((e) -> { modeSwitch.setText(Main.getFormatSelecter().swapMode()); });
 		openSaveDir.addActionListener((e) -> { Main.openSaveFolder(); });
 		
 		browse.setSize(browse.getPreferredSize().width, browse.getPreferredSize().height);
@@ -295,71 +274,16 @@ public class GUI {
 		
 	}
 	
-	private void swapMode() {
-		if(Main.audioMode.get()) {
-			Main.audioMode.set(false);
-			cb_format.setModel(videoFormatCBoxModel);
-			cb_quality.setModel(videoQualityCBoxModel);
-			quality_icon.setText("\uD83C\uDF9E\u0020");
-			quality.setText("Video Quality :");
-			modeSwitch.setText("<-> download audio");
-		} else {
-			Main.audioMode.set(true);
-			cb_format.setModel(audioFormatCBoxModel);
-			cb_quality.setModel(audioQualityCBoxModel);
-			quality_icon.setText("\uD83C\uDFB5\u0020");
-			quality.setText("Audio Quality :");
-			modeSwitch.setText("<-> download video");
-		}
-
-		cb_format.setSelectedIndex(0);
-		cb_quality.setSelectedIndex(0);
-	}
-
-
 	private void setComboBoxes() {
-		
-		cb_format = new JComboBox<>(audioFormatCBoxModel);
-		cb_quality = new JComboBox<>(audioQualityCBoxModel);
 		cb_playList = new JComboBox<>(PlayListOption.getComboBoxList());
 		cb_clipboardOption = new JComboBox<>(ClipBoardOption.getComboBoxStrings());
-		cb_format.setEditable(true);
-		
-		if(videoQualityCBoxModel.getIndexOf(Config.getQuality()) == -1) { //It was audio mode
-			cb_quality.setSelectedIndex(Integer.parseInt(Config.getQuality()));
-		} else {
-			swapMode();
-			cb_quality.setSelectedItem(Config.getQuality());
-		}
-		cb_format.setSelectedItem(Config.getFormat());
+
 		cb_playList.setSelectedItem(Config.getPlaylistOption().toComboBox());
 		cb_clipboardOption.setSelectedItem(Config.getClipboardListenOption().toString());
 
-		cb_format.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
-		
-		((JTextComponent) cb_format.getEditor().getEditorComponent()).getDocument()
-		.addDocumentListener(new DocumentListener() {
-			@Override
-			public void removeUpdate(DocumentEvent e) {  Config.setFormat(cb_format.getEditor().getItem().toString()); }
-			@Override
-			public void insertUpdate(DocumentEvent e) { Config.setFormat(cb_format.getEditor().getItem().toString()); }
-			@Override
-			public void changedUpdate(DocumentEvent e) { Config.setFormat(cb_format.getEditor().getItem().toString()); }
-		});
- 
-		cb_format.addActionListener((e) -> { 
-	        if(cb_format.getSelectedIndex() >= 0) {
-	        	Config.setFormat(cb_format.getEditor().getItem().toString());
-			} else if("comboBoxEdited".equals(e.getActionCommand())) {
-				Config.setFormat(cb_format.getEditor().getItem().toString());
-	        }
-		});
-		cb_quality.addActionListener((e) -> { Config.setQuality(cb_quality.getSelectedItem().toString()); });
 		cb_playList.addActionListener((e) -> { Config.setPlaylistOption(cb_playList.getSelectedItem().toString()); });
 		cb_clipboardOption.addActionListener((e) -> { Config.setClipboardListenOption(cb_clipboardOption.getSelectedItem().toString());	});
 		
-		cb_format.setSize(80, 22);
-		cb_quality.setSize(100, 22);
 		cb_playList.setSize(90, 22);
 		cb_clipboardOption.setSize(200, 22);
 		
@@ -409,24 +333,6 @@ public class GUI {
 		TaskStatusModel.getinstance().setCheckBoxSelectedCallback(this::removeSwitch);
 		
 	}
-
-	
-	private JPanel formatPanel() {
-		JPanel root = new JPanel(new BorderLayout());
-		JPanel formats = new JPanel();
-		formats.add(Box.createHorizontalStrut(5));
-		formats.add(format);
-		formats.add(cb_format);
-		formats.add(Box.createHorizontalStrut(15));
-		formats.add(quality_icon);
-		formats.add(quality);
-		formats.add(cb_quality);
-		root.add(formats, BorderLayout.WEST);
-		JPanel mode = new JPanel();
-		mode.add(modeSwitch);
-		root.add(mode, BorderLayout.EAST);
-		return root;
-	}
 	
 	private JPanel savetoPanel() {
 		JPanel root = new JPanel(new BorderLayout());
@@ -459,17 +365,16 @@ public class GUI {
 		nameForm.add(Box.createHorizontalStrut(5));
 		nameForm.add(nameFormat);
 		nameForm.add(nameFormatField);
-		nameForm.add(Box.createHorizontalStrut(5));
 		nameForm.add(nameFormatHelp);
-		
-		JPanel playListOpt = new JPanel();
-		playListOpt.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 5));
-		playListOpt.add(playList);
-		playListOpt.add(cb_playList);
-		playListOpt.add(Box.createHorizontalStrut(5));
+		nameForm.add(Box.createHorizontalStrut(5));
+		nameForm.add(playList);
+		nameForm.add(cb_playList);
+
+		JPanel mode = new JPanel();
+		mode.add(modeSwitch);
 		
 		root.add(nameForm, BorderLayout.WEST);
-		root.add(playListOpt, BorderLayout.EAST);
+		root.add(mode, BorderLayout.EAST);
 		return root;
 	}
 	
@@ -547,7 +452,7 @@ public class GUI {
 		}
 		return result.get();
 	}
-	
+
 	
 	private static Image getICON() {
 		final File f = new File(YoutubeClipboardAutoDownloader.getProjectPath().replace(File.separator, "/") + "/icon.png");
@@ -558,5 +463,5 @@ public class GUI {
 			return null;
 		}
 	}
-	
+
 }

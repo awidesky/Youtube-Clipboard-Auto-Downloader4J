@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
@@ -32,6 +31,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.ExitCodes;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.LoadingStatus;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.FormatSelectorPanel;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.GUI;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.gui.TaskStatusModel;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil;
@@ -56,9 +56,8 @@ public class Main {
 	
 	public static final Charset NATIVECHARSET = Charset.forName(System.getProperty("native.encoding"));
 	
-	public static volatile AtomicBoolean audioMode = new AtomicBoolean(true);
-	
 	private static GUI gui;
+	private static FormatSelectorPanel formatSelector;
 	private static Function<String, TaskLogger> taskLogGetter;
 	
 	private static volatile int taskNum = 0;
@@ -164,6 +163,7 @@ public class Main {
 			long t = System.currentTimeMillis();
 			SwingUtilities.invokeAndWait(() -> {
 				gui = new GUI();
+				formatSelector = new FormatSelectorPanel();
 				gui.initLoadingFrame();
 				gui.setLoadingStat(LoadingStatus.PREPARING_THREADS);
 			});
@@ -217,7 +217,7 @@ public class Main {
 		TaskLogger logTask = getTaskLogger("[Task" + num + "] ");
 		logTask.log("Received a link from your clipboard : " + data);
 
-		TaskData t = new TaskData(num, logTask, Main.audioMode.get());
+		TaskData t = new TaskData(num, logTask, formatSelector.isAudioMode());
 		
 		t.setUrl(data); 
 		t.setVideoName(data); // temporarily set video name as url
@@ -503,6 +503,10 @@ public class Main {
 		} catch (IOException e) {
 			SwingDialogs.warning("Cannot open directory explorer!", "Please open manually " + f.getAbsolutePath() + "\n%e%", e, true);
 		}
+	}
+
+	public static FormatSelectorPanel getFormatSelecter() {
+		return formatSelector;
 	}
 
 }
