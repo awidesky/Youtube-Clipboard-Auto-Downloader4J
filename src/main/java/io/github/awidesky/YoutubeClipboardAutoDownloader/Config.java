@@ -15,7 +15,6 @@ public class Config {
 	
 	private static String saveto = getDefaultSaveto();
 	private static String format = getDefaultFormat();
-	private static String extension = getDefaultAudioFormat();
 	private static String quality = getDefaultQuality();
 	private static PlayListOption playlistOption = getDefaultPlaylistOption();
 	private static String fileNameFormat = getDefaultFileNameFormat();
@@ -28,9 +27,6 @@ public class Config {
 	
 	public static String getFormat() { return format; }
 	public static synchronized void setFormat(String extension) { Config.format = extension; }
-	
-	public static String getExtension() { return extension; }
-	public static synchronized void setExtension(String audioFormat) { Config.extension = audioFormat; }
 	
 	public static String getQuality() { return quality; }
 	public static synchronized void setQuality(String quality) {
@@ -70,8 +66,7 @@ public class Config {
 	
 	// Default config values
 	public static String getDefaultSaveto() { return System.getProperty("user.home"); }
-	public static String getDefaultFormat() { return "bv[ext=mp4]+ba[ext=m4a]/b[ext=mp4] / bv*+ba/b"; }
-	public static String getDefaultAudioFormat() { return "mp3"; }
+	public static String getDefaultFormat() { return "mp3"; }
 	public static String getDefaultQuality() { return "0"; }
 	public static PlayListOption getDefaultPlaylistOption() { return PlayListOption.NO; }
 	public static String getDefaultFileNameFormat() { return "%(title)s.%(ext)s"; }
