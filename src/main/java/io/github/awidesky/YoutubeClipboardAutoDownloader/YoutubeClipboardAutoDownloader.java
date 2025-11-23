@@ -273,7 +273,7 @@ public class YoutubeClipboardAutoDownloader {
 		try {
 			Instant startTime = Instant.now();
 			
-			LinkedList<String> args = new LinkedList<>(Arrays.asList(new String[] { ytdlpPath + "yt-dlp", "--ffmpeg-location", ytdlpPath, "--get-filename", "-o",
+			LinkedList<String> args = new LinkedList<>(Arrays.asList(new String[] { ytdlpPath + "yt-dlp", "--ffmpeg-location", ytdlpPath, "--js-runtimes", "deno:" + ytdlpPath + "deno", "--get-filename", "-o",
 					ytdlpQuote + Config.getFileNameFormat().replace("%(ext)s", Config.getExtension()) + ytdlpQuote, url }));
 			if(playListOption.toCommandArgm() != null) args.add(1, playListOption.toCommandArgm());
 			
@@ -346,7 +346,7 @@ public class YoutubeClipboardAutoDownloader {
 
 		/* download video */
 		LinkedList<String> arguments = new LinkedList<>(Arrays.asList(
-				ytdlpPath + "yt-dlp", "--newline", "--force-overwrites", playListOption.toCommandArgm(), "--ffmpeg-location", ytdlpPath, "--output", ytdlpQuote + Config.getFileNameFormat() + ytdlpQuote));
+				ytdlpPath + "yt-dlp", "--newline", "--force-overwrites", playListOption.toCommandArgm(), "--ffmpeg-location", ytdlpPath, "--js-runtimes", "deno:" + ytdlpPath + "deno", "--output", ytdlpQuote + Config.getFileNameFormat() + ytdlpQuote));
 		
 		if(task.isAudioMode()) {
 			arguments.add("--extract-audio");
