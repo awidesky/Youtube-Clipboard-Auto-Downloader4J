@@ -1,6 +1,7 @@
 package io.github.awidesky.YoutubeClipboardAutoDownloader.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -13,13 +14,17 @@ import java.awt.Taskbar;
 import java.awt.Taskbar.Feature;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
@@ -34,6 +39,9 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -56,6 +64,8 @@ import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.LoadingStatus;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.PlayListOption;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.enums.TableColumnEnum;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.ProcessExecutor;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.ProcessIOThreadPool;
 import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.SwingDialogs;
 
@@ -70,6 +80,11 @@ public class GUI {
 	public static final Image ICON = getICON();
 
 	private JFrame mainFrame;
+
+	private JMenuBar menuBar;
+	private JMenu fileMenu, ytdlpMenu, ffmpegMenu;
+	private JMenuItem mi_openConfig, mi_showLog, mi_saveFolder, mi_addOption, mi_update, mi_ffprobe;
+	
 	private JButton browse, cleanCompleted, removeSwitch, nameFormatHelp, openAppFolder, modeSwitch, openSaveDir;
 	private JLabel format, quality_icon, path, nameFormat, playList;
 	private JTextField manualFormatField, pathField, nameFormatField;
@@ -162,6 +177,7 @@ public class GUI {
 			}
 		});
 
+		setMenubar();
 		setFileChooser();
 		setLabels();
 		setTextFields();
@@ -197,6 +213,99 @@ public class GUI {
 	}
 	
 
+	private void setMenubar() {
+		menuBar = new JMenuBar();
+
+		fileMenu = new JMenu("File");
+		fileMenu.setMnemonic(KeyEvent.VK_F);
+		fileMenu.getAccessibleContext().setAccessibleDescription("File menu");
+		
+		mi_openConfig = new JMenuItem("Open config.txt", KeyEvent.VK_C);
+		mi_openConfig.getAccessibleContext().setAccessibleDescription("Open config.txt");
+		mi_openConfig.addActionListener((e) -> {
+			try {
+				Desktop.getDesktop().open(new File(YoutubeClipboardAutoDownloader.getAppdataPath(), "config.txt"));
+			} catch (IOException ex) {
+				SwingDialogs.warning("Cannot open directory explorer!",
+						"Please open manually " +YoutubeClipboardAutoDownloader.getAppdataPath() + "\n%e%", ex, true);
+			}
+		});
+		mi_showLog = new JMenuItem("Show log", KeyEvent.VK_L);
+		mi_showLog.getAccessibleContext().setAccessibleDescription("Show log file");
+		mi_showLog.addActionListener((e) -> {
+			try {
+				LogTextDialog dialog = new LogTextDialog(new String[] {new File(Main.getLogFile()).getName()}, Logger.nullLogger);
+				dialog.setVisible(true);
+				Logger l = dialog.getLogger();
+				Files.lines(Paths.get(Main.getLogFile())).forEach(l::info);
+			} catch (IOException ex) {
+				SwingDialogs.warning("Cannot open directory explorer!",
+						"Please open manually " +YoutubeClipboardAutoDownloader.getAppdataPath() + "\n%e%", ex, true);
+			}
+		});
+		mi_saveFolder = new JMenuItem("Open save folder", KeyEvent.VK_S);
+		mi_saveFolder.getAccessibleContext().setAccessibleDescription("Open save folder");
+		mi_saveFolder.addActionListener((e) -> { Main.openSaveFolder(); });
+
+		fileMenu.add(mi_openConfig);
+		fileMenu.add(mi_showLog);
+		fileMenu.add(mi_saveFolder);
+		
+
+		ytdlpMenu = new JMenu("yt-dlp");
+		ytdlpMenu.getAccessibleContext().setAccessibleDescription("yt-dlp menu");
+
+		mi_addOption = new JMenuItem("Add option", KeyEvent.VK_A);
+		mi_addOption.getAccessibleContext().setAccessibleDescription("Add yt-dlp options");
+		mi_addOption.addActionListener((e) -> {
+			//TODO : implement
+		});
+		
+		mi_update = new JMenuItem("Update yt-dlp", KeyEvent.VK_U);
+		mi_update.getAccessibleContext().setAccessibleDescription("Update yt-dlp");
+		mi_update.addActionListener((e) -> {
+			ProcessIOThreadPool.submit(() ->
+				YoutubeClipboardAutoDownloader.updateYtdlp(YoutubeClipboardAutoDownloader.getYtdlpPath() + "yt-dlp", logger)
+			);
+		});
+		ytdlpMenu.add(mi_addOption);
+		ytdlpMenu.add(mi_update);
+		
+		
+		ffmpegMenu = new JMenu("ffmpeg");
+		ffmpegMenu.getAccessibleContext().setAccessibleDescription("ffmpeg menu");
+		
+		mi_ffprobe = new JMenuItem("Run mi_ffprobe", KeyEvent.VK_R);
+		mi_ffprobe.getAccessibleContext().setAccessibleDescription("Run mi_ffprobe with selected file");
+		mi_ffprobe.addActionListener((e) -> {
+			JFileChooser ffprobeFileChooser = new JFileChooser(Config.getSaveto());
+			ffprobeFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			ffprobeFileChooser.setDialogTitle("Choose file to run mi_ffprobe");
+			if(ffprobeFileChooser.showOpenDialog(mainFrame) == JFileChooser.APPROVE_OPTION) {
+				File f = ffprobeFileChooser.getSelectedFile();
+				ProcessIOThreadPool.submit(() -> {
+					LogTextDialog dial = new LogTextDialog(new String[] {"mi_ffprobe", f.getName()}, Logger.nullLogger);
+					dial.setVisible(true);
+					try {
+						ProcessExecutor.runNow(dial.getLogger(), f.getParentFile(), 
+								new File(YoutubeClipboardAutoDownloader.getYtdlpPath(), "mi_ffprobe").getAbsolutePath(),
+								"-hide_banner", f.getAbsolutePath());
+					} catch (IOException | InterruptedException | ExecutionException ex) {
+						logger.error("Failed to get mi_ffprobe result of " + f.getAbsolutePath());
+						logger.error(ex);
+					}
+				});
+			}
+		});
+		ffmpegMenu.add(mi_ffprobe);
+
+		menuBar.add(fileMenu);
+		menuBar.add(ytdlpMenu);
+		menuBar.add(ffmpegMenu);
+
+		mainFrame.setJMenuBar(menuBar);
+	}
+	
 	private void setFileChooser() {
 		jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		jfc.setDialogTitle("Choose directory to save music!");

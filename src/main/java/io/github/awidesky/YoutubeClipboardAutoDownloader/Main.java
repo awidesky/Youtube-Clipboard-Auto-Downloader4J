@@ -51,6 +51,7 @@ public class Main {
 
 	private static LoggerThread loggerThread = new LoggerThread();
 	private static TaskLogger logger = loggerThread.getLogger("[Main] ");
+	private static File logFile = null;
 
 	private static ClipBoardListeningThread clipChecker;
 	
@@ -280,7 +281,7 @@ public class Main {
 				loggerThread.setLogDestination(System.out, true);
 			} else {
 				File logFolder = new File(UserDataPath.appLocalFolder("awidesky", "YoutubeClipboardAutoDownloader", "logs"));
-				File logFile = new File(logFolder.getAbsolutePath(), "log-" + new SimpleDateFormat("yyyy-MM-dd-kk-mm-ss").format(new Date()) + ".txt");
+				logFile = new File(logFolder, "log-" + new SimpleDateFormat("yyyy-MM-dd-kk-mm-ss").format(new Date()) + ".txt");
 				if(!logFolder.exists()) logFolder.mkdirs();
 				logFile.createNewFile();
 				loggerThread.setLogDestination(new FileOutputStream(logFile), true);
@@ -435,6 +436,11 @@ public class Main {
 		} catch (InvocationTargetException | InterruptedException e1) {
 			SwingDialogs.error("Error when shutting GUI down!", "%e%", e1, false);;
 		}
+	}
+	
+	public static String getLogFile() {
+		if(logFile == null) return null;
+		return logFile.getAbsolutePath();
 	}
 	
 	/**

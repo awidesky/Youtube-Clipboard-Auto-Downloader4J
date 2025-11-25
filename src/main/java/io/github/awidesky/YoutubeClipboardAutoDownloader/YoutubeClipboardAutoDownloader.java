@@ -169,14 +169,7 @@ public class YoutubeClipboardAutoDownloader {
 						log.info("yt-dlp version : " + line);
 
 						if (checkYtdlpUpdateReleased(line, log)) {
-							if (ytdlpPath.contains("homebrew")) {
-								updateExecutable(log, new String[] { "/bin/zsh", "-c", "/opt/homebrew/bin/brew upgrade yt-dlp deno" }, "yt-dlp & deno");
-								
-							} else {
-								updateExecutable(log, new String[] { ydlfile, "--update" }, "yt-dlp");
-								updateExecutable(log, new String[] { ydlfile.substring(0, ydlfile.lastIndexOf(File.separator) + 1)
-										+ (OSUtil.isWindows() ? "deno.exe" : "deno"), "upgrade", "--no-color" }, "deno");
-							}
+							updateYtdlp(ydlfile, log);
 						}
 					} else {
 						SwingDialogs.error("Unexpected output from yt-dlp", line, null, true);
@@ -210,6 +203,17 @@ public class YoutubeClipboardAutoDownloader {
 
 	}
 	
+	public static void updateYtdlp(String ydlfile, Logger log) {
+		if (ytdlpPath.contains("homebrew")) {
+			updateExecutable(log, new String[] { "/bin/zsh", "-c", "/opt/homebrew/bin/brew upgrade yt-dlp deno" }, "yt-dlp & deno");
+			
+		} else {
+			updateExecutable(log, new String[] { ydlfile, "--update" }, "yt-dlp");
+			updateExecutable(log, new String[] { ydlfile.substring(0, ydlfile.lastIndexOf(File.separator) + 1)
+					+ (OSUtil.isWindows() ? "deno.exe" : "deno"), "upgrade", "--no-color" }, "deno");
+		}
+	}
+
 	private static void updateExecutable(Logger log, String[] updateCommands, String name) {
 		log.info(name + " update process start...");
 		LogTextDialog upDiag = new LogTextDialog(updateCommands, Main.getLogger("[" + name + " update] "));
