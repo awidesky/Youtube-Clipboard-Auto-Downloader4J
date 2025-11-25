@@ -309,16 +309,6 @@ public class Main {
 	 * note - this method should be Exception-proof.
 	 * */
 	private static void readProperties() {
-
-		String p = Config.getDefaultSaveto();
-		String f = Config.getDefaultFormat();
-		String e = Config.getDefaultExtension();
-		String q = Config.getDefaultQuality();
-		String l = Config.getDefaultPlaylistOption().toCommandArgm();
-		String n = Config.getDefaultFileNameFormat(); 
-		String c = Config.getDefaultClipboardListenOption().getString(); 
-		String u = Long.toString(Config.getDefaultYtdlpUpdateDuration()); 
-		
 		
 		if (!configFile.exists()) {
 			logger.info("Config file does not exist : " + configFile.getAbsolutePath());
@@ -338,14 +328,14 @@ public class Main {
 				}
 			};
 			
-			p = read.apply(p); p = "%user.home%".equalsIgnoreCase(p) ? Config.getDefaultSaveto() : p;
-			f = read.apply(f);
-			e = read.apply(e);
-			q = read.apply(q);
-			l = read.apply(l);
-			n = read.apply(n);
-			c = read.apply(c);
-			u = read.apply(u);
+			Config.setSaveto(read.apply(Config.getDefaultSaveto()).replace("%user.home%", Config.getDefaultSaveto()));
+			Config.setFormat(read.apply(Config.getDefaultFormat()));
+			Config.setExtension(read.apply(Config.getDefaultExtension()));
+			Config.setQuality(read.apply(Config.getDefaultQuality()));
+			Config.setPlaylistOption(read.apply(Config.getDefaultPlaylistOption().name()));
+			Config.setFileNameFormat(read.apply(Config.getDefaultFileNameFormat()));
+			Config.setClipboardListenOption(read.apply(Config.getDefaultClipboardListenOption().getString()));
+			Config.setYtdlpUpdateDuration(read.apply(Long.toString(Config.getDefaultYtdlpUpdateDuration())));
 			
 			String s;
 			while((s = br.readLine()) != null) {
@@ -358,15 +348,6 @@ public class Main {
 		} catch (Exception ex) {
 			SwingDialogs.error("Exception occurred when reading config.txt", "%e%\nWill use default configuration..", ex, true);
 		} finally {
-			Config.setSaveto(p);
-			Config.setFormat(f);
-			Config.setExtension(e);
-			Config.setQuality(q);
-			Config.setPlaylistOption(l);
-			Config.setFileNameFormat(n);
-			Config.setClipboardListenOption(c);
-			Config.setYtdlpUpdateDuration(u);
-			
 			logger.newLine();
 			logProperties(logger, "Initial properties :");
 		}
