@@ -29,8 +29,8 @@ public class TaskData {
 	private AtomicInteger totalNumOfVideo = new AtomicInteger(1);
 	private AtomicInteger videoNum = new AtomicInteger(1);
 	
-	private AtomicReference<String> err = new AtomicReference<String>(null);
-	private AtomicReference<String> ffprobe = new AtomicReference<String>(null);
+	private StringBuffer err = new StringBuffer();
+	private StringBuffer ffprobe = new StringBuffer();
 	
 	/** Is this task finished or failed? */
 	private Status st = Status.RUNNING;
@@ -112,7 +112,8 @@ public class TaskData {
 
 	public boolean isAudioMode() { return audioMode.get(); }
 
-	public void addErrorMessage(String errorMessage) { err.set(errorMessage); }
+	public void addErrorMessage(String errorMessage) { err.append(errorMessage).append('\n'); }
+	public void addFFprobe(String ffprobeResult) { ffprobe.append(ffprobeResult).append('\n'); }
 
 	public void kill() {
 		if(!isFinished()) {
@@ -126,8 +127,7 @@ public class TaskData {
 		return progress + "%" + ( (totalNumOfVideo.get() > 1) ? " (" + videoNum.get() + "/" + totalNumOfVideo.get() + ")" : "" );
 	}
 	public String getStatusToolTip() {
-		String e = err.get();
-		return e == null ? status.get() : err.get();
+		return err.isEmpty() ? status.get() : err.toString();
 	}
 
 	public void setFuture(Future<?> submit) { fu = submit; }
@@ -143,19 +143,20 @@ public class TaskData {
 		pw.println("Status : " + status.get());
 		pw.println("Progress : " + progress.get() + "%");
 		pw.println("Destination : " + dest.get());
+		pw.println("Output name : " + videoName.get());
 		if(totalNumOfVideo.get() > 1) pw.println("playlist index : " + videoNum.get() + " of " + totalNumOfVideo.get());
 		pw.println("Download mode : " + (audioMode.get() ? "audio only" : "video"));
 		
-		if(err.get() != null) {
+		if(!err.isEmpty()) {
 			pw.println();
 			pw.println("yt-dlp error :");
-			pw.println(err.get());
+			pw.println(err.toString());
 		}
 		
-		if(ffprobe.get() != null) {
+		if(!ffprobe.isEmpty()) {
 			pw.println();
 			pw.println("ffprobe :");
-			pw.println(ffprobe.get());
+			pw.println(ffprobe.toString());
 		}
 		
 		pw.flush(); pw.close();

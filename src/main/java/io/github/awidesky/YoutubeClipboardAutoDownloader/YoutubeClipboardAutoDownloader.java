@@ -27,8 +27,8 @@ import io.github.awidesky.YoutubeClipboardAutoDownloader.util.OSUtil;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.ProcessExecutor;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.ResourceInstaller;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.YTDLPFallbacks;
+import io.github.awidesky.YoutubeClipboardAutoDownloader.util.workers.ProcessIOThreadPool;
 import io.github.awidesky.guiUtil.Logger;
-import io.github.awidesky.guiUtil.StringLogger;
 import io.github.awidesky.guiUtil.SwingDialogs;
 import io.github.awidesky.projectPath.JarPath;
 import io.github.awidesky.projectPath.UserDataPath;
@@ -43,6 +43,7 @@ public class YoutubeClipboardAutoDownloader {
 	private static final Pattern versionPtn = Pattern.compile("\\d{4}\\.\\d{2}\\.\\d{2}");
 	private static final Pattern downloadFormatPtn = Pattern.compile("[\\s|\\S]+Downloading [\\d]+ format\\(s\\)\\:[\\s|\\S]+");
 	private static final Pattern downloadIndexPtn = Pattern.compile("\\[download\\] Downloading item [\\d]+ of [\\d]+");
+	private static final Pattern outputNamePtn = Pattern.compile("^\\[Merger\\] Merging formats into \\\"(.*?)\\\"$");
 	
 	public static final String ytdlpQuote = OSUtil.isWindows() ? "\"" : "";
 	
@@ -395,6 +396,8 @@ public class YoutubeClipboardAutoDownloader {
 							task.setStatus("Extracting Audio (" + task.getNowVideoNum() + "/" + task.getTotalNumVideo() + ")");
 						} else if(line.startsWith("[Merger]")) {
 							task.setStatus("Merging Video and Audio (" + task.getNowVideoNum() + "/" + task.getTotalNumVideo() + ")");
+							Matcher m = outputNamePtn.matcher(line);
+							if(m.find()) task.setVideoName(m.group(1));
 						}
 						
 						Matcher m = percentPtn.matcher(line);
@@ -436,6 +439,7 @@ public class YoutubeClipboardAutoDownloader {
 						return;
 					}
 					if (!errors.isEmpty()) {
+						errors.stream().map(String::strip).forEach(task::addErrorMessage);
 						SwingDialogs.error("Error [" + task.getVideoName() + "]",
 								"[Task" + task.getTaskNum() + "|downloading] There's error(s) in yt-dlp proccess!\n"
 										+ errors.stream().collect(Collectors.joining("\n")), null, true);
@@ -483,18 +487,16 @@ public class YoutubeClipboardAutoDownloader {
 				task.logger.info("[finished] Finished!\n");
 				task.finished();
 				
-				Thread th = new Thread(() -> {
-					StringLogger st = new StringLogger();
+				ProcessIOThreadPool.submit(() -> {
 					try {
-						// TODO
-						ProcessExecutor.runNow(st, new File(ytdlpPath), "ffprobe", "-hide_banner" );
-					} catch (InterruptedException | ExecutionException | IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						ProcessExecutor.run(List.of(new File(ytdlpPath, "ffprobe").getAbsolutePath(), "-hide_banner", task.getVideoName()),
+								new File(task.getDest()),
+								br -> br.lines().filter(s -> s.startsWith("  Duration:") || s.startsWith("  Stream #")).forEach(task::addFFprobe));
+					} catch (IOException e) {
+						task.logger.error("Failed to get ffprobe result of " + task.getVideoName());
+						task.logger.error(e);
 					}
 				});
-				th.setPriority(0);
-				
 			}
 		} catch (InterruptedException | ExecutionException e) {
 			task.failed();
