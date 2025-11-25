@@ -61,16 +61,16 @@ public class ClipBoardListeningThread extends Thread implements ClipboardOwner {
 								cb.setContents(new StringSelection((String) cb.getData(DataFlavor.stringFlavor)), this);
 							}
 						} catch (UnsupportedFlavorException | IOException e) {
-							logger.log("Unable to reset ");
-							logger.log(e);
+							logger.error("Unable to reset ");
+							logger.error(e);
 						}
 						continue;
 					}
 				}
 				r.run();
 			} catch (InterruptedException e) {
-				 logger.log("ClipBoardCheckerThread Interrupted!");
-				 logger.log(e);
+				 logger.error("ClipBoardCheckerThread Interrupted!");
+				 logger.error(e);
 			}
 		}
 	}
@@ -82,10 +82,10 @@ public class ClipBoardListeningThread extends Thread implements ClipboardOwner {
 
 	private void checkClipBoard(long now) {
 		history.removeIf(h -> now - h.timeStamp > 100);
-		logger.logVerbose("[debug] Executing clipboard checking process fired by system clipboard listner...");
+		logger.debug("Executing clipboard checking process fired by system clipboard listner...");
 		
 		if (Config.getClipboardListenOption() == ClipBoardOption.NOLISTEN) {
-			logger.logVerbose("[debug] Clipboard ignored due to ClipboardListenOption == \"" + ClipBoardOption.NOLISTEN.getString() + "\"");
+			logger.debug("Clipboard ignored due to ClipboardListenOption == \"" + ClipBoardOption.NOLISTEN.getString() + "\"");
 			return;
 		}
 		
@@ -95,39 +95,39 @@ public class ClipBoardListeningThread extends Thread implements ClipboardOwner {
 
 			Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
 			if (!cb.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
-				logger.logVerbose("[debug] Non-String Clipboard input!");
-				logger.logVerbose("[debug] Clipboard data Flavor(s) : " + Arrays.stream(cb.getAvailableDataFlavors())
+				logger.debug("Non-String Clipboard input!");
+				logger.debug("Clipboard data Flavor(s) : " + Arrays.stream(cb.getAvailableDataFlavors())
 						.map(DataFlavor::getHumanPresentableName).collect(Collectors.joining(", ")));
-				logger.logVerbose("[debug] These can be represented as :");
+				logger.debug("These can be represented as :");
 				Arrays.stream(cb.getAvailableDataFlavors()).map(t -> {
 					try {
 						return cb.getData(t);
 					} catch (UnsupportedFlavorException | IOException e) {
-						logger.log(e);
+						logger.error(e);
 						return null;
 					}
-				}).filter(Objects::nonNull).forEach(o -> logger.logVerbose("[debug] \t" + o));
+				}).filter(Objects::nonNull).forEach(o -> logger.debug("\t" + o));
 				return;
 			}
 			final String data = (String) cb.getData(DataFlavor.stringFlavor);
 			cb.setContents(new StringSelection(data), this); // reset clipboard ownership so that we won't miss another
 															 // clipboard event
 
-			logger.logVerbose("[debug] Clipboard : " + data);
+			logger.debug("Clipboard : " + data);
 			if (!Config.isLinkAcceptable(data)) {
-				logger.logVerbose("[debug] " + data + " is not acceptable!");
+				logger.debug(data + " is not acceptable!");
 				return;
 			}
 			
 			if (history.stream().anyMatch(h -> h.sameHash(data))) {
-				logger.logVerbose("[debug] Duplicate input, ignore : " + data);
+				logger.debug("Duplicate input, ignore : " + data);
 				history.add(new InputHistory(data, System.currentTimeMillis()));
 				return;
 			}
 
 			if (Config.getClipboardListenOption() == ClipBoardOption.ASK) {
 				boolean d = SwingDialogs.confirm("Download link from clipboard?", "Link : " + data);
-				logger.logVerbose("[GUI.linkAcceptChoose] " + (d ? "Accepted" : "Declined") + " download link " + data);
+				logger.debug("[GUI.linkAcceptChoose] " + (d ? "Accepted" : "Declined") + " download link " + data);
 				history.add(new InputHistory(data, System.currentTimeMillis()));
 				if (!d) return;
 			}
@@ -166,7 +166,7 @@ public class ClipBoardListeningThread extends Thread implements ClipboardOwner {
 
 	@Override
 	public void lostOwnership(Clipboard clipboard, Transferable contents) {
-		logger.logVerbose("Lost ownership from clipboard \"" + clipboard.getName() + "\"");
+		logger.debug("Lost ownership from clipboard \"" + clipboard.getName() + "\"");
 	}
 	
 }

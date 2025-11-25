@@ -22,7 +22,7 @@ public class YTDLPFallbacks {
 		List<FixCommand> list = Arrays.stream(fixArr).filter(f -> f.error.matcher(err).matches()).toList();
 
 		if(list.isEmpty()) {
-			log.log("no available fix for : " + err);
+			log.info("no available fix for : " + err);
 			return Stream.of(Boolean.FALSE);
 		}
 		return list.stream().map(FixCommand::runFixCommand);
@@ -41,13 +41,13 @@ public class YTDLPFallbacks {
 		
 		public boolean runFixCommand() {
 			log.newLine();
-			log.log("Found known error : \"" + error + "\"");
-			log.log("Trying to fix error automatically by executing \"" + Arrays.stream(command).collect(Collectors.joining(" ")) + "\"");
+			log.info("Found known error : \"" + error + "\"");
+			log.info("Trying to fix error automatically by executing \"" + Arrays.stream(command).collect(Collectors.joining(" ")) + "\"");
 			
 			// start process
 			try {
 				int ret = ProcessExecutor.runNow(log, null, command);
-				log.log("Executing ended with exit code : " + ret);
+				log.info("Executing ended with exit code : " + ret);
 				return ret == 0;
 			} catch (Exception e) {
 				SwingDialogs.error("Error!", "Error when fixing yt-dlp problem!\n%e%", e, false);

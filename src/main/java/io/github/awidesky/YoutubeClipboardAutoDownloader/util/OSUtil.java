@@ -53,8 +53,8 @@ public class OSUtil {
 		try {
 			return Files.walk(dir).filter(Files::isDirectory).allMatch(addPerm);
 		} catch(IOException e) {
-			log.log(e);
-			log.log("Failed to traverse : " + dir);
+			log.error(e);
+			log.error("Failed to traverse : " + dir);
 			return false;
 		}
 	}
@@ -65,7 +65,7 @@ public class OSUtil {
 		List<AclEntryPermission> addPerm = Arrays.asList(perm);
 		try {
 			UserPrincipal user = file.getFileSystem().getUserPrincipalLookupService().lookupPrincipalByName(System.getProperty("user.name"));
-			log.log("Current user : " + user);
+			log.info("Current user : " + user);
 			printACL(file, log);
 
 			AclFileAttributeView aclAttr = Files.getFileAttributeView(file, AclFileAttributeView.class);
@@ -81,7 +81,7 @@ public class OSUtil {
 						Set<AclEntryPermission> permissions = entryOfThePrincipal.permissions();
 						if(permissions.containsAll(addPerm)) {
 							//this user already has the permission, check the owner.
-							log.log("User : \"%s\" already has permission : \"%s\""
+							log.info("User : \"%s\" already has permission : \"%s\""
 									.formatted(principal, addPerm.stream().map(AclEntryPermission::toString).collect(Collectors.joining(", "))));
 							return false;
 						}
@@ -95,21 +95,21 @@ public class OSUtil {
 							aclAttr.setAcl(list);
 							return true;
 						} catch (IOException e) {
-							log.log(e);
+							log.info(e);
 							return false;
 						}
 					}).findFirst();
 			
 			result.ifPresentOrElse(
-							u -> log.log("Execute permission added for user :" + u),
-							() -> log.log("Permission is not added!")
+							u -> log.info("Execute permission added for user :" + u),
+							() -> log.info("Permission is not added!")
 							);
 
 			printACL(file, log);
 			return result.isPresent();
 		} catch (IOException e) {
-			log.log(e);
-			log.log("Failed to add permission \"%s\""
+			log.error(e);
+			log.error("Failed to add permission \"%s\""
 					.formatted(addPerm.stream().map(AclEntryPermission::toString).collect(Collectors.joining(", "))));
 			return false;
 		} finally {
@@ -123,12 +123,12 @@ public class OSUtil {
 		try {
 			Set<PosixFilePermission> permSet = Files.getPosixFilePermissions(file);
 
-			log.log("Current user : " + file.getFileSystem().getUserPrincipalLookupService().lookupPrincipalByName(System.getProperty("user.name")));
-			log.log("Permission of " + file + " : " + PosixFilePermissions.toString(permSet));
-			log.log("Owner : " + Files.getOwner(file));
+			log.info("Current user : " + file.getFileSystem().getUserPrincipalLookupService().lookupPrincipalByName(System.getProperty("user.name")));
+			log.info("Permission of " + file + " : " + PosixFilePermissions.toString(permSet));
+			log.info("Owner : " + Files.getOwner(file));
 			
 			if(permSet.containsAll(toAdd)) {
-				log.log("Permission : \"%s\" is already granted!"
+				log.info("Permission : \"%s\" is already granted!"
 						.formatted(toAdd.stream().map(PosixFilePermission::toString).collect(Collectors.joining(", "))));
 				return true;
 			}
@@ -137,14 +137,14 @@ public class OSUtil {
 			Files.setPosixFilePermissions(file, permSet);
 
 			permSet = Files.getPosixFilePermissions(file);
-			log.log("After adding permission(s) \"%s\" : %s".formatted(
+			log.error("After adding permission(s) \"%s\" : %s".formatted(
 					toAdd.stream().map(PosixFilePermission::toString).collect(Collectors.joining(", ")),
 					PosixFilePermissions.toString(permSet)));
 			
 			return permSet.containsAll(toAdd);
 		} catch(IOException e) {
-			log.log(e);
-			log.log("Failed to add posix permission(s) \"%s\"".formatted(
+			log.error(e);
+			log.error("Failed to add posix permission(s) \"%s\"".formatted(
 					toAdd.stream().map(PosixFilePermission::toString).collect(Collectors.joining(", "))));
 			return false;
 		} finally {
@@ -153,14 +153,14 @@ public class OSUtil {
 	}
 
 	private static void printACL(Path file, Logger log) throws IOException {
-		log.log("Permission of " + file + " : ");
+		log.info("Permission of " + file + " : ");
 		AclFileAttributeView aclAttr = Files.getFileAttributeView(file, AclFileAttributeView.class);
-		log.log("Owner : " + aclAttr.getOwner());
+		log.info("Owner : " + aclAttr.getOwner());
 		for (AclEntry aclEntry : aclAttr.getAcl()) {
-			log.log();
-			log.log("User : " + aclEntry.principal() + ", type : " + aclEntry.type().name());
-			log.log("Permmission : " + aclEntry.permissions().stream().map(AclEntryPermission::name).collect(Collectors.joining(", ")));
-			log.log("Flag : " + aclEntry.flags().stream().map(AclEntryFlag::name).collect(Collectors.joining(", ")));
+			log.info();
+			log.info("User : " + aclEntry.principal() + ", type : " + aclEntry.type().name());
+			log.info("Permmission : " + aclEntry.permissions().stream().map(AclEntryPermission::name).collect(Collectors.joining(", ")));
+			log.info("Flag : " + aclEntry.flags().stream().map(AclEntryFlag::name).collect(Collectors.joining(", ")));
 		}
 	}
 

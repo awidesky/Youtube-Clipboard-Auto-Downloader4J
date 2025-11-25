@@ -30,6 +30,7 @@ public class TaskData {
 	private AtomicInteger videoNum = new AtomicInteger(1);
 	
 	private AtomicReference<String> err = new AtomicReference<String>(null);
+	private AtomicReference<String> ffprobe = new AtomicReference<String>(null);
 	
 	/** Is this task finished or failed? */
 	private Status st = Status.RUNNING;
@@ -117,7 +118,7 @@ public class TaskData {
 		if(!isFinished()) {
 			if (p != null) p.destroy();
 			if (fu != null) fu.cancel(true);
-			logger.log("[Canceled] Task number " + taskNum + " has killed!");
+			logger.info("[Canceled] Task number " + taskNum + " has killed!");
 		}
 	}
 
@@ -149,6 +150,12 @@ public class TaskData {
 			pw.println();
 			pw.println("yt-dlp error :");
 			pw.println(err.get());
+		}
+		
+		if(ffprobe.get() != null) {
+			pw.println();
+			pw.println("ffprobe :");
+			pw.println(ffprobe.get());
 		}
 		
 		pw.flush(); pw.close();

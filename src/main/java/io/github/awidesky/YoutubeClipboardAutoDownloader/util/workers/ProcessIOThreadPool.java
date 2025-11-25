@@ -20,8 +20,8 @@ public class ProcessIOThreadPool {
 			try {
 				executorService.awaitTermination(timeout, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
-				log.log("Failed to wait worker Thread to shutdown!");
-				log.log(e);
+				log.error("Failed to wait worker Thread to shutdown!");
+				log.error(e);
 			}
 		}
 	}

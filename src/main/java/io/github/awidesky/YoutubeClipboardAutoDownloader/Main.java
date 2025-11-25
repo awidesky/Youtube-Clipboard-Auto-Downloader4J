@@ -42,6 +42,7 @@ import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.LoggerThread;
 import io.github.awidesky.guiUtil.SwingDialogs;
 import io.github.awidesky.guiUtil.TaskLogger;
+import io.github.awidesky.guiUtil.level.Level;
 import io.github.awidesky.projectPath.JarPath;
 import io.github.awidesky.projectPath.UserDataPath;
 
@@ -67,7 +68,8 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		boolean verbose = false, datePrefix = false, logbyTask = false, logOnConsole = false;
+		Level logLevel = Level.INFO;
+		boolean datePrefix = false, logbyTask = false, logOnConsole = false;
 		for (String arg : args) {
 			if ("--help".equals(arg)) {
 				System.out.println("Youtube Clipboard Auto Downloader (a.k.a. Clipboard-dl) " + version);
@@ -102,7 +104,7 @@ public class Main {
 				System.out.println("Please refer to : https://github.com/awidesky/Youtube-Audio-Auto-Downloader4J/blob/master/LICENSE");
 				Main.kill(ExitCodes.SUCCESSFUL);
 			} else if ("--verbose".equals(arg)) {
-				verbose = true;
+				logLevel = Level.DEBUG;
 			} else if ("--logTime".equals(arg)) {
 				datePrefix = true;
 			} else if ("--logbyTask".equals(arg)) {
@@ -129,7 +131,7 @@ public class Main {
 
 		preRunTasks();
 		
-		prepareLogFile(verbose, datePrefix, logbyTask, logOnConsole);
+		prepareLogFile(logLevel, datePrefix, logbyTask, logOnConsole);
 		setup();
 		
 	}
@@ -172,7 +174,7 @@ public class Main {
 			clipChecker = new ClipBoardListeningThread(OSUtil.isMac() ? 150 : -1); // A daemon thread that will keep checking clipboard
 			Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener(clipChecker::submit);
 			logger.newLine();
-			logger.log("Listening clipboard...\n");
+			logger.info("Listening clipboard...\n");
 			
 			times[1] = System.currentTimeMillis() - t; t = System.currentTimeMillis();
 			SwingUtilities.invokeAndWait(() -> gui.setLoadingStat(LoadingStatus.READING_PROPERTIES));
@@ -194,15 +196,15 @@ public class Main {
 			clipChecker.start();
 			
 			times[5] = System.currentTimeMillis() - t; t = System.currentTimeMillis();
-			logger.log("Initiating GUI : %dms, PREPARING_THREADS : %dms, READING_PROPERTIES : %dms, CHECKING_FFMPEG : %dms, CHECKING_YTDLP : %dms, LOADING_WINDOW : %dms"
+			logger.info("Initiating GUI : %dms, PREPARING_THREADS : %dms, READING_PROPERTIES : %dms, CHECKING_FFMPEG : %dms, CHECKING_YTDLP : %dms, LOADING_WINDOW : %dms"
 					.formatted((Object[])times));
 		} catch (InterruptedException e1) {
-			logger.log("[init] EDT failed while loading application!");
+			logger.error("[init] EDT failed while loading application!");
 			e1.printStackTrace();
 			SwingDialogs.error("EDT Interrupted!", "%e%", e1, true);
 			Main.kill(ExitCodes.EDTFAILED);
 		} catch (InvocationTargetException e2) {
-			logger.log("[init] " + e2.getCause().getClass().getSimpleName() + " thrown while loading application!");
+			logger.error("[init] " + e2.getCause().getClass().getSimpleName() + " thrown while loading application!");
 			e2.printStackTrace();
 			SwingDialogs.error("Loading Failed!", "%e%", e2.getCause(), true);
 			Main.kill(ExitCodes.EDTFAILED);
@@ -214,7 +216,7 @@ public class Main {
 	public static void submitDownload(String data) {
 		int num = taskNum++;
 		TaskLogger logTask = getTaskLogger("[Task" + num + "] ");
-		logTask.log("Received a link from your clipboard : " + data);
+		logTask.info("Received a link from your clipboard : " + data);
 
 		TaskData t = new TaskData(num, logTask, Main.audioMode.get());
 		
@@ -229,7 +231,7 @@ public class Main {
 			if(TaskStatusModel.getinstance().isTaskExistsSameStatus(t)) return; 
 
 			if(!SwingDialogs.confirm("Download same file in same directory?", data + "\nis already downloading/downloaded(by another Task) in\n" + other.getDest() + "\ndownload anyway?")) {
-				logTask.log(data + " is canceled because same task exists.");
+				logTask.info(data + " is canceled because same task exists.");
 				return;
 			}
 		}
@@ -272,7 +274,7 @@ public class Main {
 		};
 	}
 	
-	private static void prepareLogFile(boolean verbose, boolean datePrefix, boolean logbyTask, boolean logOnConsole) {
+	private static void prepareLogFile(Level logLevel, boolean datePrefix, boolean logbyTask, boolean logOnConsole) {
 		try {
 			if(logOnConsole) {
 				loggerThread.setLogDestination(System.out, true);
@@ -288,7 +290,7 @@ public class Main {
 			SwingDialogs.error("Error when creating log flie, log in console instead...", "%e%", e, false);
 		} finally {
 			taskLogGetter = logbyTask ? loggerThread::getBufferedLogger : loggerThread::getLogger;
-			loggerThread.setVerboseAllChildren(verbose);
+			loggerThread.setLogLevelAllChildren(logLevel);
 			if (datePrefix) loggerThread.setDatePrefixAllChildren(new SimpleDateFormat("[kk:mm:ss.SSS]"));
 			SwingDialogs.setLogger(loggerThread.getLogger());
 		}
@@ -319,7 +321,7 @@ public class Main {
 		
 		
 		if (!configFile.exists()) {
-			logger.log("Config file does not exist : " + configFile.getAbsolutePath());
+			logger.info("Config file does not exist : " + configFile.getAbsolutePath());
 			new File(YoutubeClipboardAutoDownloader.getAppdataPath()).mkdirs();
 		}
 		
@@ -379,7 +381,7 @@ public class Main {
 	private static void writeProperties() {
 
 		if (!configFile.exists()) {
-			logger.log("Config file not exist : " + configFile.getAbsolutePath());
+			logger.info("Config file not exist : " + configFile.getAbsolutePath());
 			new File(YoutubeClipboardAutoDownloader.getAppdataPath()).mkdirs();
 		}
 		
@@ -418,7 +420,7 @@ public class Main {
 	}
 
 	public static void logProperties(Logger logTo, String status) {
-		logTo.log(status + Config.status());
+		logTo.info(status + Config.status());
 	}
 
 
@@ -463,7 +465,7 @@ public class Main {
 		ProcessIOThreadPool.kill(2500);
 		writeProperties();
 		if(logger != null) {
-			logger.log("Clipboard-dl exit code : " + exitCode.getCode());
+			logger.info("Clipboard-dl exit code : " + exitCode.getCode());
 			if(exitCode != ExitCodes.SUCCESSFUL) SwingDialogs.error("Error code : " + exitCode.getCode(), "Exit code : " + exitCode, null, true);
 			logger.close();
 		}

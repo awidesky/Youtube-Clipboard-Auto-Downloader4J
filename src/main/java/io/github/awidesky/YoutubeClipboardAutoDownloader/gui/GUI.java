@@ -113,7 +113,7 @@ public class GUI {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				e.getWindow().dispose();
-				logger.log("LoadingFrame was closed");
+				logger.info("LoadingFrame was closed");
 				Main.kill(ExitCodes.SUCCESSFUL);
 			}
 		});
@@ -521,10 +521,10 @@ public class GUI {
 	
 	public void disposeAll() {
 
-		logger.logVerbose("");
-		logger.logVerbose("Existing Windows are :");
-		Stream.of(JWindow.getWindows()).map(Window::toString).forEach(logger::logVerbose);
-		logger.logVerbose("");
+		logger.debug();
+		logger.debug("Existing Windows are :");
+		Stream.of(JWindow.getWindows()).map(Window::toString).forEach(logger::debug);
+		logger.debug();
 
 		Stream.of(JWindow.getWindows()).forEach(Window::dispose);
 		disposeLoadingFrame();

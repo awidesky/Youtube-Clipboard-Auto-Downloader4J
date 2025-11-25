@@ -43,7 +43,7 @@
 		<dependency>
 			<groupId>io.github.awidesky</groupId>
 			<artifactId>GUIUtil</artifactId>
-			<version>1.2.1</version>
+			<version>1.3.1</version>
 		</dependency>
 		<dependency>
 			<groupId>io.github.awidesky</groupId>

@@ -28,6 +28,7 @@ import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.ProcessExecut
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.ResourceInstaller;
 import io.github.awidesky.YoutubeClipboardAutoDownloader.util.exec.YTDLPFallbacks;
 import io.github.awidesky.guiUtil.Logger;
+import io.github.awidesky.guiUtil.StringLogger;
 import io.github.awidesky.guiUtil.SwingDialogs;
 import io.github.awidesky.projectPath.JarPath;
 import io.github.awidesky.projectPath.UserDataPath;
@@ -67,13 +68,13 @@ public class YoutubeClipboardAutoDownloader {
 			if (ResourceInstaller.ffmpegAvailable() && SwingDialogs.confirm("ffmpeg installation invalid!", installPrompt)) {
 				try {
 					ResourceInstaller.getFFmpeg();
-					log.log("ffmpeg installation success. re-checking ffmpeg...");
+					log.info("ffmpeg installation success. re-checking ffmpeg...");
 					return checkFFmpeg();
 				} catch (Exception e) {
 					if(e.getMessage().contains("denied")) { // "Permission denied" | "Access is denied"
 						if(SwingDialogs.confirm("Error when installing ffmpeg : Access Denied!", "Change permission and try again?\n" + e.getLocalizedMessage())) {
 							Path dir = Paths.get(appDataPath);
-							log.log("Retry after change permission of : " + dir);
+							log.info("Retry after change permission of : " + dir);
 							return OSUtil.addDeletePermissionRecursive(dir, log) && checkFFmpeg();
 						} else return false;
 					}
@@ -92,18 +93,18 @@ public class YoutubeClipboardAutoDownloader {
 	}
 	
 	private static boolean checkFFmpegPath(String path, Logger log) {
-		log.log("ffmpeg installation check command : \"" + path + "ffmpeg -version" + "\"");
+		log.info("ffmpeg installation check command : \"" + path + "ffmpeg -version" + "\"");
 		try {
 			int ret = ProcessExecutor.runNow(log, null, path + "ffmpeg", "-version");
-			log.log("ffmpeg installation check command terminated with exit code : " + ret);
+			log.info("ffmpeg installation check command terminated with exit code : " + ret);
 			return ret == 0;
 		} catch (Exception e) {
-			log.log("Error when checking ffmpeg : " + e.getClass().getName());
-			log.log(e);
+			log.error("Error when checking ffmpeg : " + e.getClass().getName());
+			log.error(e);
 			
 			if(e.getMessage().contains("denied")) { // "Permission denied" | "Access is denied"
 				if(SwingDialogs.confirm("Error when checking ffmpeg : Access Denied!", "Change permission and try again?\n" + e.getLocalizedMessage())) {
-					log.log("Retry after changing executable permission...");
+					log.info("Retry after changing executable permission...");
 					OSUtil.addExecutePermission(Paths.get(path, "ffmpeg"), log);
 					return checkFFmpegPath(path, log);
 				} else return false;
@@ -128,7 +129,7 @@ public class YoutubeClipboardAutoDownloader {
 				if (ResourceInstaller.ytdlpAvailable() && SwingDialogs.confirm("yt-dlp installation invalid!", "Install yt-dlp in app resource folder?")) {
 					try {
 						ResourceInstaller.getYtdlp();
-						log.log("yt-dlp installation success. re-checking yt-dlp...");
+						log.info("yt-dlp installation success. re-checking yt-dlp...");
 						return checkYtdlp();
 					} catch (IOException | InterruptedException | ExecutionException e) {
 						SwingDialogs.error("Failed to install yt-dlp! : " + e.getClass().getName(), "%e%", e, true);
@@ -142,17 +143,17 @@ public class YoutubeClipboardAutoDownloader {
 			}
 		}
 			
-		log.log("projectPath = " + projectPath);
-		log.log("ytdlpPath = " + (ytdlpPath.equals("") ? "system %PATH%" : ytdlpPath) + "\n");
+		log.info("projectPath = " + projectPath);
+		log.info("ytdlpPath = " + (ytdlpPath.equals("") ? "system %PATH%" : ytdlpPath) + "\n");
 		return true;
 		
 	}
 
 	private static boolean checkYtdlpPath(String ydlfile, Logger log) {
 
-		log.log("Check if yt-dlp path is in " + ydlfile);
+		log.info("Check if yt-dlp path is in " + ydlfile);
 		List<String> args = Arrays.asList(ydlfile, "--version");
-		log.log("yt-dlp installation check command : \"" + args.stream().collect(Collectors.joining(" ")).trim() + "\"");
+		log.info("yt-dlp installation check command : \"" + args.stream().collect(Collectors.joining(" ")).trim() + "\"");
 
 		StringBuffer stderr = new StringBuffer();
 		
@@ -163,8 +164,8 @@ public class YoutubeClipboardAutoDownloader {
 				try {
 					if (versionPtn.matcher(line = br.readLine()).matches()) { // valid path
 
-						log.log("Found valid command to execute yt-dlp : \"" + ydlfile + "\"");
-						log.log("yt-dlp version : " + line);
+						log.info("Found valid command to execute yt-dlp : \"" + ydlfile + "\"");
+						log.info("yt-dlp version : " + line);
 
 						if (checkYtdlpUpdateReleased(line, log)) {
 							if (ytdlpPath.contains("homebrew")) {
@@ -186,19 +187,19 @@ public class YoutubeClipboardAutoDownloader {
 				}
 			}, br -> br.lines().forEach(str -> {
 				stderr.append(str).append('\n');
-				log.log("yt-dlp stderr : " + str);
+				log.error("yt-dlp stderr : " + str);
 			})).wait_all();
 			
-			log.log("yt-dlp installation check command terminated with exit code : " + ret);
+			log.info("yt-dlp installation check command terminated with exit code : " + ret);
 			if(!stderr.isEmpty()) SwingDialogs.error("yt-dlp Error! code : " + ret, stderr.toString(), null, false);
 			return ret == 0;
 		} catch (Exception e) {
-			log.log("Error when checking yt-dlp : " + e.getClass().getName() + "\n" + e.getMessage());
-			log.log(e);
+			log.error("Error when checking yt-dlp : " + e.getClass().getName() + "\n" + e.getMessage());
+			log.error(e);
 			
 			if(e.getMessage().contains("denied")) { // "Permission denied" | "Access is denied"
 				if(SwingDialogs.confirm("Error when checking yt-dlp : Access Denied!", "Change permission and try again?\n" + e.getLocalizedMessage())) {
-					log.log("Retry after changing executable permission...");
+					log.info("Retry after changing executable permission...");
 					OSUtil.addExecutePermission(Paths.get(ydlfile), log);
 					return checkYtdlpPath(ydlfile, log);
 				} else return false;
@@ -209,9 +210,9 @@ public class YoutubeClipboardAutoDownloader {
 	}
 	
 	private static void updateExecutable(Logger log, String[] updateCommands, String name) {
-		log.log(name + " update process start...");
+		log.info(name + " update process start...");
 		LogTextDialog upDiag = new LogTextDialog(updateCommands, Main.getLogger("[" + name + " update] "));
-		log.log("Update " + name + " with : " + Arrays.stream(updateCommands).collect(Collectors.joining(" ")));
+		log.info("Update " + name + " with : " + Arrays.stream(updateCommands).collect(Collectors.joining(" ")));
 		upDiag.setVisible(true);
 		try {
 			int e;
@@ -221,7 +222,8 @@ public class YoutubeClipboardAutoDownloader {
 			SwingDialogs.warning("Failed to update " + name, "%e%", e, true);
 		} finally {
 			try { Thread.sleep(3000); } catch (InterruptedException e) {
-				e.printStackTrace();
+				log.error("Error while waiting a bit for user to read the content of dialog :");
+				log.error(e);
 			}
 			upDiag.dispose();
 		}
@@ -233,33 +235,33 @@ public class YoutubeClipboardAutoDownloader {
 			LocalDate today = LocalDate.now();	
 			LocalDate currentDay = LocalDate.parse(ytdlpVersion, dateFormat);
 
-			log.log("Today : " + dateFormat.format(today) + ", current yt-dlp release day : " + ytdlpVersion);
+			log.info("Today : " + dateFormat.format(today) + ", current yt-dlp release day : " + ytdlpVersion);
 
 			if(ChronoUnit.DAYS.between(currentDay, today) < Config.getYtdlpUpdateDuration()) {
-				log.log("yt-dlp version is not older than " + Config.getYtdlpUpdateDuration() + "days. update process skipped...");
+				log.info("yt-dlp version is not older than " + Config.getYtdlpUpdateDuration() + "days. update process skipped...");
 				return false;
 			}
 
 			String message = "yt-dlp version is older than " + Config.getYtdlpUpdateDuration() + "days.";
 			String releaseDate = ResourceInstaller.ytdlpLatestReleaseDate();
 			if(releaseDate != null) {
-				log.log("Latest yt-dlp release date : " + releaseDate);
+				log.info("Latest yt-dlp release date : " + releaseDate);
 				if (LocalDate.parse(releaseDate, dateFormat).isAfter(currentDay)) {
 					message = "Latest yt-dlp version " + releaseDate + " is found.";
 				} else {
-					log.log("Latest : " + releaseDate + ", current : " + ytdlpVersion + ". Update is not needed...");
+					log.info("Latest : " + releaseDate + ", current : " + ytdlpVersion + ". Update is not needed...");
 					return false;
 				}
-			} else log.log("Cannot find latest release date of yt-dlp!");
+			} else log.info("Cannot find latest release date of yt-dlp!");
 
 			if(!SwingDialogs.confirm("Update yt-dlp?", message + "\nUpdate yt-dlp?")) {
-				log.log("User does not want to update it. update process skipped...");
+				log.info("User does not want to update it. update process skipped...");
 				return false;
 			}
 			return true;
 		} catch (Exception e) {
-			log.log("Error while checking yt-dlp released date!");
-			log.log(e);
+			log.error("Error while checking yt-dlp released date!");
+			log.error(e);
 			return false;
 		}
 	}
@@ -279,18 +281,18 @@ public class YoutubeClipboardAutoDownloader {
 			
 			// retrieve command line argument
 			task.logger.newLine(); task.logger.newLine();
-			task.logger.log("[validating] Video name command : \"" + args.stream().collect(Collectors.joining(" ")) + "\"");
+			task.logger.info("[validating] Video name command : \"" + args.stream().collect(Collectors.joining(" ")) + "\"");
 
 			// start process
 			ProcessExecutor.ProcessHandle p1 = ProcessExecutor.run(args, null, br -> {
 				try {
 					String name = br.readLine();
-					task.logger.log("[validating] yt-dlp stdout : " + name);
+					task.logger.info("[validating] yt-dlp stdout : " + name);
 					if (playListOption == PlayListOption.YES) {
 						int vdnum = 1;
 						String str;
 						while ((str = br.readLine()) != null) {
-							task.logger.log("[validating] yt-dlp stdout : " + str);							
+							task.logger.info("[validating] yt-dlp stdout : " + str);							
 							vdnum++;
 						}
 						
@@ -308,7 +310,7 @@ public class YoutubeClipboardAutoDownloader {
 					StringBuilder warning = new StringBuilder();
 					StringBuilder error = new StringBuilder();
 					br.lines().forEach(l -> {
-						task.logger.log("[validating] yt-dlp stderr : " + l);
+						task.logger.info("[validating] yt-dlp stderr : " + l);
 						(l.startsWith("WARNING") ? warning : error).append(l).append("\n");
 					});
 					if(!warning.isEmpty()) SwingDialogs.warning("Warning when getting video name", "[Task" + task.getTaskNum() + "|validating]\n" + warning.toString(), null, true);
@@ -324,9 +326,9 @@ public class YoutubeClipboardAutoDownloader {
 			task.setProcess(p1.getProcess());
 			int exit = p1.wait_all();
 			Duration diff = Duration.between(startTime, Instant.now());
-			task.logger.log("[validating] Video name : " + task.getVideoName());
-			task.logger.log("[validating] Terminated with exit code : " + exit);
-			task.logger.log("[validating] Elapsed time in validating link and downloading video name : " + String.format("%d min %d.%03d sec",
+			task.logger.info("[validating] Video name : " + task.getVideoName());
+			task.logger.info("[validating] Terminated with exit code : " + exit);
+			task.logger.info("[validating] Elapsed time in validating link and downloading video name : " + String.format("%d min %d.%03d sec",
 					diff.toMinutes(), diff.toSecondsPart(), diff.toMillisPart()));
 			if (exit != 0) {
 				task.failed();
@@ -364,7 +366,7 @@ public class YoutubeClipboardAutoDownloader {
 
 		
 		// retrieve command line argument
-		task.logger.log("[downloading] Video download command : \"" + arguments.stream().collect(Collectors.joining(" ")) + "\"");
+		task.logger.info("[downloading] Video download command : \"" + arguments.stream().collect(Collectors.joining(" ")) + "\"");
 
 		// start process
 		ProcessExecutor.ProcessHandle p = null;
@@ -407,7 +409,7 @@ public class YoutubeClipboardAutoDownloader {
 							}
 							if(percent == 100 && !percentStr.contains(".")) videoDownloadDone = true;
 						}
-						task.logger.log("[downloading] yt-dlp stdout : " + line);
+						task.logger.info("[downloading] yt-dlp stdout : " + line);
 					}
 				} catch (IOException e) {
 					task.failed();
@@ -420,7 +422,7 @@ public class YoutubeClipboardAutoDownloader {
 					List<String> errors = new ArrayList<>();
 					List<String> warnings = new ArrayList<>();
 					while ((line = br.readLine()) != null) {
-						task.logger.log("[downloading] yt-dlp stderr : " + line);
+						task.logger.error("[downloading] yt-dlp stderr : " + line);
 						(line.startsWith("ERROR") ? errors : warnings).add(line);
 					}
 
@@ -456,30 +458,43 @@ public class YoutubeClipboardAutoDownloader {
 		}
 		Instant starttime = p.getProcess().info().startInstant().orElseGet(Instant::now);
 		p.getProcess().info().commandLine().ifPresent(line -> 
-			task.logger.log("[process info] Executed process command : \"" + line + "\""));
+			task.logger.info("[process info] Executed process command : \"" + line + "\""));
 		task.setProcess(p.getProcess());
 		task.setStatus("Initiating download");
 		task.setProgress(0);
 		
 		try {
 			int errorCode = p.wait_all();
-			task.logger.log("[process info] Process exit code : " + errorCode);
+			task.logger.info("[process info] Process exit code : " + errorCode);
 			p.getProcess().info().totalCpuDuration()
-					.ifPresent(cputime -> task.logger.log("[process info] Process cpu time : " + String.format("%d min %d.%03d sec",
+					.ifPresent(cputime -> task.logger.info("[process info] Process cpu time : " + String.format("%d min %d.%03d sec",
 									cputime.toMinutes(), cputime.toSecondsPart(), cputime.toMillisPart())));
 			
 			Duration diff = Duration.between(starttime, Instant.now());
 			if(errorCode != 0) { 
 				SwingDialogs.error("Error in yt-dlp", "[Task" + task.getTaskNum() + "|downloading] yt-dlp has ended with error code : " + errorCode, null, true);
-				task.logger.log("[downloading] elapsed time in downloading(failed) : " + String.format("%d min %d.%03d sec",
+				task.logger.info("[downloading] elapsed time in downloading(failed) : " + String.format("%d min %d.%03d sec",
 						diff.toMinutes(), diff.toSecondsPart(), diff.toMillisPart()));
 				task.failed();
 				return;
 			} else { 
-				task.logger.log("[downloaded] elapsed time in working(succeed) : " + String.format("%d min %d.%03d sec",
+				task.logger.info("[downloaded] elapsed time in working(succeed) : " + String.format("%d min %d.%03d sec",
 						diff.toMinutes(), diff.toSecondsPart(), diff.toMillisPart()));
-				task.logger.log("[finished] Finished!\n");
+				task.logger.info("[finished] Finished!\n");
 				task.finished();
+				
+				Thread th = new Thread(() -> {
+					StringLogger st = new StringLogger();
+					try {
+						// TODO
+						ProcessExecutor.runNow(st, new File(ytdlpPath), "ffprobe", "-hide_banner" );
+					} catch (InterruptedException | ExecutionException | IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				});
+				th.setPriority(0);
+				
 			}
 		} catch (InterruptedException | ExecutionException e) {
 			task.failed();

@@ -52,7 +52,7 @@ public class TaskStatusModel extends AbstractTableModel {
 		default:
 			break;
 		}
-		log.log("invalid index - row : " + rowIndex + ", col :" + columnIndex);
+		log.error("invalid index - row : " + rowIndex + ", col :" + columnIndex);
 		SwingDialogs.error("Invalid column index!", "Invalid column index : " + columnIndex, null, false);
 		return null; // this should not happen!
 	}
@@ -137,8 +137,8 @@ public class TaskStatusModel extends AbstractTableModel {
 			try {
 				SwingUtilities.invokeAndWait(r);
 			} catch (InvocationTargetException | InterruptedException e) {
-				log.log("Exception when waitng EDT for add task to the Table!");
-				log.log(e);
+				log.error("Exception when waitng EDT for add task to the Table!");
+				log.error(e);
 				SwingUtilities.invokeLater(r);
 			}
 		}
@@ -156,8 +156,8 @@ public class TaskStatusModel extends AbstractTableModel {
 				SwingUtilities.invokeAndWait(() -> { result.set(isTaskExists(t)); });
 				return result.get();
 			} catch (Exception e) {
-				log.log("Exception when checking existing Task(s)");
-				log.log(e);
+				log.error("Exception when checking existing Task(s)");
+				log.error(e);
 			}
 			return null;
 		}
@@ -176,8 +176,8 @@ public class TaskStatusModel extends AbstractTableModel {
 				SwingUtilities.invokeAndWait(() -> { result.set(rows.get(rows.indexOf(t)).getStatus().equals(t.getStatus())); });
 				return result.get();
 			} catch (Exception e) {
-				log.log("Exception when checking existing Task(s) is done");
-				log.log(e);
+				log.error("Exception when checking existing Task(s) is done");
+				log.error(e);
 			}
 			return false;
 		}

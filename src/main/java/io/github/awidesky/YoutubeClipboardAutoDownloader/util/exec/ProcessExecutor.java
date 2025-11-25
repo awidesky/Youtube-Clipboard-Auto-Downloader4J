@@ -22,7 +22,7 @@ import io.github.awidesky.guiUtil.SwingDialogs;
 public class ProcessExecutor {
 	
 	public static int runNow(Logger logger, File dir, String... command) throws InterruptedException, ExecutionException, IOException {
-		return run(Arrays.asList(command), dir, br -> br.lines().forEach(logger::log), br -> br.lines().forEach(logger::log)).wait_all();
+		return run(Arrays.asList(command), dir, br -> br.lines().forEach(logger::info), br -> br.lines().forEach(logger::error)).wait_all();
 	}
 	public static ProcessHandle run(List<String> command, File dir, Consumer<BufferedReader> allOut) throws IOException {
 		return run(command, dir, allOut, allOut);

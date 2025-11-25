@@ -79,7 +79,7 @@ public class ResourceInstaller {
 	
 	
 	public static void getFFmpeg() throws IOException, InterruptedException, ExecutionException {
-		log.log("Installing ffmpeg...");
+		log.info("Installing ffmpeg...");
 		showProgress("Downloading ffmpeg");
 		
 		if(isWindows()) {
@@ -89,7 +89,7 @@ public class ResourceInstaller {
 			url = url.replace("%s", version);
 
 			long filesize = getFileSize(new URL(url));
-			log.log("Length of " + url + " : " + filesize);
+			log.info("Length of " + url + " : " + filesize);
 			
 			setLoadingFrameContent("Downloading ffmpeg version " + version, filesize);
 			
@@ -110,8 +110,8 @@ public class ResourceInstaller {
 				deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "doc"));
 				deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "presets"));
 			} catch (IOException e) {
-				log.log("Failed to clean up files!");
-				log.log(e);
+				log.error("Failed to clean up files!");
+				log.error(e);
 				SwingDialogs.warning("Failed to clean up some files", "ffmpeg files might be corrupted...\n%e%", e, true);
 			}
 		} else if(isMac()) {
@@ -126,7 +126,7 @@ public class ResourceInstaller {
 			String arch = getArch();
 			String url = "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-" + arch + "-static.tar.xz";		
 			long filesize = getFileSize(new URL(url));
-			log.log("Length of " + url + " : " + filesize);
+			log.info("Length of " + url + " : " + filesize);
 			
 			setLoadingFrameContent("Downloading ffmpeg", filesize);
 			ProcessIOThreadPool.submit(() -> fetchFFmpegVersion("https://johnvansickle.com/ffmpeg/release-readme.txt"));
@@ -143,7 +143,7 @@ public class ResourceInstaller {
 				untar.addAll(List.of("mkdir", "ffmpeg;"));
 			
 			untar.addAll(List.of("tar", "-xf", downloadFile.toString(), "-C", "ffmpeg", "--strip-components", "1"));
-			log.log("Unzipping ffmpeg.tar.xz with : " + untar.stream().collect(Collectors.joining(" " )));
+			log.info("Unzipping ffmpeg.tar.xz with : " + untar.stream().collect(Collectors.joining(" " )));
 			ProcessExecutor.runNow(log, new File(root), untar.toArray(String[]::new));
 			
 			Files.move(Paths.get(root, "ffmpeg", "ffmpeg"), Files.createDirectories(Paths.get(root, "ffmpeg", "bin")).resolve("ffmpeg"));
@@ -153,14 +153,14 @@ public class ResourceInstaller {
 				Files.delete(Paths.get(root, "ffmpeg", "qt-faststart"));
 				deleteDirectoryRecursion(Paths.get(root, "ffmpeg", "manpages"));
 			} catch (IOException e) {
-				log.log("Failed to clean up files!");
-				log.log(e);
+				log.error("Failed to clean up files!");
+				log.error(e);
 				SwingDialogs.warning("Failed to clean up some files", "ffmpeg files might be corrupted...\n%e%", e, true);
 			}
 		}
 
 		hideProgress();
-		log.log("ffmpeg installed!!");
+		log.info("ffmpeg installed!!");
 	}
 	
 	private static String getArch() {
@@ -177,16 +177,16 @@ public class ResourceInstaller {
 			else if (arch.contains("arm") || arch.contains("aarch"))
 				ret = "arm64";
 			else {
-				log.log("Unable to guess architecture. Please report to https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J/issues");
+				log.error("Unable to guess architecture. Please report to https://github.com/awidesky/Youtube-Clipboard-Auto-Downloader4J/issues");
 				ret = "amd64";
 			}
-			log.log("Unrecognized architecture : " + arch + ". Considering it's " + ret);
+			log.info("Unrecognized architecture : " + arch + ". Considering it's " + ret);
 			yield ret;
 		}
 		};
 	}
 	public static void getYtdlp() throws MalformedURLException, IOException, InterruptedException, ExecutionException {
-		log.log("Installing yt-dlp...");
+		log.info("Installing yt-dlp...");
 		showProgress("Downloading yt-dlp");
 		if(isMac()) {
 			String[] cmd = {"/bin/bash", "-c", "/opt/homebrew/bin/brew install yt-dlp deno"};
@@ -220,7 +220,7 @@ public class ResourceInstaller {
 
 
 			long filesize = getFileSize(new URL(ytdlpURL));
-			log.log("Length of " + ytdlpURL + " : " + filesize);
+			log.info("Length of " + ytdlpURL + " : " + filesize);
 			setLoadingFrameContent("Downloading yt-dlp version " + ytdlpLatestReleaseDate(), filesize);
 			Path ytdlpFile = Paths.get(root, "ffmpeg", "bin", (isWindows() ? "yt-dlp.exe" : "yt-dlp"));
 			download(new URL(ytdlpURL), ytdlpFile);
@@ -228,9 +228,9 @@ public class ResourceInstaller {
 			
 			hideProgress();
 			showProgress("Downloading deno");
-			log.log("yt-dlp installed. Now Deno...");
+			log.info("yt-dlp installed. Now Deno...");
 			filesize = getFileSize(new URL(denoURL));
-			log.log("Length of " + denoURL + " : " + filesize);
+			log.info("Length of " + denoURL + " : " + filesize);
 			setLoadingFrameContent("Downloading deno version " + denoLatestReleaseDate(), filesize);
 			Path denoFile = Paths.get(root, "ffmpeg", "bin", "deno.zip");
 			download(new URL(denoURL), denoFile);
@@ -240,7 +240,7 @@ public class ResourceInstaller {
 		}
 		
 		hideProgress();
-		log.log("yt-dlp installed!!");
+		log.info("yt-dlp installed!!");
 	}
 
 	private static AtomicReference<String> ytdlpLatestReleaseDate = new AtomicReference<>();
@@ -248,11 +248,11 @@ public class ResourceInstaller {
 	private static AtomicReference<String> denoLatestReleaseDate = new AtomicReference<>();
 	public static String ytdlpLatestReleaseDate() {
 		String ret = fetchGithubReleaseVersion("https://github.com/yt-dlp/yt-dlp/releases/latest", ytdlpLatestReleaseDate);
-		log.log("Latest yt-dlp release date from github : " + ret);
+		log.info("Latest yt-dlp release date from github : " + ret);
 		
 		if (OSUtil.isMac()) {
 			ret = fetchBrewYtdlpVersion(ytdlpLatestReleaseDate);
-			log.log("Latest yt-dlp release date from brew   : " + ret);
+			log.info("Latest yt-dlp release date from brew   : " + ret);
 		}
 		return  ret;
 	}
@@ -276,7 +276,7 @@ public class ResourceInstaller {
 			holder.setOpaque(ret);
 			return ret;
 		} catch (IOException e) {
-			log.log(e);
+			log.error(e);
 			return null;
 		} finally {
 			if (conn != null) conn.disconnect();
@@ -298,10 +298,10 @@ public class ResourceInstaller {
 		        }
 			}
 			
-			log.log("Unable to find pattern \"" + ptr.pattern() + "\" from url : " + url);
+			log.info("Unable to find pattern \"" + ptr.pattern() + "\" from url : " + url);
 		} catch (IOException e) {
-			log.log("Failed to get homebrew yt-dlp version from " + url);
-			log.log(e);
+			log.error("Failed to get homebrew yt-dlp version from " + url);
+			log.error(e);
 		}
 		return null;
 	}
@@ -314,12 +314,12 @@ public class ResourceInstaller {
 		try (ReadableByteChannel in = Channels.newChannel(url.openStream());
 				FileChannel out = FileChannel.open(dest, StandardOpenOption.WRITE)) {
 
-			log.log("Downloading from " + url.toString() + " to " + dest);
-			log.log("Buffer size : " + formatFileSize(BUFFER_SIZE));
+			log.info("Downloading from " + url.toString() + " to " + dest);
+			log.info("Buffer size : " + formatFileSize(BUFFER_SIZE));
 			
 			ByteBuffer bytebuf = ByteBuffer.allocateDirect(BUFFER_SIZE);
 			long total = getFileSize(url);
-			log.log("Target file size : " + formatFileSize(total));
+			log.info("Target file size : " + formatFileSize(total));
 			int written = 0;
 			boolean eof = false;
   			while (true) {
@@ -336,7 +336,7 @@ public class ResourceInstaller {
 			}
 		}
 		
-		log.log("Successfully downloaded " + url.toString());
+		log.info("Successfully downloaded " + url.toString());
 	}
 	
 	private static long getFileSize(URL url) throws IOException {
@@ -346,8 +346,8 @@ public class ResourceInstaller {
 			conn.setRequestMethod("HEAD");
 			return conn.getContentLengthLong();
 		} catch(IOException  e) {
-			log.log("Failed to get length of " + url);
-			log.log(e);
+			log.error("Failed to get length of " + url);
+			log.error(e);
 			return -1;
 		} finally {
 			if(conn != null) conn.disconnect();
@@ -368,13 +368,13 @@ public class ResourceInstaller {
 				}
 			}
 			
-			log.log("Unable to find pattern \"" + ptr.pattern() + "\" from url : " + url.toString());
+			log.info("Unable to find pattern \"" + ptr.pattern() + "\" from url : " + url.toString());
 			SwingUtilities.invokeLater(() -> {
 				loadingFrame.setTitle("Downloading ffmpeg (version unknown)");
 			});
 		} catch (IOException e) {
-			log.log("Failed to get ffmpeg version from " + url);
-			log.log(e);
+			log.error("Failed to get ffmpeg version from " + url);
+			log.error(e);
 		}
 	}
 
@@ -421,7 +421,7 @@ public class ResourceInstaller {
 		});
 	}
 	private static void updateUI(long now, long total) {
-		log.logVerbose("Progress : " + formatFileSize(now) + " / " + formatFileSize(total) + " (" + (total > -1 ? (int)(100.0 * now / total) : -1) + "%)");
+		log.debug("Progress : " + formatFileSize(now) + " / " + formatFileSize(total) + " (" + (total > -1 ? (int)(100.0 * now / total) : -1) + "%)");
 		SwingUtilities.invokeLater(() -> {
 			loadingStatus.setText(formatFileSize(now) + " / " + formatFileSize(total));
 			progress.setValue((total > -1 ? (int)(100.0 * now / total) : -1));
@@ -475,7 +475,7 @@ public class ResourceInstaller {
 	 * */
     private static void unzipFolder(Path source, Path target) throws IOException {
 
-    	log.logVerbose("Unzip " + source.toAbsolutePath().toString() + " to " + target.toAbsolutePath().toString());
+    	log.debug("Unzip " + source.toAbsolutePath().toString() + " to " + target.toAbsolutePath().toString());
     	
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(source.toFile()))) {
 
@@ -510,7 +510,7 @@ public class ResourceInstaller {
                     }
 
                     // copy files, nio
-                    log.logVerbose("copy to " + newPath.toAbsolutePath().toString());
+                    log.debug("copy to " + newPath.toAbsolutePath().toString());
                     Files.copy(zis, newPath, StandardCopyOption.REPLACE_EXISTING);
 
                     // copy files, classic
@@ -529,7 +529,7 @@ public class ResourceInstaller {
 
         }
         
-        log.logVerbose("Successfully Unzipped " + source.toAbsolutePath().toString());
+        log.debug("Successfully Unzipped " + source.toAbsolutePath().toString());
         
     }
     

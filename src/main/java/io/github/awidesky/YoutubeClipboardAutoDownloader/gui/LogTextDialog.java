@@ -16,6 +16,7 @@ import javax.swing.SwingUtilities;
 
 import io.github.awidesky.guiUtil.AbstractLogger;
 import io.github.awidesky.guiUtil.Logger;
+import io.github.awidesky.guiUtil.level.Level;
 
 public class LogTextDialog extends JDialog {
 	
@@ -33,14 +34,14 @@ public class LogTextDialog extends JDialog {
 			
 			@Override
 			public void newLine() {
-				log("\n");
+				info("\n");
 			}
 			
 			@Override
-			public void log(String data) {
-				logger.log(data);
+			protected void writeString(Level level, CharSequence str) {
+				logger.info(str);
 				SwingUtilities.invokeLater(() -> {
-					text.append(data);
+					text.append(str.toString());
 					text.append("\n");
 				});
 			}
