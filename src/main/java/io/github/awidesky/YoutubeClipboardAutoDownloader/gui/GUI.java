@@ -256,7 +256,7 @@ public class GUI {
 		removeSwitch = new JButton("remove selected");
 		nameFormatHelp = new JButton("<= help?");
 		openAppFolder = new JButton("open app folder");
-		modeSwitch = new JButton("Mode : Video");
+		modeSwitch = new JButton("Mode : Audio");
 		openSaveDir = new JButton("open");
 		
 		browse.addActionListener((e) -> {
@@ -284,8 +284,6 @@ public class GUI {
 		openAppFolder.setSize(openAppFolder.getPreferredSize().width, openAppFolder.getPreferredSize().height);
 		modeSwitch.setSize(modeSwitch.getPreferredSize().width, modeSwitch.getPreferredSize().height);
 		openSaveDir.setSize(openSaveDir.getPreferredSize().width, openSaveDir.getPreferredSize().height);
-		
-		modeSwitch.setFont(modeSwitch.getFont().deriveFont(Font.ITALIC));
 		
 		removeSwitch(false);
 		
