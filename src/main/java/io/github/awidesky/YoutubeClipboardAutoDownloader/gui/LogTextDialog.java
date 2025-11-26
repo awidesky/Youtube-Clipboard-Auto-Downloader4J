@@ -2,10 +2,12 @@ package io.github.awidesky.YoutubeClipboardAutoDownloader.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -19,12 +21,14 @@ import io.github.awidesky.guiUtil.Logger;
 import io.github.awidesky.guiUtil.level.Level;
 
 public class LogTextDialog extends JDialog {
+
+	public static final Font MONOSPACED_FONT = getMonospacedFont();
 	
 	private static final long serialVersionUID = 449601573420880012L;
 	private final Logger log;
 	private final JTextArea text = new JTextArea();
 	
-	public LogTextDialog(String[] updateCommands, Logger logger) {
+	public LogTextDialog(String title, Logger logger) {
 		this.log = new AbstractLogger() {
 			
 			@Override
@@ -46,7 +50,8 @@ public class LogTextDialog extends JDialog {
 				});
 			}
 		};
-		
+
+		text.setFont(MONOSPACED_FONT);
 		text.setEditable(false);
 		text.setLineWrap(true);
 		JScrollPane p = new JScrollPane(text, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -55,7 +60,7 @@ public class LogTextDialog extends JDialog {
 		panel.add(p, BorderLayout.CENTER);
 		this.add(panel);
 		add(panel);
-		setTitle(Arrays.stream(updateCommands).collect(Collectors.joining(" ")));
+		setTitle(title);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		pack();
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -64,5 +69,14 @@ public class LogTextDialog extends JDialog {
 
 	public Logger getLogger() {
 		return log;
+	}
+	
+	private static Font getMonospacedFont() {
+		return new Font(Stream.of("Courier New", "Ubuntu Mono", "Consolas")
+				.filter(f ->
+					Arrays.stream(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames())
+					.anyMatch(f::equals))
+				.findFirst().orElse(Font.MONOSPACED),
+				Font.PLAIN, new JTextArea().getFont().getSize());
 	}
 }

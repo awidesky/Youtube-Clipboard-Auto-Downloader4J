@@ -24,8 +24,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
@@ -83,7 +86,7 @@ public class GUI {
 
 	private JMenuBar menuBar;
 	private JMenu fileMenu, ytdlpMenu, ffmpegMenu;
-	private JMenuItem mi_openConfig, mi_showLog, mi_saveFolder, mi_addOption, mi_update, mi_ffprobe;
+	private JMenuItem mi_openConfig, mi_showLog, mi_saveFolder, mi_ytdlp, mi_update, mi_addOption, mi_ffmpeg, mi_ffprobe;
 	
 	private JButton browse, cleanCompleted, removeSwitch, nameFormatHelp, openAppFolder, modeSwitch, openSaveDir;
 	private JLabel format, quality_icon, path, nameFormat, playList;
@@ -234,7 +237,7 @@ public class GUI {
 		mi_showLog.getAccessibleContext().setAccessibleDescription("Show log file");
 		mi_showLog.addActionListener((e) -> {
 			try {
-				LogTextDialog dialog = new LogTextDialog(new String[] {new File(Main.getLogFile()).getName()}, Logger.nullLogger);
+				LogTextDialog dialog = new LogTextDialog(new File(Main.getLogFile()).getName(), Logger.nullLogger);
 				dialog.setVisible(true);
 				Logger l = dialog.getLogger();
 				Files.lines(Paths.get(Main.getLogFile())).forEach(l::info);
@@ -255,10 +258,12 @@ public class GUI {
 		ytdlpMenu = new JMenu("yt-dlp");
 		ytdlpMenu.getAccessibleContext().setAccessibleDescription("yt-dlp menu");
 
-		mi_addOption = new JMenuItem("Add option", KeyEvent.VK_A);
-		mi_addOption.getAccessibleContext().setAccessibleDescription("Add yt-dlp options");
-		mi_addOption.addActionListener((e) -> {
-			//TODO : implement
+		mi_ytdlp = new JMenuItem("Run yt-dlp", KeyEvent.VK_Y);
+		mi_ytdlp.getAccessibleContext().setAccessibleDescription("Run yt-dlp manually");
+		mi_ytdlp.addActionListener((e) -> {
+			showTextAreaInputDialog("Enter yt-dlp options, separated in each lines.",
+					"Run : " + YoutubeClipboardAutoDownloader.getYtdlpPath() + "ffmpeg",
+					"yt-dlp", Main.getLogger("[Run yt-dlp] "));
 		});
 		
 		mi_update = new JMenuItem("Update yt-dlp", KeyEvent.VK_U);
@@ -268,35 +273,52 @@ public class GUI {
 				YoutubeClipboardAutoDownloader.updateYtdlp(YoutubeClipboardAutoDownloader.getYtdlpPath() + "yt-dlp", logger)
 			);
 		});
-		ytdlpMenu.add(mi_addOption);
+		
+		mi_addOption = new JMenuItem("Add option", KeyEvent.VK_A);
+		mi_addOption.getAccessibleContext().setAccessibleDescription("Add yt-dlp options");
+		mi_addOption.addActionListener((e) -> {
+			//TODO : implement
+		});
+		
+		ytdlpMenu.add(mi_ytdlp);
 		ytdlpMenu.add(mi_update);
+		ytdlpMenu.add(mi_addOption);
 		
 		
 		ffmpegMenu = new JMenu("ffmpeg");
 		ffmpegMenu.getAccessibleContext().setAccessibleDescription("ffmpeg menu");
 		
-		mi_ffprobe = new JMenuItem("Run mi_ffprobe", KeyEvent.VK_R);
-		mi_ffprobe.getAccessibleContext().setAccessibleDescription("Run mi_ffprobe with selected file");
+		mi_ffmpeg = new JMenuItem("Run ffmpeg", KeyEvent.VK_F);
+		mi_ffmpeg.getAccessibleContext().setAccessibleDescription("Run ffmpeg with selected file");
+		mi_ffmpeg.addActionListener((e) -> {
+			showTextAreaInputDialog("Enter ffmpeg options, separated in each lines.",
+					"Run : " + YoutubeClipboardAutoDownloader.getYtdlpPath() + "ffmpeg",
+					"ffmpeg", Main.getLogger("[Run ffmpeg] "));
+		});
+		
+		mi_ffprobe = new JMenuItem("Run ffprobe", KeyEvent.VK_P);
+		mi_ffprobe.getAccessibleContext().setAccessibleDescription("Run ffprobe with selected file");
 		mi_ffprobe.addActionListener((e) -> {
 			JFileChooser ffprobeFileChooser = new JFileChooser(Config.getSaveto());
 			ffprobeFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			ffprobeFileChooser.setDialogTitle("Choose file to run mi_ffprobe");
+			ffprobeFileChooser.setDialogTitle("Choose file to run ffprobe");
 			if(ffprobeFileChooser.showOpenDialog(mainFrame) == JFileChooser.APPROVE_OPTION) {
 				File f = ffprobeFileChooser.getSelectedFile();
 				ProcessIOThreadPool.submit(() -> {
-					LogTextDialog dial = new LogTextDialog(new String[] {"mi_ffprobe", f.getName()}, Logger.nullLogger);
+					LogTextDialog dial = new LogTextDialog("ffprobe " +  f.getName(), Logger.nullLogger);
 					dial.setVisible(true);
 					try {
 						ProcessExecutor.runNow(dial.getLogger(), f.getParentFile(), 
-								new File(YoutubeClipboardAutoDownloader.getYtdlpPath(), "mi_ffprobe").getAbsolutePath(),
+								new File(YoutubeClipboardAutoDownloader.getYtdlpPath(), "ffprobe").getAbsolutePath(),
 								"-hide_banner", f.getAbsolutePath());
 					} catch (IOException | InterruptedException | ExecutionException ex) {
-						logger.error("Failed to get mi_ffprobe result of " + f.getAbsolutePath());
-						logger.error(ex);
+						SwingDialogs.error("Failed to get ffprobe result of " + f.getAbsolutePath(),
+								"%e%", ex, true);
 					}
 				});
 			}
 		});
+		ffmpegMenu.add(mi_ffmpeg);
 		ffmpegMenu.add(mi_ffprobe);
 
 		menuBar.add(fileMenu);
@@ -306,6 +328,7 @@ public class GUI {
 		mainFrame.setJMenuBar(menuBar);
 	}
 	
+
 	private void setFileChooser() {
 		jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		jfc.setDialogTitle("Choose directory to save music!");
@@ -613,6 +636,7 @@ public class GUI {
 		return root;
 	}
 	
+
 	private void removeSwitch(boolean selectedMode) {
 		if(selectedMode) {
 			removeSwitch.setText("remove selected");
@@ -650,6 +674,39 @@ public class GUI {
 		initProgress = null;
 	}
 	
+	private void showTextAreaInputDialog(String message, String title, String executable, Logger l) {
+		JTextArea textArea = new JTextArea(10, 30);
+	    textArea.setLineWrap(false);
+	    JScrollPane scrollPane = new JScrollPane(textArea);
+	    scrollPane.setPreferredSize(new Dimension(400, 200));
+	
+		if (JOptionPane.showConfirmDialog(null, new Object[] { message, scrollPane },
+				title, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) {
+			
+			final String str = textArea.getText();
+			ProcessIOThreadPool.submit(() -> {
+				List<String> cmd = new LinkedList<>();
+				cmd.add(new File(YoutubeClipboardAutoDownloader.getYtdlpPath(), executable).getAbsolutePath());
+				cmd.addAll(str.lines().toList());
+				String cmdstr = cmd.stream().collect(Collectors.joining(" "));
+				l.info("Running independent command :");
+				l.info("    \"" + cmdstr + "\""); l.info();
+				LogTextDialog dial = new LogTextDialog(cmdstr, l);
+				dial.setVisible(true);
+				dial.getLogger().info("[COMMAND] " + cmdstr + "\n");
+				try {
+					ProcessExecutor.runNow(dial.getLogger(), new File(YoutubeClipboardAutoDownloader.getYtdlpPath()), 
+							cmd.toArray(String[]::new));
+				} catch (IOException | InterruptedException | ExecutionException ex) {
+					SwingDialogs.error("Failed to run " + cmdstr, "%e%", ex, true);
+				}
+				l.info("Independent command execution finished"); l.info();
+			});
+			
+		}
+	}
+
+
 	public void setLoadingStat(LoadingStatus stat) {
 		loadingStatus.setText(stat.getStatus());
 		initProgress.setValue(stat.getProgress());

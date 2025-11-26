@@ -117,7 +117,7 @@ public class ResourceInstaller {
 		} else if(isMac()) {
 			String[] cmd = {"/bin/zsh", "-c", "brew install ffmpeg"};
 			setLoadingFrameContent("Installing ffmpeg via \"brew install ffmpeg\"... (Progress bar will stay in 0)", -1);
-			LogTextDialog upDiag = new LogTextDialog(cmd, log);
+			LogTextDialog upDiag = new LogTextDialog(Arrays.stream(cmd).collect(Collectors.joining(" ")), log);
 			upDiag.setVisible(true);
 			ProcessExecutor.runNow(upDiag.getLogger(), null, cmd);
 			upDiag.dispose();
@@ -191,7 +191,7 @@ public class ResourceInstaller {
 		if(isMac()) {
 			String[] cmd = {"/bin/bash", "-c", "/opt/homebrew/bin/brew install yt-dlp deno"};
 			setLoadingFrameContent("Installing yt-dlp via \"" + cmd[2] + "\"... (Progress bar will stay in 0)", -1);
-			LogTextDialog upDiag = new LogTextDialog(cmd, log);
+			LogTextDialog upDiag = new LogTextDialog(Arrays.stream(cmd).collect(Collectors.joining(" ")), log);
 			upDiag.setVisible(true);
 			ProcessExecutor.runNow(upDiag.getLogger(), null, cmd);
 			upDiag.dispose();

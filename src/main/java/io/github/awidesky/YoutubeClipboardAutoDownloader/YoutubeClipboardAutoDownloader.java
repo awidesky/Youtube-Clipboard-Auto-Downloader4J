@@ -216,7 +216,8 @@ public class YoutubeClipboardAutoDownloader {
 
 	private static void updateExecutable(Logger log, String[] updateCommands, String name) {
 		log.info(name + " update process start...");
-		LogTextDialog upDiag = new LogTextDialog(updateCommands, Main.getLogger("[" + name + " update] "));
+		LogTextDialog upDiag = new LogTextDialog(Arrays.stream(updateCommands).collect(Collectors.joining(" ")),
+				Main.getLogger("[" + name + " update] "));
 		log.info("Update " + name + " with : " + Arrays.stream(updateCommands).collect(Collectors.joining(" ")));
 		upDiag.setVisible(true);
 		try {
