@@ -72,7 +72,7 @@ public class LogTextDialog extends JDialog {
 	}
 	
 	private static Font getMonospacedFont() {
-		return new Font(Stream.of("Courier New", "Ubuntu Mono", "Consolas")
+		return new Font(Stream.of("SF Mono", "Cascadia Code", "Consolas", "Ubuntu Mono", "Courier New")
 				.filter(f ->
 					Arrays.stream(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames())
 					.anyMatch(f::equals))

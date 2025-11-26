@@ -228,7 +228,7 @@ public class GUI {
 		mi_openConfig.addActionListener((e) -> {
 			try {
 				Desktop.getDesktop().open(new File(YoutubeClipboardAutoDownloader.getAppdataPath(), "config.txt"));
-			} catch (IOException ex) {
+			} catch (Exception ex) {
 				SwingDialogs.warning("Cannot open directory explorer!",
 						"Please open manually " +YoutubeClipboardAutoDownloader.getAppdataPath() + "\n%e%", ex, true);
 			}

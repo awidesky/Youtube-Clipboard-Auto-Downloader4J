@@ -65,7 +65,7 @@ public class Main {
 	private static volatile int taskNum = 0;
 	private static String[] ytdlpAdditionalOptions = new String[0];
 	
-	public static final String version = "v2.1.3";
+	public static final String version = "v2.2.0";
 
 	public static void main(String[] args) {
 		
