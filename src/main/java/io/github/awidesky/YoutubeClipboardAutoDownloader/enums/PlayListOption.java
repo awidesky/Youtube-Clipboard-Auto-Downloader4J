@@ -6,7 +6,7 @@ public enum PlayListOption {
 
 	YES("yes", "--yes-playlist"),
 	NO("no", "--no-playlist"),
-	ASK("ask", null);
+	ASK("ask", "");
 	
 	private String comboBoxForm;
 	private String commandArgForm;

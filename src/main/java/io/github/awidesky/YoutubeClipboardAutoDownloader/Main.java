@@ -248,8 +248,11 @@ public class Main {
 
 				PlayListOption p = Config.getPlaylistOption();
 
-				if (p == PlayListOption.ASK && t.getUrl().contains("list=")) {
-					p = (SwingDialogs.confirm("Download entire Playlist?", "PlayList Link : " + url)) ? PlayListOption.YES : PlayListOption.NO;
+				if (p == PlayListOption.ASK) {
+					if(t.getUrl().contains("youtu") && !t.getUrl().contains("list="))
+						p = PlayListOption.NO;
+					else
+						p = (SwingDialogs.confirm("Download entire Playlist?", "PlayList Link : " + url)) ? PlayListOption.YES : PlayListOption.NO;
 				}
 
 				if (YoutubeClipboardAutoDownloader.validateAndSetName(url, t, p)) {
