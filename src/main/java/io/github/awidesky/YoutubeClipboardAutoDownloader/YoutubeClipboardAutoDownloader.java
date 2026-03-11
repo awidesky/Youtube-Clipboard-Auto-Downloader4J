@@ -366,10 +366,11 @@ public class YoutubeClipboardAutoDownloader {
 			arguments.add("-f");
 			arguments.add(getVideoFormat());
 		}
-		arguments.add(url);
 		
-		if(additianalOptions.length != 0) arguments.addAll(arguments.size() - 1, Arrays.asList(additianalOptions));
+		if(additianalOptions != null && additianalOptions.length != 0)
+			Arrays.stream(additianalOptions).filter(s -> !s.isBlank()).forEach(arguments::add);
 
+		arguments.add(url);
 		
 		// retrieve command line argument
 		task.logger.info("[downloading] Video download command : \"" + arguments.stream().collect(Collectors.joining(" ")) + "\"");
@@ -460,7 +461,8 @@ public class YoutubeClipboardAutoDownloader {
 				}
 
 			});
-		} catch (IOException e1) {
+		} catch (Exception e1) {
+			e1.printStackTrace();
 			task.failed();
 			SwingDialogs.error("Error [" + task.getVideoName() + "]", "[Task" + task.getTaskNum() + "|downloading] Couldn't start yt-dlp : " + e1.getClass().getName() + "\n%e%" , e1, true);
 			return;

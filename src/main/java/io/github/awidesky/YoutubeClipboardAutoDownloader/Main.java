@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
@@ -63,7 +64,7 @@ public class Main {
 	private static Function<String, TaskLogger> taskLogGetter;
 	
 	private static volatile int taskNum = 0;
-	private static String[] ytdlpAdditionalOptions = new String[0];
+	private static AtomicReference<String[]> ytdlpAdditionalOptions = new AtomicReference<>(new String[0]);
 	
 	public static final String version = "v2.2.0";
 
@@ -113,7 +114,7 @@ public class Main {
 			} else if ("--logOnConsole".equals(arg)) {
 				logOnConsole = true;
 			} else if (arg.startsWith("--ytdlpArgs")) {
-				ytdlpAdditionalOptions = arg.substring(arg.indexOf("=") + 1).split(" ");
+				ytdlpAdditionalOptions.set(arg.substring(arg.indexOf("=") + 1).split(" "));
 			} else {
 				System.err.println("Invaild option : \"" + arg + "\"");
 				System.err.println("If you want to find usage, use --help");
@@ -266,7 +267,7 @@ public class Main {
 						SwingDialogs.error("Download Path is invalid!", "Invalid path : " + save, null, false);
 						return;
 					}
-					YoutubeClipboardAutoDownloader.download(url, t, p, ytdlpAdditionalOptions);
+					YoutubeClipboardAutoDownloader.download(url, t, p, ytdlpAdditionalOptions.get());
 				} else {
 					t.failed();
 					return;
@@ -308,6 +309,15 @@ public class Main {
 	}
 	
 	
+	public static String[] getYtdlpAdditionalOptions() {
+		return ytdlpAdditionalOptions.get();
+	}
+
+	public static void setYtdlpAdditionalOptions(String[] ytdlpAdditionalOptions) {
+		Main.ytdlpAdditionalOptions.set(ytdlpAdditionalOptions);
+	}
+
+
 	private static final File configFile = new File(YoutubeClipboardAutoDownloader.getAppdataPath(), "config.txt");
 	/**
 	 * note - this method should be Exception-proof.

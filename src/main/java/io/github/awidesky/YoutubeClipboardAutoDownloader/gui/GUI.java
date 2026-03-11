@@ -261,7 +261,7 @@ public class GUI {
 		mi_ytdlp = new JMenuItem("Run yt-dlp", KeyEvent.VK_Y);
 		mi_ytdlp.getAccessibleContext().setAccessibleDescription("Run yt-dlp manually");
 		mi_ytdlp.addActionListener((e) -> {
-			showTextAreaInputDialog("Enter yt-dlp options, separated in each lines.",
+			runExeWithDialogInput("Enter yt-dlp options, separated in each lines.",
 					"Run : " + YoutubeClipboardAutoDownloader.getYtdlpPath() + "ffmpeg",
 					"yt-dlp", Main.getLogger("[Run yt-dlp] "));
 		});
@@ -277,7 +277,15 @@ public class GUI {
 		mi_addOption = new JMenuItem("Add option", KeyEvent.VK_A);
 		mi_addOption.getAccessibleContext().setAccessibleDescription("Add yt-dlp options");
 		mi_addOption.addActionListener((e) -> {
-			//TODO : implement
+			String additionalArgs = Arrays.stream(Main.getYtdlpAdditionalOptions()).collect(Collectors.joining("\n"));
+			additionalArgs = showTextAreaInputDialog("Enter additional yt-dlp options, separated in each lines.",
+					"Add additional yt-dlp options", additionalArgs);
+			if(additionalArgs != null) {
+				if(additionalArgs.isBlank())
+					Main.setYtdlpAdditionalOptions(new String[0]);
+				else 
+					Main.setYtdlpAdditionalOptions(additionalArgs.split("\\R"));
+			}
 		});
 		
 		ytdlpMenu.add(mi_ytdlp);
@@ -291,7 +299,7 @@ public class GUI {
 		mi_ffmpeg = new JMenuItem("Run ffmpeg", KeyEvent.VK_F);
 		mi_ffmpeg.getAccessibleContext().setAccessibleDescription("Run ffmpeg with selected file");
 		mi_ffmpeg.addActionListener((e) -> {
-			showTextAreaInputDialog("Enter ffmpeg options, separated in each lines.",
+			runExeWithDialogInput("Enter ffmpeg options, separated in each lines.",
 					"Run : " + YoutubeClipboardAutoDownloader.getYtdlpPath() + "ffmpeg",
 					"ffmpeg", Main.getLogger("[Run ffmpeg] "));
 		});
@@ -674,36 +682,47 @@ public class GUI {
 		initProgress = null;
 	}
 	
-	private void showTextAreaInputDialog(String message, String title, String executable, Logger l) {
+	private String showTextAreaInputDialog(String message, String title) {
+		return showTextAreaInputDialog(message, title, null);
+	}
+	private String showTextAreaInputDialog(String message, String title, String text) {
 		JTextArea textArea = new JTextArea(10, 30);
 	    textArea.setLineWrap(false);
+	    textArea.setText(text);
 	    JScrollPane scrollPane = new JScrollPane(textArea);
 	    scrollPane.setPreferredSize(new Dimension(400, 200));
 	
 		if (JOptionPane.showConfirmDialog(null, new Object[] { message, scrollPane },
 				title, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) {
 			
-			final String str = textArea.getText();
-			ProcessIOThreadPool.submit(() -> {
-				List<String> cmd = new LinkedList<>();
-				cmd.add(new File(YoutubeClipboardAutoDownloader.getYtdlpPath(), executable).getAbsolutePath());
-				cmd.addAll(str.lines().toList());
-				String cmdstr = cmd.stream().collect(Collectors.joining(" "));
-				l.info("Running independent command :");
-				l.info("    \"" + cmdstr + "\""); l.info();
-				LogTextDialog dial = new LogTextDialog(cmdstr, l);
-				dial.setVisible(true);
-				dial.getLogger().info("[COMMAND] " + cmdstr + "\n");
-				try {
-					ProcessExecutor.runNow(dial.getLogger(), new File(YoutubeClipboardAutoDownloader.getYtdlpPath()), 
-							cmd.toArray(String[]::new));
-				} catch (IOException | InterruptedException | ExecutionException ex) {
-					SwingDialogs.error("Failed to run " + cmdstr, "%e%", ex, true);
-				}
-				l.info("Independent command execution finished"); l.info();
-			});
-			
+			return textArea.getText();
 		}
+		return null;
+	}
+		
+	private void runExeWithDialogInput(String message, String title, String executable, Logger l) {
+		final String str = showTextAreaInputDialog(message, title);
+		if(str == null) return;
+		
+		ProcessIOThreadPool.submit(() -> {
+			List<String> cmd = new LinkedList<>();
+			cmd.add(new File(YoutubeClipboardAutoDownloader.getYtdlpPath(), executable).getAbsolutePath());
+			cmd.addAll(str.lines().toList());
+			String cmdstr = cmd.stream().collect(Collectors.joining(" "));
+			l.info("Running independent command :");
+			l.info("    \"" + cmdstr + "\""); l.info();
+			LogTextDialog dial = new LogTextDialog(cmdstr, l);
+			dial.setVisible(true);
+			dial.getLogger().info("[COMMAND] " + cmdstr + "\n");
+			try {
+				ProcessExecutor.runNow(dial.getLogger(), new File(YoutubeClipboardAutoDownloader.getYtdlpPath()), 
+						cmd.toArray(String[]::new));
+			} catch (IOException | InterruptedException | ExecutionException ex) {
+				SwingDialogs.error("Failed to run " + cmdstr, "%e%", ex, true);
+			}
+			l.info("Independent command execution finished"); l.info();
+		});
+
 	}
 
 
