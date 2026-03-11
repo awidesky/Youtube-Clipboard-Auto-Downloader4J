@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -89,7 +90,7 @@ public class GUI {
 	private JMenuItem mi_openConfig, mi_showLog, mi_saveFolder, mi_ytdlp, mi_update, mi_addOption, mi_ffmpeg, mi_ffprobe;
 	
 	private JButton browse, cleanCompleted, removeSwitch, nameFormatHelp, openAppFolder, modeSwitch, openSaveDir;
-	private JLabel format, quality_icon, path, nameFormat, playList;
+	private JLabel format, mode_icon, path, nameFormat, playList;
 	private JTextField manualFormatField, pathField, nameFormatField;
 	private JComboBox<String> cb_format, cb_quality, cb_playList, cb_clipboardOption;
 	private JCheckBox chb_editFormat;
@@ -345,15 +346,17 @@ public class GUI {
 	
 	private void setLabels() {
 		format = new JLabel("Format :");
-		quality_icon = new JLabel("\uD83C\uDFB5\u0020");
-		if(OSUtil.isWindows()) quality_icon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, new JLabel().getFont().getSize()));
-		else if(OSUtil.isMac()) quality_icon.setFont(new Font("Apple Color Emoji", Font.PLAIN, new JLabel().getFont().getSize()));
-		else if(OSUtil.isLinux()) quality_icon.setFont(new Font("Noto Color Emoji", Font.PLAIN, new JLabel().getFont().getSize()));
-		if("Dialog".equals(quality_icon.getFont().getFontName()) || quality_icon.getFont().canDisplayUpTo("\uD83C\uDF9E\uD83C\uDFB5") != -1) {
+		mode_icon = new JLabel("\uD83C\uDFB5");
+		int iconSize = new JLabel().getFont().getSize() + 10;
+		if(OSUtil.isWindows()) mode_icon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, iconSize));
+		else if(OSUtil.isMac()) mode_icon.setFont(new Font("Apple Color Emoji", Font.PLAIN, iconSize));
+		else if(OSUtil.isLinux()) mode_icon.setFont(new Font("Noto Color Emoji", Font.PLAIN, iconSize));
+		if("Dialog".equals(mode_icon.getFont().getFontName()) || mode_icon.getFont().canDisplayUpTo("\uD83C\uDF9E\uD83C\uDFB5") != -1) {
 			Arrays.stream(GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts())
-				.filter(f -> f.canDisplayUpTo("\uD83C\uDF9E\uD83C\uDFB5") == -1).findFirst()
-				.ifPresent(quality_icon::setFont);
+				.filter(f -> f.canDisplayUpTo("\uD83C\uDF9E\uD83C\uDFB5") == -1).map(f -> f.deriveFont((float)iconSize))
+				.findFirst().ifPresent(mode_icon::setFont);
 		}
+		mode_icon.setBorder(BorderFactory.createLoweredSoftBevelBorder());
 		path = new JLabel("Save to :");
 		nameFormat = new JLabel("Output : ");
 		playList = new JLabel("Playlist : ");
@@ -434,13 +437,13 @@ public class GUI {
 			Main.audioMode.set(false);
 			cb_format.setModel(videoFormatCBoxModel);
 			cb_quality.setModel(videoQualityCBoxModel);
-			quality_icon.setText("\uD83C\uDF9E\u0020");
+			mode_icon.setText("\uD83C\uDF9E");
 			modeSwitch.setText("Mode : Video");
 		} else {
 			Main.audioMode.set(true);
 			cb_format.setModel(audioFormatCBoxModel);
 			cb_quality.setModel(audioQualityCBoxModel);
-			quality_icon.setText("\uD83C\uDFB5\u0020");
+			mode_icon.setText("\uD83C\uDFB5");
 			modeSwitch.setText("Mode : Audio");
 		}
 
@@ -561,7 +564,8 @@ public class GUI {
 		JPanel root = new JPanel(new BorderLayout());
 		JPanel formats = new JPanel();
 		formats.add(Box.createHorizontalStrut(5));
-		formats.add(quality_icon);
+		formats.add(mode_icon);
+		formats.add(Box.createHorizontalStrut(2));
 		formats.add(format);
 		formats.add(cb_format);
 		formats.add(cb_quality);
